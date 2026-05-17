@@ -99,39 +99,48 @@ object DeviceUtils {
         val voltage = intent?.getIntExtra(BatteryManager.EXTRA_VOLTAGE, 0) ?: 0
         val tech = intent?.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY) ?: "Unknown"
 
-        // Live current & capacity via BatteryManager
         val bm = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
-        val currentNow = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW)  // µA
-        val chargeCounter = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER) // µAh
-        val capacity = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY) // %
-        val energyCounter = bm.getLongProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER) // nWh
+        val currentNow = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW)
+        val chargeCounter = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER)
 
-        val currentMa = if (currentNow != Int.MIN_VALUE) "${Math.abs(currentNow / 1000)} mA ${if (currentNow > 0) "↑ Charging" else "↓ Draining"}" else "Unknown"
-        val chargeMah = if (chargeCounter > 0) "${chargeCounter / 1000} mAh remaining" else "Unknown"
-        val energyStr = if (energyCounter > 0) "${energyCounter / 1_000_000} mWh" else "Unknown"
+        // No underscore literals inside string templates — compute first, then format
+        val currentMa: String = if (currentNow != Int.MIN_VALUE) {
+            val ma = Math.abs(currentNow / 1000)
+            val dir = if (currentNow > 0) "Charging" else "Draining"
+            "$ma mA ($dir)"
+        } else {
+            "Unknown"
+        }
+
+        val chargeMah: String = if (chargeCounter > 0) {
+            val mah = chargeCounter / 1000
+            "$mah mAh remaining"
+        } else {
+            "Unknown"
+        }
 
         return linkedMapOf(
-            "Health"          to health,
-            "Level"           to "$pct %",
-            "Power Source"    to plugged,
-            "Status"          to status,
-            "Technology"      to tech,
-            "Temperature"     to "$temp °C",
-            "Voltage"         to "$voltage mV",
-            "Current Now"     to currentMa,
-            "Charge Remaining"to chargeMah,
-            "Energy Counter"  to energyStr
+            "Health"           to health,
+            "Level"            to "$pct %",
+            "Power Source"     to plugged,
+            "Status"           to status,
+            "Technology"       to tech,
+            "Temperature"      to "$temp °C",
+            "Voltage"          to "$voltage mV",
+            "Current Now"      to currentMa,
+            "Charge Remaining" to chargeMah
         )
     }
 
-    // GPU info — dynamically from EGL (no hardcoding)
     fun getGpuInfo(): Map<String, String> {
         return try {
             val display = EGL14.eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY)
-            val major = IntArray(1); val minor = IntArray(1)
+            val major = IntArray(1)
+            val minor = IntArray(1)
             EGL14.eglInitialize(display, major, 0, minor, 0)
             val attribs = intArrayOf(EGL14.EGL_RENDERABLE_TYPE, EGL14.EGL_OPENGL_ES2_BIT, EGL14.EGL_NONE)
-            val configs = arrayOfNulls<EGLConfig>(1); val numConfigs = IntArray(1)
+            val configs = arrayOfNulls<EGLConfig>(1)
+            val numConfigs = IntArray(1)
             EGL14.eglChooseConfig(display, attribs, 0, configs, 0, 1, numConfigs, 0)
             val ctxAttribs = intArrayOf(EGL14.EGL_CONTEXT_CLIENT_VERSION, 2, EGL14.EGL_NONE)
             val ctx = EGL14.eglCreateContext(display, configs[0]!!, EGL14.EGL_NO_CONTEXT, ctxAttribs, 0)
@@ -167,19 +176,25 @@ object DeviceUtils {
             else -> "Unknown"
         }
         info["Connection Type"] = type
-        info["Internet Access"] = if (caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
-            caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)) "Yes" else "No"
-        info["Download Speed"] = "${caps.linkDownstreamBandwidthKbps / 1000} Mbps (est.)"
-        info["Upload Speed"]   = "${caps.linkUpstreamBandwidthKbps / 1000} Mbps (est.)"
+        val hasInternet = caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+            caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+        info["Internet Access"] = if (hasInternet) "Yes" else "No"
+
+        val dlMbps = caps.linkDownstreamBandwidthKbps / 1000
+        val ulMbps = caps.linkUpstreamBandwidthKbps / 1000
+        info["Download Speed"] = "$dlMbps Mbps (est.)"
+        info["Upload Speed"]   = "$ulMbps Mbps (est.)"
 
         if (caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
             val wm = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
             val wifiInfo = wm.connectionInfo
-            info["WiFi SSID"]        = if (wifiInfo.ssid.isNullOrBlank() || wifiInfo.ssid == "<unknown ssid>") "Hidden/Unknown" else wifiInfo.ssid.removeSurrounding("\"")
-            info["WiFi Frequency"]   = "${wifiInfo.frequency} MHz (${if (wifiInfo.frequency > 4000) "5 GHz" else "2.4 GHz"})"
-            info["WiFi Link Speed"]  = "${wifiInfo.linkSpeed} Mbps"
-            info["WiFi Signal"]      = "${WifiManager.calculateSignalLevel(wifiInfo.rssi, 5)}/5 bars (${wifiInfo.rssi} dBm)"
-            info["IP Address"]       = intToIp(wifiInfo.ipAddress)
+            val ssid = wifiInfo.ssid
+            info["WiFi SSID"]       = if (ssid.isNullOrBlank() || ssid == "<unknown ssid>") "Hidden/Unknown" else ssid.removeSurrounding("\"")
+            info["WiFi Frequency"]  = "${wifiInfo.frequency} MHz (${if (wifiInfo.frequency > 4000) "5 GHz" else "2.4 GHz"})"
+            info["WiFi Link Speed"] = "${wifiInfo.linkSpeed} Mbps"
+            val bars = WifiManager.calculateSignalLevel(wifiInfo.rssi, 5)
+            info["WiFi Signal"]     = "$bars/5 bars (${wifiInfo.rssi} dBm)"
+            info["IP Address"]      = intToIp(wifiInfo.ipAddress)
         }
 
         if (caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
@@ -188,7 +203,6 @@ object DeviceUtils {
         return info
     }
 
-    private fun intToIp(i: Int): String {
-        return "${i and 0xFF}.${i shr 8 and 0xFF}.${i shr 16 and 0xFF}.${i shr 24 and 0xFF}"
-    }
+    private fun intToIp(i: Int): String =
+        "${i and 0xFF}.${i shr 8 and 0xFF}.${i shr 16 and 0xFF}.${i shr 24 and 0xFF}"
 }
