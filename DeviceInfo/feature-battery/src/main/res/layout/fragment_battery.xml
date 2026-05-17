@@ -7,30 +7,39 @@
     android:background="?attr/colorSurface"
     android:paddingTop="4dp">
 
-    <!-- Battery chart -->
-    <com.example.deviceinfo.feature.battery.BatteryChartView
-        android:id="@+id/batteryChart"
+    <!-- Doughnut + Line chart side by side in a horizontal row -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="110dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
-        android:layout_marginTop="8dp"
-        android:background="@android:color/transparent"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"/>
+        android:layout_height="120dp"
+        android:orientation="horizontal"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="8dp">
 
-    <!-- RAM chart -->
+        <!-- Battery Doughnut (left, compact) -->
+        <com.example.deviceinfo.feature.battery.BatteryDoughnutView
+            android:id="@+id/batteryDoughnut"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+
+        <!-- Battery % Line chart (right) -->
+        <com.example.deviceinfo.feature.battery.BatteryChartView
+            android:id="@+id/batteryChart"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"/>
+
+    </LinearLayout>
+
+    <!-- RAM line chart -->
     <com.example.deviceinfo.feature.battery.RamChartView
         android:id="@+id/ramChart"
         android:layout_width="match_parent"
         android:layout_height="90dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
-        android:background="@android:color/transparent"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"/>
+        android:layout_marginHorizontal="12dp"
+        android:background="@android:color/transparent"/>
 
-    <!-- Export button row -->
+    <!-- Export button -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -62,7 +71,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@android:color/transparent"
         android:clipToPadding="false"
         android:paddingBottom="8dp"/>
 

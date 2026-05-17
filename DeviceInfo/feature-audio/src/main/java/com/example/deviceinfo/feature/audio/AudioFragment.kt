@@ -33,6 +33,9 @@ class AudioFragment : Fragment(), ShareableFragment {
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         b.recyclerView.adapter = adapter
 
+        // Volume bar chart — 4 streams, no permission needed
+        updateVolumeChart()
+
         b.searchBar.etSearch.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) { adapter?.filter(s?.toString() ?: "") }
             override fun beforeTextChanged(s: CharSequence?, st: Int, cnt: Int, aft: Int) {}
@@ -40,55 +43,71 @@ class AudioFragment : Fragment(), ShareableFragment {
         })
     }
 
+    private fun updateVolumeChart() {
+        if (_b == null) return
+        val am = requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val streams = listOf(
+            Triple(AudioManager.STREAM_MUSIC,        "Media",  0xFF1E88E5.toInt()),
+            Triple(AudioManager.STREAM_RING,         "Ring",   0xFF43A047.toInt()),
+            Triple(AudioManager.STREAM_ALARM,        "Alarm",  0xFFE53935.toInt()),
+            Triple(AudioManager.STREAM_NOTIFICATION, "Notif",  0xFF8E24AA.toInt())
+        )
+        val data = streams.map { (stream, label, color) ->
+            VolumeBarChartView.VolumeStream(
+                label   = label,
+                current = am.getStreamVolume(stream),
+                max     = am.getStreamMaxVolume(stream),
+                color   = color
+            )
+        }
+        b.volumeBarChart.update(data)
+    }
+
     private fun buildAudioInfo(): List<InfoItem> {
         val items = mutableListOf<InfoItem>()
         val am = requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
-        // ── Output ──────────────────────────────────────────────
         items.add(InfoItem("── Output ──", "", true))
-
-        val isSpeakerOn = am.isSpeakerphoneOn
-        items.add(InfoItem("Speakerphone", if (isSpeakerOn) "On" else "Off"))
-
-        val isWiredHeadset = am.isWiredHeadsetOn
-        items.add(InfoItem("Wired Headset", if (isWiredHeadset) "Connected" else "Not Connected"))
-
+        items.add(InfoItem("Speakerphone", if (am.isSpeakerphoneOn) "On" else "Off"))
+        items.add(InfoItem("Wired Headset", if (am.isWiredHeadsetOn) "Connected" else "Not Connected"))
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            items.add(InfoItem("Fixed Volume",  if (am.isVolumeFixed) "Yes" else "No"))
+            items.add(InfoItem("Fixed Volume", if (am.isVolumeFixed) "Yes" else "No"))
         }
 
-        // Volume levels (no permission needed — just reading state)
-        val streams = listOf(
-            AudioManager.STREAM_MUSIC   to "Media Volume",
-            AudioManager.STREAM_RING    to "Ring Volume",
-            AudioManager.STREAM_ALARM   to "Alarm Volume",
+        val streamDefs = listOf(
+            AudioManager.STREAM_MUSIC        to "Media Volume",
+            AudioManager.STREAM_RING         to "Ring Volume",
+            AudioManager.STREAM_ALARM        to "Alarm Volume",
             AudioManager.STREAM_NOTIFICATION to "Notification Volume"
         )
-        streams.forEach { (stream, label) ->
+        streamDefs.forEach { (stream, label) ->
             val cur = am.getStreamVolume(stream)
             val max = am.getStreamMaxVolume(stream)
             items.add(InfoItem(label, "$cur / $max"))
         }
 
-        // ── Bluetooth Audio ──────────────────────────────────────
         items.add(InfoItem("── Bluetooth Audio ──", "", true))
         val btManager = requireContext().getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
         val btAdapter = btManager?.adapter
         if (btAdapter != null) {
-            items.add(InfoItem("Bluetooth",     if (btAdapter.isEnabled) "Enabled" else "Disabled"))
-            items.add(InfoItem("BLE Support",   if (requireContext().packageManager.hasSystemFeature("android.hardware.bluetooth_le")) "Yes" else "No"))
+            items.add(InfoItem("Bluetooth",
+                if (btAdapter.isEnabled) "Enabled" else "Disabled"))
+            items.add(InfoItem("BLE Support",
+                if (requireContext().packageManager.hasSystemFeature("android.hardware.bluetooth_le")) "Yes" else "No"))
         } else {
             items.add(InfoItem("Bluetooth", "Not available"))
         }
         items.add(InfoItem("Bluetooth SCO", if (am.isBluetoothScoOn) "Active" else "Inactive"))
         items.add(InfoItem("BT A2DP",       if (am.isBluetoothA2dpOn) "Connected" else "Not Connected"))
 
-        // ── Codec / Format Support ──────────────────────────────
         items.add(InfoItem("── Audio Formats ──", "", true))
-
-        // Check supported audio encodings
         val encodings = mutableListOf<String>()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val linearPcmEncodings = setOf(
+                AudioFormat.ENCODING_PCM_16BIT,
+                AudioFormat.ENCODING_PCM_8BIT,
+                AudioFormat.ENCODING_PCM_FLOAT
+            )
             val encodingMap = mapOf(
                 AudioFormat.ENCODING_PCM_16BIT  to "PCM 16-bit",
                 AudioFormat.ENCODING_PCM_8BIT   to "PCM 8-bit",
@@ -100,24 +119,17 @@ class AudioFragment : Fragment(), ShareableFragment {
                 AudioFormat.ENCODING_MP3        to "MP3",
                 AudioFormat.ENCODING_AAC_LC     to "AAC-LC",
                 AudioFormat.ENCODING_AAC_HE_V1  to "AAC-HE v1",
-                AudioFormat.ENCODING_AAC_HE_V2  to "AAC-HE v2",
-            )
-            val linearPcmEncodings = setOf(
-                AudioFormat.ENCODING_PCM_16BIT,
-                AudioFormat.ENCODING_PCM_8BIT,
-                AudioFormat.ENCODING_PCM_FLOAT
+                AudioFormat.ENCODING_AAC_HE_V2  to "AAC-HE v2"
             )
             encodingMap.forEach { (encoding, name) ->
                 if (encoding in linearPcmEncodings ||
-                    try { AudioFormat.Builder().setEncoding(encoding); true } catch (e: Exception) { false }) {
+                    try { AudioFormat.Builder().setEncoding(encoding); true } catch (e: Exception) { false })
                     encodings.add(name)
-                }
             }
         }
         items.add(InfoItem("Supported Encodings",
             if (encodings.isNotEmpty()) encodings.joinToString(", ") else "PCM 16-bit, AAC"))
 
-        // ── Microphone ─────────────────────────────────────────
         items.add(InfoItem("── Microphone ──", "", true))
         val hasMic = requireContext().packageManager.hasSystemFeature("android.hardware.microphone")
         items.add(InfoItem("Microphone", if (hasMic) "Available" else "Not Available"))
@@ -127,37 +139,28 @@ class AudioFragment : Fragment(), ShareableFragment {
             mics.forEachIndexed { i, mic ->
                 items.add(InfoItem("Mic $i Location",
                     when (mic.location) {
-                        android.media.MicrophoneInfo.LOCATION_MAINBODY          -> "Main Body"
-                        android.media.MicrophoneInfo.LOCATION_MAINBODY_MOVABLE  -> "Movable"
-                        android.media.MicrophoneInfo.LOCATION_PERIPHERAL        -> "Peripheral"
+                        android.media.MicrophoneInfo.LOCATION_MAINBODY         -> "Main Body"
+                        android.media.MicrophoneInfo.LOCATION_MAINBODY_MOVABLE -> "Movable"
+                        android.media.MicrophoneInfo.LOCATION_PERIPHERAL       -> "Peripheral"
                         else -> "Unknown"
-                    }
-                ))
+                    }))
             }
         }
 
-        // ── Low-Latency ──────────────────────────────────────────
         items.add(InfoItem("── Performance ──", "", true))
         val hasLowLatency = requireContext().packageManager.hasSystemFeature("android.hardware.audio.low_latency")
         val hasPro        = requireContext().packageManager.hasSystemFeature("android.hardware.audio.pro")
-        items.add(InfoItem("Low Latency Audio", if (hasLowLatency) "Supported" else "Not Supported"))
+        items.add(InfoItem("Low-Latency Audio", if (hasLowLatency) "Supported" else "Not Supported"))
         items.add(InfoItem("Pro Audio",         if (hasPro) "Supported" else "Not Supported"))
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val sampleRate   = am.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE) ?: "Unknown"
-            val framesPerBuf = am.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER) ?: "Unknown"
-            items.add(InfoItem("Output Sample Rate",    "$sampleRate Hz"))
-            items.add(InfoItem("Frames Per Buffer",     framesPerBuf))
-        }
 
         return items
     }
 
     override fun getShareText(): String {
         val sb = StringBuilder()
-        sb.appendLine("🔊 Audio Info")
+        sb.appendLine("\uD83D\uDD0A Audio Info")
         sb.appendLine("─────────────────")
-        latestItems.filter { it.label.isNotEmpty() }.forEach { sb.appendLine("${it.label}: ${it.value}") }
+        latestItems.forEach { sb.appendLine("${it.label}: ${it.value}") }
         sb.appendLine("\nShared from CPU-A Device Info app")
         return sb.toString()
     }

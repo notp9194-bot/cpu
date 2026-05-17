@@ -6,6 +6,15 @@
     android:background="?attr/colorSurface"
     android:paddingTop="4dp">
 
+    <!-- Sensor category bar chart -->
+    <com.example.deviceinfo.feature.sensors.SensorBarChartView
+        android:id="@+id/sensorBarChart"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"/>
+
     <include
         android:id="@+id/searchBar"
         layout="@layout/layout_search_bar"/>

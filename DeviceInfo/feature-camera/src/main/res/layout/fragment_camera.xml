@@ -6,6 +6,15 @@
     android:background="?attr/colorSurface"
     android:paddingTop="4dp">
 
+    <!-- Camera megapixel bar chart -->
+    <com.example.deviceinfo.feature.camera.CameraMpBarChartView
+        android:id="@+id/cameraMpChart"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"/>
+
     <include
         android:id="@+id/searchBar"
         layout="@layout/layout_search_bar"/>

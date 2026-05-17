@@ -1,24 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:orientation="vertical"
-      android:background="?attr/colorSurface"
-      android:paddingTop="4dp">
-      <include android:id="@+id/searchBar" layout="@layout/layout_search_bar"/>
-      <androidx.recyclerview.widget.RecyclerView
-          android:id="@+id/recyclerView"
-          android:layout_width="match_parent"
-          android:layout_height="0dp"
-          android:layout_weight="1"
-          android:clipToPadding="false"
-          android:paddingBottom="8dp"/>
-      <Button
-          android:id="@+id/btnExport"
-          android:layout_width="match_parent"
-          android:layout_height="48dp"
-          android:layout_margin="12dp"
-          android:text="Export Display Info"
-          android:textColor="#FFFFFF"
-          style="@style/Widget.MaterialComponents.Button"/>
-  </LinearLayout>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?attr/colorSurface"
+    android:paddingTop="4dp">
+
+    <!-- Refresh Rate Gauge + info cards -->
+    <com.example.deviceinfo.feature.display.RefreshRateGaugeView
+        android:id="@+id/refreshRateGauge"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"/>
+
+    <include
+        android:id="@+id/searchBar"
+        layout="@layout/layout_search_bar"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp"/>
+
+</LinearLayout>

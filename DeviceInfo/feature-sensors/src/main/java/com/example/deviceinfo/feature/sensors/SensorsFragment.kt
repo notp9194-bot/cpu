@@ -27,6 +27,7 @@ class SensorsFragment : Fragment(), SensorEventListener, ShareableFragment {
         super.onViewCreated(view, s)
         sm = requireContext().getSystemService(Context.SENSOR_SERVICE) as SensorManager
         sensorList = sm.getSensorList(Sensor.TYPE_ALL)
+
         val items = sensorList.map { InfoItem(it.name, typeLabel(it.type), it.isWakeUpSensor) }
         adapter = InfoAdapter(items)
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -37,10 +38,51 @@ class SensorsFragment : Fragment(), SensorEventListener, ShareableFragment {
             override fun beforeTextChanged(s: CharSequence?, st: Int, cnt: Int, aft: Int) {}
             override fun onTextChanged(s: CharSequence?, st: Int, bf: Int, cnt: Int) {}
         })
+
+        // Build sensor category bar chart
+        updateSensorBarChart()
     }
 
-    override fun onResume() { super.onResume(); sensorList.forEach { sm.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL) } }
-    override fun onPause()  { super.onPause();  sm.unregisterListener(this) }
+    private fun updateSensorBarChart() {
+        if (_b == null) return
+        // Group sensors into categories
+        val motionSensors = listOf(
+            Sensor.TYPE_ACCELEROMETER, Sensor.TYPE_GYROSCOPE,
+            Sensor.TYPE_GRAVITY, Sensor.TYPE_LINEAR_ACCELERATION,
+            Sensor.TYPE_ROTATION_VECTOR, Sensor.TYPE_GAME_ROTATION_VECTOR,
+            Sensor.TYPE_STEP_DETECTOR, Sensor.TYPE_STEP_COUNTER
+        )
+        val positionSensors = listOf(
+            Sensor.TYPE_MAGNETIC_FIELD, Sensor.TYPE_PROXIMITY
+        )
+        val envSensors = listOf(
+            Sensor.TYPE_LIGHT, Sensor.TYPE_PRESSURE,
+            Sensor.TYPE_TEMPERATURE, Sensor.TYPE_AMBIENT_TEMPERATURE,
+            Sensor.TYPE_RELATIVE_HUMIDITY
+        )
+        val bioSensors = listOf(Sensor.TYPE_HEART_RATE)
+
+        val countMotion   = sensorList.count { it.type in motionSensors }
+        val countPosition = sensorList.count { it.type in positionSensors }
+        val countEnv      = sensorList.count { it.type in envSensors }
+        val countBio      = sensorList.count { it.type in bioSensors }
+        val countOther    = sensorList.size - countMotion - countPosition - countEnv - countBio
+
+        val cats = mutableListOf<SensorBarChartView.SensorCategory>()
+        if (countMotion   > 0) cats.add(SensorBarChartView.SensorCategory("Motion",   countMotion,   0xFF1E88E5.toInt()))
+        if (countPosition > 0) cats.add(SensorBarChartView.SensorCategory("Position", countPosition, 0xFF00897B.toInt()))
+        if (countEnv      > 0) cats.add(SensorBarChartView.SensorCategory("Environ",  countEnv,      0xFF43A047.toInt()))
+        if (countBio      > 0) cats.add(SensorBarChartView.SensorCategory("Bio",      countBio,      0xFFE53935.toInt()))
+        if (countOther    > 0) cats.add(SensorBarChartView.SensorCategory("Other",    countOther,    0xFF8E24AA.toInt()))
+
+        b.sensorBarChart.update(cats)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        sensorList.forEach { sm.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL) }
+    }
+    override fun onPause() { super.onPause(); sm.unregisterListener(this) }
 
     private fun typeLabel(t: Int) = when (t) {
         Sensor.TYPE_ACCELEROMETER        -> "Accelerometer"
@@ -64,7 +106,7 @@ class SensorsFragment : Fragment(), SensorEventListener, ShareableFragment {
 
     override fun getShareText(): String {
         val sb = StringBuilder()
-        sb.appendLine("📡 Sensors (${sensorList.size} total)")
+        sb.appendLine("\uD83D\uDCE1 Sensors (${sensorList.size} total)")
         sb.appendLine("─────────────────")
         sensorList.forEach { sb.appendLine("${it.name} — ${typeLabel(it.type)}") }
         sb.appendLine("\nShared from CPU-A Device Info app")
