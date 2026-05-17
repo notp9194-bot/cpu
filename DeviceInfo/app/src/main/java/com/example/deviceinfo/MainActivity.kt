@@ -32,6 +32,9 @@ package com.example.deviceinfo
   import com.example.deviceinfo.feature.audio.AudioFragment
   import com.example.deviceinfo.feature.display.DisplayFragment
   import com.example.deviceinfo.feature.codec.CodecFragment
+  import com.example.deviceinfo.feature.benchmark.BenchmarkFragment
+  import com.example.deviceinfo.feature.connectivity.ConnectivityFragment
+  import com.example.deviceinfo.feature.power.PowerFragment
   import com.google.android.material.tabs.TabLayoutMediator
 
   class MainActivity : AppCompatActivity() {
@@ -40,7 +43,8 @@ package com.example.deviceinfo
 
       private val tabs = listOf(
           "SOC", "DEVICE", "SYSTEM", "BATTERY", "THERMAL",
-          "SENSORS", "NETWORK", "CAMERA", "AUDIO", "DISPLAY", "CODEC", "ABOUT"
+          "SENSORS", "NETWORK", "CAMERA", "AUDIO", "DISPLAY", "CODEC",
+          "BENCHMARK", "CONNECTIVITY", "POWER", "ABOUT"
       )
 
       override fun onCreate(savedInstanceState: Bundle?) {
@@ -136,7 +140,10 @@ package com.example.deviceinfo
               8  -> AudioFragment()
               9  -> DisplayFragment()
               10 -> CodecFragment()
-              11 -> AboutFragment()
+              11 -> BenchmarkFragment()
+              12 -> ConnectivityFragment()
+              13 -> PowerFragment()
+              14 -> AboutFragment()
               else -> SocFragment()
           }
       }

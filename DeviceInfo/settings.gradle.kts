@@ -20,3 +20,6 @@ pluginManagement {
   include(":feature-audio")
   include(":feature-display")
   include(":feature-codec")
+  include(":feature-benchmark")
+  include(":feature-connectivity")
+  include(":feature-power")

@@ -20,8 +20,8 @@ import java.util.Properties
           applicationId = "com.example.deviceinfo"
           minSdk = 24
           targetSdk = 35
-          versionCode = 9
-          versionName = "9.0"
+          versionCode = 10
+          versionName = "10.0"
           testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
       }
 
@@ -82,6 +82,9 @@ import java.util.Properties
       implementation(project(":feature-audio"))
       implementation(project(":feature-display"))
       implementation(project(":feature-codec"))
+      implementation(project(":feature-benchmark"))
+      implementation(project(":feature-connectivity"))
+      implementation(project(":feature-power"))
       implementation(libs.androidx.core.ktx)
       implementation(libs.androidx.appcompat)
       implementation(libs.material)
