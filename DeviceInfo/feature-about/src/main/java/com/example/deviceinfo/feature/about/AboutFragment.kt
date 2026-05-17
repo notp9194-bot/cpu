@@ -18,7 +18,7 @@ class AboutFragment : Fragment() {
             val pi = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
             b.tvVersion.text = "Version ${pi.versionName}"
         } catch (e: Exception) {
-            b.tvVersion.text = "Version 2.0"
+            b.tvVersion.text = "Version 5.0"
         }
     }
 

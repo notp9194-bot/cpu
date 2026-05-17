@@ -1,9 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.recyclerview.widget.RecyclerView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/recyclerView"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurface"
-    android:clipToPadding="false"
-    android:paddingBottom="8dp"/>
+    android:orientation="vertical"
+    android:background="?attr/colorSurface">
+
+    <!-- Battery % chart — in-session history -->
+    <com.example.deviceinfo.feature.battery.BatteryChartView
+        android:id="@+id/batteryChart"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:background="?attr/colorSurface"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp"/>
+
+    <!-- Export button -->
+    <Button
+        android:id="@+id/btnExport"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="4dp"
+        android:text="Export Info"
+        android:textSize="12sp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="?attr/colorSurface"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp"/>
+
+</LinearLayout>

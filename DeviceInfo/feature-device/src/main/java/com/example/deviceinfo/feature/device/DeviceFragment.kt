@@ -21,8 +21,40 @@ class DeviceFragment : Fragment() {
 
     override fun onViewCreated(view: View, s: Bundle?) {
         super.onViewCreated(view, s)
-        @Suppress("DEPRECATION")
-        val m = DisplayMetrics().also { requireActivity().windowManager.defaultDisplay.getMetrics(it) }
+
+        // BUG FIX #4: Use WindowMetrics (API 30+) instead of deprecated defaultDisplay.getMetrics()
+        val widthPx: Int
+        val heightPx: Int
+        val xdpi: Float
+        val ydpi: Float
+        val refreshRate: Float
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val wm = requireContext().getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            val metrics = wm.currentWindowMetrics
+            widthPx  = metrics.bounds.width()
+            heightPx = metrics.bounds.height()
+            val dm = resources.displayMetrics
+            xdpi = dm.xdpi
+            ydpi = dm.ydpi
+            refreshRate = requireActivity().display?.refreshRate ?: 60f
+        } else {
+            @Suppress("DEPRECATION")
+            val m = DisplayMetrics().also { requireActivity().windowManager.defaultDisplay.getMetrics(it) }
+            widthPx  = m.widthPixels
+            heightPx = m.heightPixels
+            xdpi = m.xdpi
+            ydpi = m.ydpi
+            @Suppress("DEPRECATION")
+            refreshRate = requireActivity().windowManager.defaultDisplay.refreshRate
+        }
+
+        val dm = resources.displayMetrics
+        val inches = sqrt(
+            (widthPx / xdpi).toDouble().let { it * it } +
+            (heightPx / ydpi).toDouble().let { it * it }
+        )
+
         val am = requireContext().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         val mi = ActivityManager.MemoryInfo().also { am.getMemoryInfo(it) }
         val totalRam = mi.totalMem / (1024 * 1024)
@@ -30,14 +62,6 @@ class DeviceFragment : Fragment() {
         val sf = StatFs(Environment.getDataDirectory().path)
         val totalSt = sf.totalBytes / (1024 * 1024 * 1024)
         val availSt = sf.availableBytes / (1024 * 1024 * 1024)
-        val inches = sqrt(
-            (m.widthPixels / m.xdpi).toDouble().let { it * it } +
-            (m.heightPixels / m.ydpi).toDouble().let { it * it }
-        )
-        val refreshRate = if (Build.VERSION.SDK_INT >= 30)
-            requireActivity().display?.refreshRate ?: 60f
-        else
-            @Suppress("DEPRECATION") requireActivity().windowManager.defaultDisplay.refreshRate
 
         val items = listOf(
             InfoItem("Model",             "${Build.MODEL} (${Build.DEVICE})"),
@@ -46,8 +70,8 @@ class DeviceFragment : Fragment() {
             InfoItem("Board",             Build.BOARD),
             InfoItem("Hardware",          Build.HARDWARE),
             InfoItem("Screen Size",       String.format("%.2f inches", inches)),
-            InfoItem("Screen Resolution", "${m.widthPixels} x ${m.heightPixels} px"),
-            InfoItem("Screen Density",    "${m.densityDpi} dpi"),
+            InfoItem("Screen Resolution", "$widthPx x $heightPx px"),
+            InfoItem("Screen Density",    "${dm.densityDpi} dpi"),
             InfoItem("Refresh Rate",      "${refreshRate.toInt()} Hz"),
             InfoItem("Total RAM",         "$totalRam MB"),
             InfoItem("Available RAM",     "$availRam MB (${availRam * 100 / totalRam}%)", true),

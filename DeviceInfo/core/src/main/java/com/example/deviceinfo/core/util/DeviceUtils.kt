@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.opengl.EGL14
 import android.opengl.EGLConfig
@@ -103,7 +104,6 @@ object DeviceUtils {
         val currentNow = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW)
         val chargeCounter = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER)
 
-        // No underscore literals inside string templates — compute first, then format
         val currentMa: String = if (currentNow != Int.MIN_VALUE) {
             val ma = Math.abs(currentNow / 1000)
             val dir = if (currentNow > 0) "Charging" else "Draining"
@@ -130,6 +130,14 @@ object DeviceUtils {
             "Current Now"      to currentMa,
             "Charge Remaining" to chargeMah
         )
+    }
+
+    fun getBatteryPercent(context: Context): Int {
+        val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+        val intent = context.registerReceiver(null, filter)
+        val level = intent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
+        val scale = intent?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
+        return if (level >= 0 && scale > 0) level * 100 / scale else 0
     }
 
     fun getGpuInfo(): Map<String, String> {
@@ -159,6 +167,8 @@ object DeviceUtils {
         }
     }
 
+    // BUG FIX #3: WifiManager.getConnectionInfo() deprecated on API 31+
+    // Use NetworkCapabilities.transportInfo for API 31+, fallback for older
     fun getNetworkInfo(context: Context): Map<String, String> {
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val info = linkedMapOf<String, String>()
@@ -186,15 +196,32 @@ object DeviceUtils {
         info["Upload Speed"]   = "$ulMbps Mbps (est.)"
 
         if (caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-            val wm = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-            val wifiInfo = wm.connectionInfo
-            val ssid = wifiInfo.ssid
-            info["WiFi SSID"]       = if (ssid.isNullOrBlank() || ssid == "<unknown ssid>") "Hidden/Unknown" else ssid.removeSurrounding("\"")
-            info["WiFi Frequency"]  = "${wifiInfo.frequency} MHz (${if (wifiInfo.frequency > 4000) "5 GHz" else "2.4 GHz"})"
-            info["WiFi Link Speed"] = "${wifiInfo.linkSpeed} Mbps"
-            val bars = WifiManager.calculateSignalLevel(wifiInfo.rssi, 5)
-            info["WiFi Signal"]     = "$bars/5 bars (${wifiInfo.rssi} dBm)"
-            info["IP Address"]      = intToIp(wifiInfo.ipAddress)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                // API 31+ — use transportInfo (non-deprecated)
+                val wifiInfo = caps.transportInfo as? WifiInfo
+                if (wifiInfo != null) {
+                    val ssid = wifiInfo.ssid
+                    info["WiFi SSID"]       = if (ssid.isNullOrBlank() || ssid == "<unknown ssid>") "Hidden/Unknown" else ssid.removeSurrounding("\"")
+                    info["WiFi Frequency"]  = "${wifiInfo.frequency} MHz (${if (wifiInfo.frequency > 4000) "5 GHz" else "2.4 GHz"})"
+                    info["WiFi Link Speed"] = "${wifiInfo.linkSpeed} Mbps"
+                    val bars = WifiManager.calculateSignalLevel(wifiInfo.rssi, 5)
+                    info["WiFi Signal"]     = "$bars/5 bars (${wifiInfo.rssi} dBm)"
+                    info["IP Address"]      = intToIp(wifiInfo.ipAddress)
+                }
+            } else {
+                @Suppress("DEPRECATION")
+                val wm = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+                @Suppress("DEPRECATION")
+                val wifiInfo = wm.connectionInfo
+                val ssid = wifiInfo.ssid
+                info["WiFi SSID"]       = if (ssid.isNullOrBlank() || ssid == "<unknown ssid>") "Hidden/Unknown" else ssid.removeSurrounding("\"")
+                info["WiFi Frequency"]  = "${wifiInfo.frequency} MHz (${if (wifiInfo.frequency > 4000) "5 GHz" else "2.4 GHz"})"
+                info["WiFi Link Speed"] = "${wifiInfo.linkSpeed} Mbps"
+                @Suppress("DEPRECATION")
+                val bars = WifiManager.calculateSignalLevel(wifiInfo.rssi, 5)
+                info["WiFi Signal"]     = "$bars/5 bars (${wifiInfo.rssi} dBm)"
+                info["IP Address"]      = intToIp(wifiInfo.ipAddress)
+            }
         }
 
         if (caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {

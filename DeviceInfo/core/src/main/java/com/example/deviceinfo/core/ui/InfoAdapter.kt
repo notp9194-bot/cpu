@@ -3,7 +3,9 @@ package com.example.deviceinfo.core.ui
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
@@ -18,20 +20,31 @@ class InfoAdapter(private val items: List<InfoItem>) : RecyclerView.Adapter<Info
 
     override fun onBindViewHolder(holder: VH, pos: Int) {
         val item = items[pos]
+
+        // Spacer row
+        if (item.label.isEmpty() && item.value.isEmpty()) {
+            holder.b.tvLabel.visibility = View.INVISIBLE
+            holder.b.tvValue.visibility = View.INVISIBLE
+            holder.b.btnCopy.visibility = View.INVISIBLE
+            holder.b.root.setBackgroundColor(Color.TRANSPARENT)
+            return
+        }
+
+        holder.b.tvLabel.visibility = View.VISIBLE
+        holder.b.tvValue.visibility = View.VISIBLE
+        holder.b.btnCopy.visibility = View.VISIBLE
+
         holder.b.tvLabel.text = item.label
         holder.b.tvValue.text = item.value
 
-        if (item.label.isEmpty() && item.value.isEmpty()) {
-            // Spacer
-            holder.b.tvLabel.visibility = android.view.View.INVISIBLE
-            holder.b.tvValue.visibility = android.view.View.INVISIBLE
-            holder.b.btnCopy.visibility = android.view.View.INVISIBLE
-            return
+        // Highlighted rows get a subtle tinted background
+        if (item.isHighlighted) {
+            holder.b.root.setBackgroundColor(0x0F7B2FBE)  // 6% purple tint
+        } else {
+            holder.b.root.setBackgroundResource(android.R.color.transparent)
         }
-        holder.b.tvLabel.visibility = android.view.View.VISIBLE
-        holder.b.tvValue.visibility = android.view.View.VISIBLE
-        holder.b.btnCopy.visibility = android.view.View.VISIBLE
 
+        // BUG FIX #5 (copy): Copy individual row — already in UI, now properly wired
         holder.b.btnCopy.setOnClickListener {
             val ctx = holder.itemView.context
             val cm = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager

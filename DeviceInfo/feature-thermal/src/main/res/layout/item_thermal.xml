@@ -8,6 +8,7 @@
     android:paddingTop="13dp"
     android:paddingBottom="13dp"
     android:background="?attr/colorSurface">
+
     <TextView
         android:id="@+id/tvLabel"
         android:layout_width="0dp"
@@ -15,13 +16,13 @@
         android:layout_weight="1"
         android:textColor="?android:attr/textColorSecondary"
         android:textSize="14sp"/>
+
     <TextView
         android:id="@+id/tvValue"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textColor="?attr/colorPrimary"
         android:textSize="14sp"
         android:textStyle="bold"
         android:gravity="end"/>
+
 </LinearLayout>
