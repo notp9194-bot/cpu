@@ -8,9 +8,10 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.deviceinfo.core.model.InfoItem
 import com.example.deviceinfo.core.ui.InfoAdapter
+import com.example.deviceinfo.core.ui.ShareableFragment
 import com.example.deviceinfo.feature.sensors.databinding.FragmentSensorsBinding
 
-class SensorsFragment : Fragment(), SensorEventListener {
+class SensorsFragment : Fragment(), SensorEventListener, ShareableFragment {
     private var _b: FragmentSensorsBinding? = null
     private val b get() = _b!!
     private lateinit var sm: SensorManager
@@ -28,17 +29,8 @@ class SensorsFragment : Fragment(), SensorEventListener {
         b.recyclerView.adapter = InfoAdapter(items)
     }
 
-    // BUG FIX #1: Register listeners in onResume, not onViewCreated
-    // So that after tab switch, sensors work again
-    override fun onResume() {
-        super.onResume()
-        sensorList.forEach { sm.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL) }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        sm.unregisterListener(this)
-    }
+    override fun onResume() { super.onResume(); sensorList.forEach { sm.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL) } }
+    override fun onPause()  { super.onPause();  sm.unregisterListener(this) }
 
     private fun typeLabel(t: Int) = when (t) {
         Sensor.TYPE_ACCELEROMETER        -> "Accelerometer"
@@ -58,6 +50,15 @@ class SensorsFragment : Fragment(), SensorEventListener {
         Sensor.TYPE_AMBIENT_TEMPERATURE  -> "Ambient Temperature"
         Sensor.TYPE_HEART_RATE           -> "Heart Rate"
         else                             -> "Type $t"
+    }
+
+    override fun getShareText(): String {
+        val sb = StringBuilder()
+        sb.appendLine("📡 Sensors (${sensorList.size} total)")
+        sb.appendLine("─────────────────")
+        sensorList.forEach { sb.appendLine("${it.name} — ${typeLabel(it.type)}") }
+        sb.appendLine("\nShared from CPU-A Device Info app")
+        return sb.toString()
     }
 
     override fun onSensorChanged(e: SensorEvent?) {}

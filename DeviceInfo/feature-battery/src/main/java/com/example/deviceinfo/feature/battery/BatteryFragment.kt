@@ -10,16 +10,15 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.deviceinfo.core.model.InfoItem
 import com.example.deviceinfo.core.ui.InfoAdapter
+import com.example.deviceinfo.core.ui.ShareableFragment
 import com.example.deviceinfo.core.util.DeviceUtils
 import com.example.deviceinfo.core.util.ExportUtils
 import com.example.deviceinfo.feature.battery.databinding.FragmentBatteryBinding
 
-class BatteryFragment : Fragment() {
+class BatteryFragment : Fragment(), ShareableFragment {
     private var _b: FragmentBatteryBinding? = null
     private val b get() = _b!!
     private var receiver: BroadcastReceiver? = null
-
-    // Cache latest data for export
     private var latestData: Map<String, String> = emptyMap()
 
     override fun onCreateView(i: LayoutInflater, c: ViewGroup?, s: Bundle?) =
@@ -28,14 +27,10 @@ class BatteryFragment : Fragment() {
     override fun onViewCreated(view: View, s: Bundle?) {
         super.onViewCreated(view, s)
         loadData()
-
-        // Live update when battery changes
         receiver = object : BroadcastReceiver() {
             override fun onReceive(ctx: Context?, intent: Intent?) { loadData() }
         }
         requireContext().registerReceiver(receiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-
-        // Export button
         b.btnExport.setOnClickListener {
             ExportUtils.exportToFile(requireContext(), "Battery", latestData)
         }
@@ -44,14 +39,18 @@ class BatteryFragment : Fragment() {
     private fun loadData() {
         if (_b == null) return
         latestData = DeviceUtils.getBatteryInfo(requireContext())
-        val items = latestData.map { (k, v) -> InfoItem(k, v) }
-
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        b.recyclerView.adapter = InfoAdapter(items)
+        b.recyclerView.adapter = InfoAdapter(latestData.map { (k, v) -> InfoItem(k, v) })
+        b.batteryChart.addDataPoint(DeviceUtils.getBatteryPercent(requireContext()))
+    }
 
-        // Add data point to chart (battery %)
-        val pct = DeviceUtils.getBatteryPercent(requireContext())
-        b.batteryChart.addDataPoint(pct)
+    override fun getShareText(): String {
+        val sb = StringBuilder()
+        sb.appendLine("🔋 Battery Info")
+        sb.appendLine("─────────────────")
+        latestData.forEach { (k, v) -> sb.appendLine("$k: $v") }
+        sb.appendLine("\nShared from CPU-A Device Info app")
+        return sb.toString()
     }
 
     override fun onDestroyView() {

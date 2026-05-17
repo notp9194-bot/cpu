@@ -14,6 +14,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.example.deviceinfo.core.ui.ShareableFragment
 import com.example.deviceinfo.databinding.ActivityMainBinding
 import com.example.deviceinfo.feature.soc.SocFragment
 import com.example.deviceinfo.feature.device.DeviceFragment
@@ -50,7 +51,6 @@ class MainActivity : AppCompatActivity() {
             tab.text = tabs[position]
         }.attach()
 
-        // Request POST_NOTIFICATIONS permission for battery alerts (Android 13+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -85,16 +85,31 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.action_share -> {
-                val currentTab = binding.viewPager.currentItem
-                shareTabInfo(tabs[currentTab])
+                shareCurrentTab()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    private fun shareTabInfo(tabName: String) {
-        val shareText = "Checking out my device info on CPU-A app!\nTab: $tabName"
+    /**
+     * FIXED: Ask the active fragment for its real data via ShareableFragment.
+     * Falls back to a generic message only for tabs that don't implement it (e.g. About).
+     */
+    private fun shareCurrentTab() {
+        val pos = binding.viewPager.currentItem
+        val tabName = tabs[pos]
+
+        // FragmentStateAdapter tags fragments as "f{itemId}" inside the ViewPager2 host
+        val fragmentTag = "f$pos"
+        val fragment = supportFragmentManager.findFragmentByTag(fragmentTag)
+
+        val shareText = if (fragment is ShareableFragment) {
+            fragment.getShareText()
+        } else {
+            "📱 Device Info — $tabName\nChecked with CPU-A Device Info app."
+        }
+
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, shareText)

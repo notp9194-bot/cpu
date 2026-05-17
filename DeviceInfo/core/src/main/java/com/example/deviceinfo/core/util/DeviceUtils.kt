@@ -3,18 +3,21 @@ package com.example.deviceinfo.core.util
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.hardware.display.DisplayManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
+import android.os.BatteryManager
+import android.os.Build
 import android.opengl.EGL14
 import android.opengl.EGLConfig
 import android.opengl.GLES20
-import android.os.BatteryManager
-import android.os.Build
+import android.view.Display
 import java.io.BufferedReader
 import java.io.FileReader
 import java.io.IOException
+import java.net.InetAddress
 
 object DeviceUtils {
 
@@ -104,20 +107,13 @@ object DeviceUtils {
         val currentNow = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW)
         val chargeCounter = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER)
 
-        val currentMa: String = if (currentNow != Int.MIN_VALUE) {
+        val currentMa = if (currentNow != Int.MIN_VALUE) {
             val ma = Math.abs(currentNow / 1000)
             val dir = if (currentNow > 0) "Charging" else "Draining"
             "$ma mA ($dir)"
-        } else {
-            "Unknown"
-        }
+        } else "Unknown"
 
-        val chargeMah: String = if (chargeCounter > 0) {
-            val mah = chargeCounter / 1000
-            "$mah mAh remaining"
-        } else {
-            "Unknown"
-        }
+        val chargeMah = if (chargeCounter > 0) "${chargeCounter / 1000} mAh remaining" else "Unknown"
 
         return linkedMapOf(
             "Health"           to health,
@@ -143,12 +139,10 @@ object DeviceUtils {
     fun getGpuInfo(): Map<String, String> {
         return try {
             val display = EGL14.eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY)
-            val major = IntArray(1)
-            val minor = IntArray(1)
+            val major = IntArray(1); val minor = IntArray(1)
             EGL14.eglInitialize(display, major, 0, minor, 0)
             val attribs = intArrayOf(EGL14.EGL_RENDERABLE_TYPE, EGL14.EGL_OPENGL_ES2_BIT, EGL14.EGL_NONE)
-            val configs = arrayOfNulls<EGLConfig>(1)
-            val numConfigs = IntArray(1)
+            val configs = arrayOfNulls<EGLConfig>(1); val numConfigs = IntArray(1)
             EGL14.eglChooseConfig(display, attribs, 0, configs, 0, 1, numConfigs, 0)
             val ctxAttribs = intArrayOf(EGL14.EGL_CONTEXT_CLIENT_VERSION, 2, EGL14.EGL_NONE)
             val ctx = EGL14.eglCreateContext(display, configs[0]!!, EGL14.EGL_NO_CONTEXT, ctxAttribs, 0)
@@ -167,17 +161,13 @@ object DeviceUtils {
         }
     }
 
-    // BUG FIX #3: WifiManager.getConnectionInfo() deprecated on API 31+
-    // Use NetworkCapabilities.transportInfo for API 31+, fallback for older
     fun getNetworkInfo(context: Context): Map<String, String> {
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val info = linkedMapOf<String, String>()
         val network = cm.activeNetwork
         val caps = cm.getNetworkCapabilities(network)
-        if (caps == null) {
-            info["Connection"] = "No Network"
-            return info
-        }
+        if (caps == null) { info["Connection"] = "No Network"; return info }
+
         val type = when {
             caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)     -> "WiFi"
             caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> "Mobile Data"
@@ -186,6 +176,7 @@ object DeviceUtils {
             else -> "Unknown"
         }
         info["Connection Type"] = type
+
         val hasInternet = caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
             caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
         info["Internet Access"] = if (hasInternet) "Yes" else "No"
@@ -197,7 +188,6 @@ object DeviceUtils {
 
         if (caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                // API 31+ — use transportInfo (non-deprecated)
                 val wifiInfo = caps.transportInfo as? WifiInfo
                 if (wifiInfo != null) {
                     val ssid = wifiInfo.ssid
@@ -226,6 +216,76 @@ object DeviceUtils {
 
         if (caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
             info["Network Metered"] = if (cm.isActiveNetworkMetered) "Yes" else "No"
+        }
+
+        // NEW: DNS servers via LinkProperties (no extra permission needed)
+        try {
+            val linkProps = cm.getLinkProperties(network)
+            if (linkProps != null) {
+                val dnsServers = linkProps.dnsServers
+                if (dnsServers.isNotEmpty()) {
+                    dnsServers.forEachIndexed { i, addr ->
+                        info["DNS Server ${i + 1}"] = addr.hostAddress ?: "Unknown"
+                    }
+                } else {
+                    info["DNS Servers"] = "Not available"
+                }
+                // Domains
+                val domains = linkProps.domains
+                if (!domains.isNullOrBlank()) {
+                    info["Search Domains"] = domains
+                }
+            }
+        } catch (e: Exception) {
+            info["DNS Servers"] = "Error reading"
+        }
+
+        return info
+    }
+
+    /**
+     * NEW: HDR and Wide Color Gamut info for the Device tab.
+     * Uses DisplayManager — no permission needed.
+     */
+    fun getDisplayCapabilities(context: Context): Map<String, String> {
+        val info = linkedMapOf<String, String>()
+        try {
+            val dm = context.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
+            val display = dm.getDisplay(Display.DEFAULT_DISPLAY) ?: return info
+
+            // Wide Color Gamut (API 26+)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                info["Wide Color Gamut"] = if (display.isWideColorGamut) "Yes (P3 / BT.2020)" else "No (sRGB)"
+            }
+
+            // HDR capabilities (API 24+)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                val hdrCaps = display.hdrCapabilities
+                if (hdrCaps != null) {
+                    val hdrTypes = hdrCaps.supportedHdrTypes
+                    if (hdrTypes.isNotEmpty()) {
+                        val labels = hdrTypes.map { type ->
+                            when (type) {
+                                Display.HdrCapabilities.HDR_TYPE_DOLBY_VISION -> "Dolby Vision"
+                                Display.HdrCapabilities.HDR_TYPE_HDR10         -> "HDR10"
+                                Display.HdrCapabilities.HDR_TYPE_HLG           -> "HLG"
+                                Display.HdrCapabilities.HDR_TYPE_HDR10_PLUS    -> "HDR10+"
+                                else -> "Type $type"
+                            }
+                        }
+                        info["HDR Support"]  = labels.joinToString(", ")
+                        info["Max Luminance"] = "${hdrCaps.desiredMaxLuminance.toInt()} nits"
+                        info["Min Luminance"] = "${hdrCaps.desiredMinLuminance} nits"
+                        info["Max Avg Luminance"] = "${hdrCaps.desiredMaxAverageLuminance.toInt()} nits"
+                    } else {
+                        info["HDR Support"] = "Not Supported"
+                    }
+                } else {
+                    info["HDR Support"] = "Not Supported"
+                }
+            }
+        } catch (e: Exception) {
+            info["Display Capabilities"] = "Error reading"
         }
         return info
     }

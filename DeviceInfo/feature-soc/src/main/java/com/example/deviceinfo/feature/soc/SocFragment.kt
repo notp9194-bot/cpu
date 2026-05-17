@@ -9,41 +9,29 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.deviceinfo.core.model.InfoItem
 import com.example.deviceinfo.core.ui.InfoAdapter
+import com.example.deviceinfo.core.ui.ShareableFragment
 import com.example.deviceinfo.core.util.DeviceUtils
 import com.example.deviceinfo.feature.soc.databinding.FragmentSocBinding
 
-class SocFragment : Fragment() {
+class SocFragment : Fragment(), ShareableFragment {
     private var _b: FragmentSocBinding? = null
     private val b get() = _b!!
+    private var latestItems: List<InfoItem> = emptyList()
 
-    // Auto-refresh: update CPU frequencies every 2 seconds
     private val handler = Handler(Looper.getMainLooper())
     private val refreshRunnable = object : Runnable {
         override fun run() {
-            if (_b != null) {
-                loadData()
-                handler.postDelayed(this, REFRESH_INTERVAL_MS)
-            }
+            if (_b != null) { loadData(); handler.postDelayed(this, REFRESH_INTERVAL_MS) }
         }
     }
 
     override fun onCreateView(i: LayoutInflater, c: ViewGroup?, s: Bundle?) =
         FragmentSocBinding.inflate(i, c, false).also { _b = it }.root
 
-    override fun onViewCreated(view: View, s: Bundle?) {
-        super.onViewCreated(view, s)
-        loadData()
-    }
+    override fun onViewCreated(view: View, s: Bundle?) { super.onViewCreated(view, s); loadData() }
 
-    override fun onResume() {
-        super.onResume()
-        handler.postDelayed(refreshRunnable, REFRESH_INTERVAL_MS)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        handler.removeCallbacks(refreshRunnable)
-    }
+    override fun onResume() { super.onResume(); handler.postDelayed(refreshRunnable, REFRESH_INTERVAL_MS) }
+    override fun onPause()  { super.onPause();  handler.removeCallbacks(refreshRunnable) }
 
     private fun loadData() {
         if (_b == null) return
@@ -71,17 +59,21 @@ class SocFragment : Fragment() {
             InfoItem("Scaling Governor",  DeviceUtils.getCpuGovernor()),
             InfoItem("Vulkan Support",    if (Build.VERSION.SDK_INT >= 24) "Yes (API ${Build.VERSION.SDK_INT})" else "No")
         )
+        latestItems = items
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         b.recyclerView.adapter = InfoAdapter(items)
     }
 
-    override fun onDestroyView() {
-        handler.removeCallbacks(refreshRunnable)
-        super.onDestroyView()
-        _b = null
+    override fun getShareText(): String {
+        val sb = StringBuilder()
+        sb.appendLine("⚡ SOC / CPU Info")
+        sb.appendLine("─────────────────")
+        latestItems.forEach { sb.appendLine("${it.label}: ${it.value}") }
+        sb.appendLine("\nShared from CPU-A Device Info app")
+        return sb.toString()
     }
 
-    companion object {
-        private const val REFRESH_INTERVAL_MS = 2000L
-    }
+    override fun onDestroyView() { handler.removeCallbacks(refreshRunnable); super.onDestroyView(); _b = null }
+
+    companion object { private const val REFRESH_INTERVAL_MS = 2000L }
 }
