@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.DeviceInfo" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="colorPrimary">#9B59B6</item>
+        <item name="colorPrimaryVariant">#7D3C98</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSurface">#000000</item>
+        <item name="android:windowBackground">#000000</item>
+        <item name="android:statusBarColor">#000000</item>
+    </style>
+    <style name="TabTextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">11sp</item>
+        <item name="textAllCaps">true</item>
+    </style>
+</resources>
