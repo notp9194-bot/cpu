@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 android {
-    namespace = "com.example.deviceinfo.core"
+    namespace = "com.example.deviceinfo.feature.camera"
     compileSdk = 35
     defaultConfig { minSdk = 24 }
     compileOptions {
@@ -14,8 +14,11 @@ android {
     buildFeatures { viewBinding = true }
 }
 dependencies {
+    implementation(project(":core"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.fragment.ktx)
     testImplementation(libs.junit)
 }

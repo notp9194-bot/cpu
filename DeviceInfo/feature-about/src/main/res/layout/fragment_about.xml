@@ -1,27 +1,144 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:background="?attr/colorSurface"
-    android:padding="32dp">
+    android:background="?attr/colorSurface">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Coming Soon"
-        android:textColor="?attr/colorPrimary"
-        android:textSize="28sp"
-        android:textStyle="bold"/>
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="24dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="This section is under development"
-        android:textColor="?android:attr/textColorSecondary"
-        android:textSize="14sp"
-        android:layout_marginTop="12dp"
-        android:gravity="center"/>
+        <!-- App Icon area -->
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_chip_about"
+            android:layout_marginTop="16dp"
+            android:tint="?attr/colorPrimary"
+            android:contentDescription="App Icon"/>
 
-</LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CPU-A"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp"/>
+
+        <TextView
+            android:id="@+id/tvVersion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Version 2.0"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp"/>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Description -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="CPU-A gives you detailed hardware and software information about your Android device — all in one place, with no ads and no unnecessary permissions."
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="14sp"
+            android:lineSpacingMultiplier="1.5"
+            android:gravity="center"/>
+
+        <!-- Features section -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="FEATURES"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• SOC — Processor, cores, clock speeds, GPU\n• Device — RAM, storage, screen, display\n• System — Android version, kernel, uptime\n• Battery — Level, health, current, voltage\n• Thermal — Real-time zone temperatures\n• Sensors — All hardware sensors list\n• Network — WiFi, connection type, speed\n• Camera — Resolution, aperture, focal length"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="14sp"
+            android:lineSpacingMultiplier="1.6"/>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Privacy -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="PRIVACY"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="CPU-A does not collect, store, or transmit any personal data. All information is read locally on your device only."
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="14sp"
+            android:lineSpacingMultiplier="1.5"/>
+
+        <!-- Permissions used -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="PERMISSIONS USED"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• ACCESS_NETWORK_STATE — Check connection type\n• ACCESS_WIFI_STATE — Read WiFi details"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="14sp"
+            android:lineSpacingMultiplier="1.6"/>
+
+        <!-- Footer -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Made with ♥ for Android"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="13sp"
+            android:gravity="center"
+            android:layout_marginBottom="24dp"/>
+
+    </LinearLayout>
+</ScrollView>

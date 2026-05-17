@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 
-// local.properties reader — top level function, koi scope issue nahi
 fun localProps(): Properties {
     val props = Properties()
     val f = rootProject.file("local.properties")
@@ -21,8 +20,8 @@ android {
         applicationId = "com.example.deviceinfo"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -55,7 +54,6 @@ android {
         }
     }
 
-    // AAB ke liye — Play Store automatically ABI/density/language split karta hai
     bundle {
         language { enableSplit = true }
         density  { enableSplit = true }
@@ -79,6 +77,8 @@ dependencies {
     implementation(project(":feature-thermal"))
     implementation(project(":feature-sensors"))
     implementation(project(":feature-about"))
+    implementation(project(":feature-network"))
+    implementation(project(":feature-camera"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
