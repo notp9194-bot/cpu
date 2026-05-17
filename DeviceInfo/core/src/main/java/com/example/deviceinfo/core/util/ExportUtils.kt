@@ -1,146 +1,144 @@
 package com.example.deviceinfo.core.util
 
-import android.content.ContentValues
-import android.content.Context
-import android.os.Build
-import android.os.Environment
-import android.provider.MediaStore
-import android.widget.Toast
-import java.io.File
-import java.io.FileOutputStream
-import java.text.SimpleDateFormat
-import java.util.*
+  import android.content.ContentValues
+  import android.content.Context
+  import android.graphics.Canvas
+  import android.graphics.Color
+  import android.graphics.Paint
+  import android.graphics.pdf.PdfDocument
+  import android.os.Build
+  import android.os.Environment
+  import android.provider.MediaStore
+  import android.widget.Toast
+  import java.io.File
+  import java.io.FileOutputStream
+  import java.io.OutputStream
+  import java.text.SimpleDateFormat
+  import java.util.Date
+  import java.util.Locale
 
-object ExportUtils {
+  object ExportUtils {
 
-    /** Export all sections to a single TXT file */
-    fun exportAllToFile(context: Context, allData: Map<String, Map<String, String>>) {
-        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val content = buildString {
-            appendLine("=== CPU-A Device Info — Full Report ===")
-            appendLine("Exported: ${SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())}")
-            appendLine("Device  : ${Build.MODEL}")
-            appendLine("Android : ${Build.VERSION.RELEASE}")
-            appendLine()
-            allData.forEach { (section, data) ->
-                appendLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-                appendLine("  $section")
-                appendLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-                data.forEach { (k, v) -> appendLine("  $k: $v") }
-                appendLine()
-            }
-        }
-        writeToDownloads(context, "DeviceInfo_FullReport_$timestamp.txt", content, "text/plain")
-    }
+      fun exportToFile(context: Context, tabName: String, data: Map<String, String>) {
+          val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+          val filename = "DeviceInfo_${tabName}_$ts.txt"
+          val content = buildString {
+              appendLine("CPU-A Device Info — $tabName")
+              appendLine("Exported: ${SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())}")
+              appendLine("─".repeat(40))
+              data.forEach { (k, v) -> appendLine("$k: $v") }
+          }
+          try {
+              val stream = openOutputStream(context, filename, "text/plain", Environment.DIRECTORY_DOCUMENTS)
+              stream?.use { it.write(content.toByteArray()) }
+              Toast.makeText(context, "Exported: $filename", Toast.LENGTH_LONG).show()
+          } catch (e: Exception) {
+              Toast.makeText(context, "Export failed: ${e.message}", Toast.LENGTH_SHORT).show()
+          }
+      }
 
-    /** Export a single section to TXT */
-    fun exportToFile(context: Context, sectionName: String, data: Map<String, String>) {
-        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val content = buildString {
-            appendLine("=== CPU-A Device Info Export ===")
-            appendLine("Section : $sectionName")
-            appendLine("Exported: ${SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())}")
-            appendLine("Device  : ${Build.MODEL}")
-            appendLine("Android : ${Build.VERSION.RELEASE}")
-            appendLine()
-            appendLine("--- $sectionName ---")
-            data.forEach { (k, v) -> appendLine("$k: $v") }
-        }
-        writeToDownloads(context, "DeviceInfo_${sectionName}_$timestamp.txt", content, "text/plain")
-    }
+      fun exportToPdf(context: Context, tabName: String, data: Map<String, String>) {
+          val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+          val filename = "DeviceInfo_${tabName}_$ts.pdf"
 
-    /**
-     * NEW: Export all sections as JSON to Downloads.
-     * Format: { "meta": {...}, "data": { "SOC": {...}, "Battery": {...} } }
-     */
-    fun exportAllToJson(context: Context, allData: Map<String, Map<String, String>>) {
-        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val fileName = "DeviceInfo_FullReport_$timestamp.json"
+          val pageWidth = 595   // A4 width in points
+          val pageHeight = 842  // A4 height in points
+          val margin = 48f
+          val lineHeight = 22f
 
-        val sb = StringBuilder()
-        sb.append("{\n")
-        sb.append("  \"meta\": {\n")
-        sb.append("    \"exported\": \"${SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())}\",\n")
-        sb.append("    \"device\": ${jsonString(Build.MODEL)},\n")
-        sb.append("    \"android\": ${jsonString(Build.VERSION.RELEASE)},\n")
-        sb.append("    \"app\": \"CPU-A Device Info\"\n")
-        sb.append("  },\n")
-        sb.append("  \"data\": {\n")
+          val doc = PdfDocument()
+          var pageNum = 1
+          var yPos = margin + 80f
 
-        val sectionEntries = allData.entries.toList()
-        sectionEntries.forEachIndexed { si, (section, data) ->
-            sb.append("    ${jsonString(section)}: {\n")
-            val dataEntries = data.entries.toList()
-            dataEntries.forEachIndexed { di, (k, v) ->
-                val comma = if (di < dataEntries.size - 1) "," else ""
-                sb.append("      ${jsonString(k)}: ${jsonString(v)}$comma\n")
-            }
-            val sectionComma = if (si < sectionEntries.size - 1) "," else ""
-            sb.append("    }$sectionComma\n")
-        }
+          val paintTitle = Paint().apply {
+              color = Color.parseColor("#006064")
+              textSize = 20f
+              isFakeBoldText = true
+              isAntiAlias = true
+          }
+          val paintHeader = Paint().apply {
+              color = Color.parseColor("#0097A7")
+              textSize = 11f
+              isFakeBoldText = true
+              isAntiAlias = true
+          }
+          val paintLabel = Paint().apply {
+              color = Color.parseColor("#546E7A")
+              textSize = 12f
+              isAntiAlias = true
+          }
+          val paintValue = Paint().apply {
+              color = Color.parseColor("#1A1A2E")
+              textSize = 12f
+              isFakeBoldText = true
+              isAntiAlias = true
+          }
+          val paintDivider = Paint().apply {
+              color = Color.parseColor("#B2EBF2")
+              strokeWidth = 1f
+          }
 
-        sb.append("  }\n")
-        sb.append("}\n")
+          fun newPage(): Canvas {
+              val pi = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNum++).create()
+              val page = doc.startPage(pi)
+              return page.canvas
+          }
 
-        writeToDownloads(context, fileName, sb.toString(), "application/json")
-    }
+          var canvas = newPage()
+          var currentPage = doc.pages.last()
 
-    /** Export single section as JSON */
-    fun exportToJson(context: Context, sectionName: String, data: Map<String, String>) {
-        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val sb = StringBuilder()
-        sb.append("{\n")
-        sb.append("  \"meta\": {\n")
-        sb.append("    \"section\": ${jsonString(sectionName)},\n")
-        sb.append("    \"exported\": \"${SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())}\",\n")
-        sb.append("    \"device\": ${jsonString(Build.MODEL)},\n")
-        sb.append("    \"android\": ${jsonString(Build.VERSION.RELEASE)}\n")
-        sb.append("  },\n")
-        sb.append("  \"data\": {\n")
-        val entries = data.entries.toList()
-        entries.forEachIndexed { i, (k, v) ->
-            val comma = if (i < entries.size - 1) "," else ""
-            sb.append("    ${jsonString(k)}: ${jsonString(v)}$comma\n")
-        }
-        sb.append("  }\n")
-        sb.append("}\n")
-        writeToDownloads(context, "DeviceInfo_${sectionName}_$timestamp.json", sb.toString(), "application/json")
-    }
+          // Title
+          canvas.drawText("CPU-A Device Info", margin, margin + 30f, paintTitle)
+          canvas.drawText("Tab: $tabName", margin, margin + 52f, paintHeader)
+          val dateStr = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+          canvas.drawText("Generated: $dateStr", margin, margin + 70f, paintLabel)
+          canvas.drawLine(margin, margin + 76f, pageWidth - margin, margin + 76f, paintDivider)
 
-    /** Escape a string for JSON */
-    private fun jsonString(s: String): String {
-        val escaped = s.replace("\\", "\\\\")
-                       .replace("\"", "\\\"")
-                       .replace("\n", "\\n")
-                       .replace("\r", "\\r")
-                       .replace("\t", "\\t")
-        return "\"$escaped\""
-    }
+          for ((key, value) in data) {
+              if (yPos + lineHeight > pageHeight - margin) {
+                  doc.finishPage(currentPage)
+                  canvas = newPage()
+                  currentPage = doc.pages.last()
+                  yPos = margin + 20f
+              }
+              canvas.drawText(key, margin, yPos, paintLabel)
+              val valueX = pageWidth / 2f
+              canvas.drawText(value, valueX, yPos, paintValue)
+              canvas.drawLine(margin, yPos + 4f, pageWidth - margin, yPos + 4f, paintDivider)
+              yPos += lineHeight
+          }
+          doc.finishPage(currentPage)
 
-    private fun writeToDownloads(context: Context, fileName: String, content: String, mimeType: String) {
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                val values = ContentValues().apply {
-                    put(MediaStore.Downloads.DISPLAY_NAME, fileName)
-                    put(MediaStore.Downloads.MIME_TYPE, mimeType)
-                    put(MediaStore.Downloads.IS_PENDING, 1)
-                }
-                val resolver = context.contentResolver
-                val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
-                    ?: throw Exception("Could not create file")
-                resolver.openOutputStream(uri)?.use { it.write(content.toByteArray()) }
-                values.clear()
-                values.put(MediaStore.Downloads.IS_PENDING, 0)
-                resolver.update(uri, values, null, null)
-            } else {
-                @Suppress("DEPRECATION")
-                val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                dir.mkdirs()
-                FileOutputStream(File(dir, fileName)).use { it.write(content.toByteArray()) }
-            }
-            Toast.makeText(context, "Exported: $fileName\n(Downloads folder)", Toast.LENGTH_LONG).show()
-        } catch (e: Exception) {
-            Toast.makeText(context, "Export failed: ${e.message}", Toast.LENGTH_LONG).show()
-        }
-    }
-}
+          try {
+              val stream = openOutputStream(context, filename, "application/pdf", Environment.DIRECTORY_DOWNLOADS)
+              stream?.use { doc.writeTo(it) }
+              Toast.makeText(context, "PDF saved: $filename", Toast.LENGTH_LONG).show()
+          } catch (e: Exception) {
+              Toast.makeText(context, "PDF failed: ${e.message}", Toast.LENGTH_SHORT).show()
+          } finally {
+              doc.close()
+          }
+      }
+
+      private fun openOutputStream(context: Context, filename: String, mimeType: String, dir: String): OutputStream? {
+          return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+              val values = ContentValues().apply {
+                  put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+                  put(MediaStore.MediaColumns.MIME_TYPE, mimeType)
+                  put(MediaStore.MediaColumns.RELATIVE_PATH, dir)
+              }
+              val collection = if (mimeType == "application/pdf")
+                  MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+              else
+                  MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+              context.contentResolver.insert(collection, values)?.let {
+                  context.contentResolver.openOutputStream(it)
+              }
+          } else {
+              @Suppress("DEPRECATION")
+              val folder = Environment.getExternalStoragePublicDirectory(dir)
+              folder.mkdirs()
+              FileOutputStream(File(folder, filename))
+          }
+      }
+  }

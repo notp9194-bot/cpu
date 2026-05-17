@@ -21,21 +21,21 @@ class AboutFragment : Fragment() {
             val pi = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
             b.tvVersion.text = "Version ${pi.versionName}"
         } catch (e: Exception) {
-            b.tvVersion.text = "Version 10.0"
+            b.tvVersion.text = "Version 7.0"
         }
 
-        b.btnExportAll.setOnClickListener { exportAllTabs(asJson = false) }
-        b.btnExportJson.setOnClickListener { exportAllTabs(asJson = true) }
+        b.btnExportAll.setOnClickListener { exportAllTabs() }
     }
 
-    private fun exportAllTabs(asJson: Boolean) {
+    private fun exportAllTabs() {
         val fm = requireActivity().supportFragmentManager
         val allData = linkedMapOf<String, Map<String, String>>()
-        val tabNames = listOf("SOC", "Device", "Display", "System", "Battery",
-                              "Thermal", "Sensors", "Network", "Camera", "Audio")
+
+        // Tab positions 0-7 (excluding About tab itself at position 8/9)
+        val tabNames = listOf("SOC", "Device", "System", "Battery", "Thermal", "Sensors", "Network", "Camera", "Audio")
         var collected = 0
 
-        for (pos in 0 until tabNames.size) {
+        for (pos in 0 until (tabNames.size)) {
             val fragment = fm.findFragmentByTag("f$pos")
             if (fragment is ShareableFragment) {
                 allData[tabNames.getOrElse(pos) { "Tab $pos" }] = fragment.getExportData()
@@ -49,11 +49,7 @@ class AboutFragment : Fragment() {
             return
         }
 
-        if (asJson) {
-            ExportUtils.exportAllToJson(requireContext(), allData)
-        } else {
-            ExportUtils.exportAllToFile(requireContext(), allData)
-        }
+        ExportUtils.exportAllToFile(requireContext(), allData)
     }
 
     override fun onDestroyView() { super.onDestroyView(); _b = null }

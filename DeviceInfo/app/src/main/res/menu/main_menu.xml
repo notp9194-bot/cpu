@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/action_theme"
-        android:title="Toggle Theme"
-        android:icon="@drawable/ic_dark_mode"
-        app:showAsAction="always"/>
-    <item
-        android:id="@+id/action_share"
-        android:title="Share"
-        android:icon="@drawable/ic_share"
-        app:showAsAction="always"/>
-</menu>
+  <menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+      <item
+          android:id="@+id/action_export_pdf"
+          android:title="Export PDF"
+          android:icon="@android:drawable/ic_menu_save"
+          app:showAsAction="never" />
+      <item
+          android:id="@+id/action_share"
+          android:title="Share"
+          android:icon="@drawable/ic_share"
+          app:showAsAction="always" />
+      <item
+          android:id="@+id/action_theme"
+          android:title="Toggle Theme"
+          android:icon="@drawable/ic_dark_mode"
+          app:showAsAction="always" />
+  </menu>

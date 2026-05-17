@@ -18,7 +18,7 @@
           android:layout_width="match_parent"
           android:layout_height="48dp"
           android:layout_margin="12dp"
-          android:text="Export Display Info"
+          android:text="Export Codec &amp; GPU Info"
           android:textColor="#FFFFFF"
           style="@style/Widget.MaterialComponents.Button"/>
   </LinearLayout>
