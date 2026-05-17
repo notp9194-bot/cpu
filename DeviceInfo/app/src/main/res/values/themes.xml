@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.DeviceInfo" parent="Theme.MaterialComponents.NoActionBar">
-        <item name="colorPrimary">#9B59B6</item>
-        <item name="colorPrimaryVariant">#7D3C98</item>
+    <style name="Theme.DeviceInfo" parent="Theme.MaterialComponents.NoActionBar.Bridge">
+        <item name="colorPrimary">#7B2FBE</item>
+        <item name="colorPrimaryVariant">#5C1A9C</item>
         <item name="colorOnPrimary">#FFFFFF</item>
-        <item name="android:windowBackground">#000000</item>
-        <item name="android:statusBarColor">#000000</item>
+        <item name="colorSurface">#F5F5F5</item>
+        <item name="colorOnSurface">#1A1A1A</item>
+        <item name="android:colorBackground">#FFFFFF</item>
+        <item name="android:windowBackground">#FFFFFF</item>
+        <item name="android:statusBarColor">#7B2FBE</item>
+        <item name="android:navigationBarColor">#FFFFFF</item>
+        <item name="android:textColorPrimary">#1A1A1A</item>
+        <item name="android:textColorSecondary">#555555</item>
     </style>
 </resources>

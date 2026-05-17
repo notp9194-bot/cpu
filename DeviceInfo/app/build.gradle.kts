@@ -25,6 +25,15 @@ android {
     }
     kotlinOptions { jvmTarget = "1.8" }
     buildFeatures { viewBinding = true }
+
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("arm64-v8a", "armeabi-v7a", "x86_64", "x86")
+            isUniversalApk = true  // also produce a fat universal APK
+        }
+    }
 }
 dependencies {
     implementation(project(":core"))
