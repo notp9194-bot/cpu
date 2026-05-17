@@ -24,7 +24,9 @@ class SocFragment : Fragment(), ShareableFragment {
     private val handler = Handler(Looper.getMainLooper())
     private val refreshRunnable = object : Runnable {
         override fun run() {
-            if (_b != null) { loadData(); handler.postDelayed(this, REFRESH_INTERVAL_MS) }
+            if (_b == null) return
+            loadData()
+            handler.postDelayed(this, REFRESH_INTERVAL_MS)
         }
     }
 
@@ -46,23 +48,36 @@ class SocFragment : Fragment(), ShareableFragment {
 
     private fun loadData() {
         if (_b == null) return
-        val freqs = DeviceUtils.getCpuFrequencies()
-        val cores = Runtime.getRuntime().availableProcessors()
+        val freqs   = DeviceUtils.getCpuFrequencies()
+        val cores   = Runtime.getRuntime().availableProcessors()
         val maxFreq = DeviceUtils.getMaxCpuFreq(0).let { if (it > 0) "$it MHz" else "Unknown" }
         val minFreq = if (freqs.isNotEmpty()) "${freqs.minOrNull()} MHz" else "Unknown"
         val cpuInfo = DeviceUtils.getCpuInfo()
-        val hw = cpuInfo["Hardware"] ?: Build.HARDWARE
+        val hw      = cpuInfo["Hardware"] ?: Build.HARDWARE
         val gpuInfo = DeviceUtils.getGpuInfo()
 
+        // ── Update CPU Bar Chart ─────────────────────────────────────────
+        val maxMhzGlobal = DeviceUtils.getMaxCpuFreq(0)
+        val coreDataList = (0 until cores).map { i ->
+            val freq = if (i < freqs.size) freqs[i] else 0L
+            val max  = if (maxMhzGlobal > 0) maxMhzGlobal else
+                       DeviceUtils.getMaxCpuFreq(i).let { if (it > 0) it else 2000L }
+            CpuBarChartView.CoreData(freq, max)
+        }
+        b.cpuBarChart.updateCores(coreDataList)
+        // ────────────────────────────────────────────────────────────────
+
         val items = mutableListOf(
-            InfoItem("SoC", hw, true),
-            InfoItem("Model", if (Build.VERSION.SDK_INT >= 31) Build.SOC_MODEL else hw),
-            InfoItem("Cores", cores.toString()),
-            InfoItem("Architecture", Build.SUPPORTED_ABIS.firstOrNull() ?: "Unknown"),
-            InfoItem("Processor", cpuInfo["model name"] ?: cpuInfo["Processor"] ?: "Unknown"),
-            InfoItem("Clock Speed", "$minFreq - $maxFreq"),
+            InfoItem("SoC",           hw,                                                         true),
+            InfoItem("Model",         if (Build.VERSION.SDK_INT >= 31) Build.SOC_MODEL else hw),
+            InfoItem("Cores",         cores.toString()),
+            InfoItem("Architecture",  Build.SUPPORTED_ABIS.firstOrNull() ?: "Unknown"),
+            InfoItem("Processor",     cpuInfo["model name"] ?: cpuInfo["Processor"] ?: "Unknown"),
+            InfoItem("Clock Speed",   "$minFreq – $maxFreq"),
         )
-        repeat(cores) { i -> items.add(InfoItem("CPU $i", if (i < freqs.size) "${freqs[i]} MHz" else "Unknown", true)) }
+        repeat(cores) { i ->
+            items.add(InfoItem("CPU $i", if (i < freqs.size) "${freqs[i]} MHz" else "Unknown", true))
+        }
         items += listOf(
             InfoItem("GPU Vendor",        gpuInfo["GPU Vendor"]        ?: "Unknown"),
             InfoItem("GPU Renderer",      gpuInfo["GPU Renderer"]      ?: "Unknown"),
@@ -80,14 +95,21 @@ class SocFragment : Fragment(), ShareableFragment {
 
     override fun getShareText(): String {
         val sb = StringBuilder()
-        sb.appendLine("⚡ SOC / CPU Info")
-        sb.appendLine("─────────────────")
+        sb.appendLine("\u26a1 SOC / CPU Info")
+        sb.appendLine("\u2500".repeat(17))
         latestItems.forEach { sb.appendLine("${it.label}: ${it.value}") }
         sb.appendLine("\nShared from CPU-A Device Info app")
         return sb.toString()
     }
 
-    override fun onDestroyView() { handler.removeCallbacks(refreshRunnable); super.onDestroyView(); _b = null }
+    override fun getExportData(): Map<String, String> =
+        latestItems.associate { it.label to it.value }
+
+    override fun onDestroyView() {
+        handler.removeCallbacks(refreshRunnable)
+        super.onDestroyView()
+        _b = null
+    }
 
     companion object { private const val REFRESH_INTERVAL_MS = 2000L }
 }

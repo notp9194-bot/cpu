@@ -10,6 +10,13 @@
         android:id="@+id/searchBar"
         layout="@layout/layout_search_bar"/>
 
+    <com.example.deviceinfo.feature.thermal.TempLineChartView
+        android:id="@+id/tempChart"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginBottom="4dp"/>
+
     <Button
         android:id="@+id/btnExport"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
