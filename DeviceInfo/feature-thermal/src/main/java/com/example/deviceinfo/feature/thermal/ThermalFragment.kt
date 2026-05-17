@@ -27,10 +27,9 @@ class ThermalFragment : Fragment(), ShareableFragment {
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         b.recyclerView.adapter = ThermalAdapter(thermalItems)
 
-        b.btnExport.setOnClickListener {
-            val map = latestData.associate { (k, v) -> k to String.format("%.1f °C", v) }
-            ExportUtils.exportToFile(requireContext(), "Thermal", map)
-        }
+        val asMap = { latestData.associate { (k, v) -> k to "%.1f °C".format(v) } }
+        b.btnExport.setOnClickListener     { ExportUtils.exportToFile(requireContext(), "Thermal", asMap()) }
+        b.btnExportJson.setOnClickListener { ExportUtils.exportToJson(requireContext(), "Thermal", asMap()) }
     }
 
     override fun getShareText(): String {

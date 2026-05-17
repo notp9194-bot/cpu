@@ -23,7 +23,7 @@ class SystemFragment : Fragment(), ShareableFragment {
 
     override fun onViewCreated(view: View, s: Bundle?) {
         super.onViewCreated(view, s)
-        val up  = SystemClock.elapsedRealtime()
+        val up   = SystemClock.elapsedRealtime()
         val days = TimeUnit.MILLISECONDS.toDays(up)
         val hrs  = TimeUnit.MILLISECONDS.toHours(up) % 24
         val min  = TimeUnit.MILLISECONDS.toMinutes(up) % 60
@@ -64,9 +64,8 @@ class SystemFragment : Fragment(), ShareableFragment {
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         b.recyclerView.adapter = InfoAdapter(latestData.map { (k, v) -> InfoItem(k, v) })
 
-        b.btnExport.setOnClickListener {
-            ExportUtils.exportToFile(requireContext(), "System", latestData)
-        }
+        b.btnExport.setOnClickListener     { ExportUtils.exportToFile(requireContext(), "System", latestData) }
+        b.btnExportJson.setOnClickListener { ExportUtils.exportToJson(requireContext(), "System", latestData) }
     }
 
     override fun getShareText(): String {

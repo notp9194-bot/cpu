@@ -5,15 +5,33 @@
     android:orientation="vertical"
     android:background="?attr/colorSurface">
 
-    <Button
-        android:id="@+id/btnExport"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_margin="8dp"
-        android:text="Export Info"
-        android:textSize="12sp"/>
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:paddingEnd="8dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="2dp">
+
+        <Button
+            android:id="@+id/btnExport"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:text="TXT"
+            android:textSize="11sp"/>
+
+        <Button
+            android:id="@+id/btnExportJson"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="JSON"
+            android:textSize="11sp"/>
+
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"

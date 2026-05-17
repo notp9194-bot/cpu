@@ -11,6 +11,7 @@ import com.example.deviceinfo.core.model.InfoItem
 import com.example.deviceinfo.core.ui.InfoAdapter
 import com.example.deviceinfo.core.ui.ShareableFragment
 import com.example.deviceinfo.core.util.DeviceUtils
+import com.example.deviceinfo.core.util.ExportUtils
 import com.example.deviceinfo.feature.device.databinding.FragmentDeviceBinding
 import kotlin.math.sqrt
 
@@ -31,16 +32,14 @@ class DeviceFragment : Fragment(), ShareableFragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             val wm = requireContext().getSystemService(Context.WINDOW_SERVICE) as WindowManager
             val metrics = wm.currentWindowMetrics
-            widthPx  = metrics.bounds.width()
-            heightPx = metrics.bounds.height()
+            widthPx = metrics.bounds.width(); heightPx = metrics.bounds.height()
             val dm = resources.displayMetrics
             xdpi = dm.xdpi; ydpi = dm.ydpi
             refreshRate = requireActivity().display?.refreshRate ?: 60f
         } else {
             @Suppress("DEPRECATION")
             val m = DisplayMetrics().also { requireActivity().windowManager.defaultDisplay.getMetrics(it) }
-            widthPx = m.widthPixels; heightPx = m.heightPixels
-            xdpi = m.xdpi; ydpi = m.ydpi
+            widthPx = m.widthPixels; heightPx = m.heightPixels; xdpi = m.xdpi; ydpi = m.ydpi
             @Suppress("DEPRECATION")
             refreshRate = requireActivity().windowManager.defaultDisplay.refreshRate
         }
@@ -59,7 +58,6 @@ class DeviceFragment : Fragment(), ShareableFragment {
         val totalSt = sf.totalBytes / (1024 * 1024 * 1024)
         val availSt = sf.availableBytes / (1024 * 1024 * 1024)
 
-        // NEW: HDR + Wide Color Gamut
         val displayCaps = DeviceUtils.getDisplayCapabilities(requireContext())
 
         latestData = linkedMapOf(
@@ -79,13 +77,15 @@ class DeviceFragment : Fragment(), ShareableFragment {
             "Supported ABIs"    to Build.SUPPORTED_ABIS.joinToString(", ")
         ).also { it.putAll(displayCaps) }
 
-        val items = latestData.entries.mapIndexed { idx, (k, v) ->
-            val highlight = k.contains("Available") || k.contains("HDR") || k.contains("Wide Color")
-            InfoItem(k, v, highlight)
+        val items = latestData.map { (k, v) ->
+            val h = k.contains("Available") || k.contains("HDR") || k.contains("Wide Color")
+            InfoItem(k, v, h)
         }
-
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         b.recyclerView.adapter = InfoAdapter(items)
+
+        b.btnExportTxt.setOnClickListener  { ExportUtils.exportToFile(requireContext(), "Device", latestData) }
+        b.btnExportJson.setOnClickListener { ExportUtils.exportToJson(requireContext(), "Device", latestData) }
     }
 
     override fun getShareText(): String {

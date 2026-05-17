@@ -4,18 +4,21 @@ import android.content.Context
 import android.hardware.*
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.deviceinfo.core.model.InfoItem
 import com.example.deviceinfo.core.ui.InfoAdapter
 import com.example.deviceinfo.core.ui.ShareableFragment
+import com.example.deviceinfo.core.util.ExportUtils
 import com.example.deviceinfo.feature.sensors.databinding.FragmentSensorsBinding
 
 class SensorsFragment : Fragment(), SensorEventListener, ShareableFragment {
     private var _b: FragmentSensorsBinding? = null
     private val b get() = _b!!
     private lateinit var sm: SensorManager
-    private var sensorList: List<Sensor> = emptyList()
+    private var allSensors: List<Sensor> = emptyList()
+    private var allItems: List<InfoItem> = emptyList()
 
     override fun onCreateView(i: LayoutInflater, c: ViewGroup?, s: Bundle?) =
         FragmentSensorsBinding.inflate(i, c, false).also { _b = it }.root
@@ -23,14 +26,46 @@ class SensorsFragment : Fragment(), SensorEventListener, ShareableFragment {
     override fun onViewCreated(view: View, s: Bundle?) {
         super.onViewCreated(view, s)
         sm = requireContext().getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        sensorList = sm.getSensorList(Sensor.TYPE_ALL)
-        val items = sensorList.map { InfoItem(it.name, typeLabel(it.type), it.isWakeUpSensor) }
+        allSensors = sm.getSensorList(Sensor.TYPE_ALL)
+        allItems = allSensors.map { InfoItem(it.name, typeLabel(it.type), it.isWakeUpSensor) }
+
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        b.recyclerView.adapter = InfoAdapter(items)
+        updateList("")
+
+        // SearchView filter
+        b.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(q: String?) = false
+            override fun onQueryTextChange(q: String?): Boolean {
+                updateList(q.orEmpty())
+                return true
+            }
+        })
+        b.searchView.queryHint = "Search sensors…"
     }
 
-    override fun onResume() { super.onResume(); sensorList.forEach { sm.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL) } }
-    override fun onPause()  { super.onPause();  sm.unregisterListener(this) }
+    private fun updateList(query: String) {
+        if (_b == null) return
+        val filtered = if (query.isBlank()) allItems
+        else allItems.filter {
+            it.label.contains(query, ignoreCase = true) ||
+            it.value.contains(query, ignoreCase = true)
+        }
+        val count = filtered.size
+        val total = allItems.size
+        b.tvCount.text = if (query.isBlank()) "$total sensors found"
+                         else "$count of $total sensors match \"$query\""
+        b.recyclerView.adapter = SensorsAdapter(filtered)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        allSensors.forEach { sm.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL) }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        sm.unregisterListener(this)
+    }
 
     private fun typeLabel(t: Int) = when (t) {
         Sensor.TYPE_ACCELEROMETER        -> "Accelerometer"
@@ -54,9 +89,9 @@ class SensorsFragment : Fragment(), SensorEventListener, ShareableFragment {
 
     override fun getShareText(): String {
         val sb = StringBuilder()
-        sb.appendLine("📡 Sensors (${sensorList.size} total)")
+        sb.appendLine("📡 Sensors (${allSensors.size} total)")
         sb.appendLine("─────────────────")
-        sensorList.forEach { sb.appendLine("${it.name} — ${typeLabel(it.type)}") }
+        allSensors.forEach { sb.appendLine("${it.name} — ${typeLabel(it.type)}") }
         sb.appendLine("\nShared from CPU-A Device Info app")
         return sb.toString()
     }

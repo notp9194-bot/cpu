@@ -31,9 +31,8 @@ class BatteryFragment : Fragment(), ShareableFragment {
             override fun onReceive(ctx: Context?, intent: Intent?) { loadData() }
         }
         requireContext().registerReceiver(receiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-        b.btnExport.setOnClickListener {
-            ExportUtils.exportToFile(requireContext(), "Battery", latestData)
-        }
+        b.btnExport.setOnClickListener     { ExportUtils.exportToFile(requireContext(), "Battery", latestData) }
+        b.btnExportJson.setOnClickListener { ExportUtils.exportToJson(requireContext(), "Battery", latestData) }
     }
 
     private fun loadData() {

@@ -15,6 +15,7 @@ import com.example.deviceinfo.core.model.InfoItem
 import com.example.deviceinfo.core.ui.InfoAdapter
 import com.example.deviceinfo.core.ui.ShareableFragment
 import com.example.deviceinfo.core.util.DeviceUtils
+import com.example.deviceinfo.core.util.ExportUtils
 import com.example.deviceinfo.feature.network.databinding.FragmentNetworkBinding
 
 class NetworkFragment : Fragment(), ShareableFragment {
@@ -31,6 +32,8 @@ class NetworkFragment : Fragment(), ShareableFragment {
         super.onViewCreated(view, s)
         loadData()
         registerNetworkCallback()
+        b.btnExportTxt.setOnClickListener  { ExportUtils.exportToFile(requireContext(), "Network", latestData) }
+        b.btnExportJson.setOnClickListener { ExportUtils.exportToJson(requireContext(), "Network", latestData) }
     }
 
     private fun registerNetworkCallback() {
@@ -42,16 +45,15 @@ class NetworkFragment : Fragment(), ShareableFragment {
                 handler.post { loadData() }
             }
         }
-        val request = NetworkRequest.Builder().build()
-        cm.registerNetworkCallback(request, networkCallback!!)
+        cm.registerNetworkCallback(NetworkRequest.Builder().build(), networkCallback!!)
     }
 
     private fun loadData() {
         if (_b == null) return
         latestData = DeviceUtils.getNetworkInfo(requireContext())
         val items = latestData.map { (k, v) ->
-            val highlight = k.startsWith("DNS") || k == "WiFi SSID" || k == "Connection Type"
-            InfoItem(k, v, highlight)
+            val h = k.startsWith("DNS") || k == "WiFi SSID" || k == "Connection Type"
+            InfoItem(k, v, h)
         }
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         b.recyclerView.adapter = InfoAdapter(items)
