@@ -140,5 +140,26 @@
             android:gravity="center"
             android:layout_marginBottom="24dp"/>
 
+        <!-- Export All Tabs Button -->
+        <Button
+            android:id="@+id/btnExportAll"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp"
+            android:text="📤  Export Full Report"
+            android:textSize="15sp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Exports all tabs (SOC, Device, System, Battery, Network, Camera) to a single .txt file in your Downloads folder."
+            android:textSize="12sp"
+            android:textColor="?attr/colorOnSurface"
+            android:alpha="0.6"
+            android:gravity="center"
+            android:layout_marginBottom="16dp"/>
+
     </LinearLayout>
 </ScrollView>

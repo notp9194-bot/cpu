@@ -5,40 +5,24 @@
     android:orientation="vertical"
     android:background="?attr/colorSurface">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <include layout="@layout/layout_search_bar"/>
+
+    <Button
+        android:id="@+id/btnExport"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="end"
-        android:paddingEnd="8dp"
-        android:paddingTop="4dp"
-        android:paddingBottom="2dp">
-
-        <Button
-            android:id="@+id/btnExport"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
-            android:text="TXT"
-            android:textSize="11sp"/>
-
-        <Button
-            android:id="@+id/btnExportJson"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="JSON"
-            android:textSize="11sp"/>
-
-    </LinearLayout>
+        android:layout_gravity="end"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="4dp"
+        android:text="Export Info"
+        android:textSize="12sp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="?attr/colorSurface"
         android:clipToPadding="false"
         android:paddingBottom="8dp"/>
 

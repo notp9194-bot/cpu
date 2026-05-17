@@ -2,7 +2,10 @@ package com.example.deviceinfo.feature.about
 
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.example.deviceinfo.core.ui.ShareableFragment
+import com.example.deviceinfo.core.util.ExportUtils
 import com.example.deviceinfo.feature.about.databinding.FragmentAboutBinding
 
 class AboutFragment : Fragment() {
@@ -18,8 +21,35 @@ class AboutFragment : Fragment() {
             val pi = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
             b.tvVersion.text = "Version ${pi.versionName}"
         } catch (e: Exception) {
-            b.tvVersion.text = "Version 5.0"
+            b.tvVersion.text = "Version 7.0"
         }
+
+        b.btnExportAll.setOnClickListener { exportAllTabs() }
+    }
+
+    private fun exportAllTabs() {
+        val fm = requireActivity().supportFragmentManager
+        val allData = linkedMapOf<String, Map<String, String>>()
+
+        // Tab positions 0-7 (excluding About tab itself at position 8/9)
+        val tabNames = listOf("SOC", "Device", "System", "Battery", "Thermal", "Sensors", "Network", "Camera", "Audio")
+        var collected = 0
+
+        for (pos in 0 until (tabNames.size)) {
+            val fragment = fm.findFragmentByTag("f$pos")
+            if (fragment is ShareableFragment) {
+                allData[tabNames.getOrElse(pos) { "Tab $pos" }] = fragment.getExportData()
+                collected++
+            }
+        }
+
+        if (allData.isEmpty()) {
+            Toast.makeText(requireContext(),
+                "Please visit each tab once before exporting all data.", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        ExportUtils.exportAllToFile(requireContext(), allData)
     }
 
     override fun onDestroyView() { super.onDestroyView(); _b = null }

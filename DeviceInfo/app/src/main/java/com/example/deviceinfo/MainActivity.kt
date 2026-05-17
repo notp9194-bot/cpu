@@ -25,12 +25,13 @@ import com.example.deviceinfo.feature.sensors.SensorsFragment
 import com.example.deviceinfo.feature.about.AboutFragment
 import com.example.deviceinfo.feature.network.NetworkFragment
 import com.example.deviceinfo.feature.camera.CameraFragment
+import com.example.deviceinfo.feature.audio.AudioFragment
 import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var prefs: SharedPreferences
-    private val tabs = listOf("SOC", "DEVICE", "SYSTEM", "BATTERY", "THERMAL", "SENSORS", "NETWORK", "CAMERA", "ABOUT")
+    private val tabs = listOf("SOC", "DEVICE", "SYSTEM", "BATTERY", "THERMAL", "SENSORS", "NETWORK", "CAMERA", "AUDIO", "ABOUT")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         prefs = getSharedPreferences("settings", MODE_PRIVATE)
@@ -92,24 +93,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * FIXED: Ask the active fragment for its real data via ShareableFragment.
-     * Falls back to a generic message only for tabs that don't implement it (e.g. About).
-     */
     private fun shareCurrentTab() {
         val pos = binding.viewPager.currentItem
         val tabName = tabs[pos]
-
-        // FragmentStateAdapter tags fragments as "f{itemId}" inside the ViewPager2 host
         val fragmentTag = "f$pos"
         val fragment = supportFragmentManager.findFragmentByTag(fragmentTag)
-
         val shareText = if (fragment is ShareableFragment) {
             fragment.getShareText()
         } else {
             "📱 Device Info — $tabName\nChecked with CPU-A Device Info app."
         }
-
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, shareText)
@@ -129,7 +122,8 @@ class MainActivity : AppCompatActivity() {
             5 -> SensorsFragment()
             6 -> NetworkFragment()
             7 -> CameraFragment()
-            8 -> AboutFragment()
+            8 -> AudioFragment()
+            9 -> AboutFragment()
             else -> SocFragment()
         }
     }

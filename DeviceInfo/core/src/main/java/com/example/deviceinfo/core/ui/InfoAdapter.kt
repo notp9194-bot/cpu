@@ -12,14 +12,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.deviceinfo.core.databinding.ItemInfoBinding
 import com.example.deviceinfo.core.model.InfoItem
 
-class InfoAdapter(private val items: List<InfoItem>) : RecyclerView.Adapter<InfoAdapter.VH>() {
+class InfoAdapter(private val allItems: List<InfoItem>) : RecyclerView.Adapter<InfoAdapter.VH>() {
+
+    private var filteredItems: List<InfoItem> = allItems
+
     inner class VH(val b: ItemInfoBinding) : RecyclerView.ViewHolder(b.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         VH(ItemInfoBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 
     override fun onBindViewHolder(holder: VH, pos: Int) {
-        val item = items[pos]
+        val item = filteredItems[pos]
 
         // Spacer row
         if (item.label.isEmpty() && item.value.isEmpty()) {
@@ -37,14 +40,12 @@ class InfoAdapter(private val items: List<InfoItem>) : RecyclerView.Adapter<Info
         holder.b.tvLabel.text = item.label
         holder.b.tvValue.text = item.value
 
-        // Highlighted rows get a subtle tinted background
         if (item.isHighlighted) {
-            holder.b.root.setBackgroundColor(0x0F7B2FBE)  // 6% purple tint
+            holder.b.root.setBackgroundColor(0x0F7B2FBE)
         } else {
             holder.b.root.setBackgroundResource(android.R.color.transparent)
         }
 
-        // BUG FIX #5 (copy): Copy individual row — already in UI, now properly wired
         holder.b.btnCopy.setOnClickListener {
             val ctx = holder.itemView.context
             val cm = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -53,5 +54,18 @@ class InfoAdapter(private val items: List<InfoItem>) : RecyclerView.Adapter<Info
         }
     }
 
-    override fun getItemCount() = items.size
+    override fun getItemCount() = filteredItems.size
+
+    /** Filter rows where label OR value contains [query] (case-insensitive). */
+    fun filter(query: String) {
+        filteredItems = if (query.isBlank()) {
+            allItems
+        } else {
+            val q = query.trim().lowercase()
+            allItems.filter {
+                it.label.lowercase().contains(q) || it.value.lowercase().contains(q)
+            }
+        }
+        notifyDataSetChanged()
+    }
 }

@@ -1,6 +1,8 @@
 package com.example.deviceinfo.feature.thermal
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,6 +15,7 @@ class ThermalFragment : Fragment(), ShareableFragment {
     private var _b: FragmentThermalBinding? = null
     private val b get() = _b!!
     private var latestData: List<Pair<String, Float>> = emptyList()
+    private var adapter: ThermalAdapter? = null
 
     override fun onCreateView(i: LayoutInflater, c: ViewGroup?, s: Bundle?) =
         FragmentThermalBinding.inflate(i, c, false).also { _b = it }.root
@@ -24,12 +27,20 @@ class ThermalFragment : Fragment(), ShareableFragment {
             latestData.map { (n, t) -> ThermalItem(n, t) }
         else listOf(ThermalItem("Thermal", 0f))
 
+        adapter = ThermalAdapter(thermalItems)
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        b.recyclerView.adapter = ThermalAdapter(thermalItems)
+        b.recyclerView.adapter = adapter
 
-        val asMap = { latestData.associate { (k, v) -> k to "%.1f °C".format(v) } }
-        b.btnExport.setOnClickListener     { ExportUtils.exportToFile(requireContext(), "Thermal", asMap()) }
-        b.btnExportJson.setOnClickListener { ExportUtils.exportToJson(requireContext(), "Thermal", asMap()) }
+        b.btnExport.setOnClickListener {
+            val map = latestData.associate { (k, v) -> k to String.format("%.1f °C", v) }
+            ExportUtils.exportToFile(requireContext(), "Thermal", map)
+        }
+
+        b.etSearch.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) { adapter?.filter(s?.toString() ?: "") }
+            override fun beforeTextChanged(s: CharSequence?, st: Int, cnt: Int, aft: Int) {}
+            override fun onTextChanged(s: CharSequence?, st: Int, bf: Int, cnt: Int) {}
+        })
     }
 
     override fun getShareText(): String {

@@ -1,6 +1,8 @@
 package com.example.deviceinfo.feature.system
 
 import android.os.*
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
@@ -17,13 +19,14 @@ class SystemFragment : Fragment(), ShareableFragment {
     private var _b: FragmentSystemBinding? = null
     private val b get() = _b!!
     private var latestData: LinkedHashMap<String, String> = linkedMapOf()
+    private var adapter: InfoAdapter? = null
 
     override fun onCreateView(i: LayoutInflater, c: ViewGroup?, s: Bundle?) =
         FragmentSystemBinding.inflate(i, c, false).also { _b = it }.root
 
     override fun onViewCreated(view: View, s: Bundle?) {
         super.onViewCreated(view, s)
-        val up   = SystemClock.elapsedRealtime()
+        val up  = SystemClock.elapsedRealtime()
         val days = TimeUnit.MILLISECONDS.toDays(up)
         val hrs  = TimeUnit.MILLISECONDS.toHours(up) % 24
         val min  = TimeUnit.MILLISECONDS.toMinutes(up) % 60
@@ -61,11 +64,19 @@ class SystemFragment : Fragment(), ShareableFragment {
             "Keyboard Language"   to currentIme
         )
 
+        adapter = InfoAdapter(latestData.map { (k, v) -> InfoItem(k, v) })
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        b.recyclerView.adapter = InfoAdapter(latestData.map { (k, v) -> InfoItem(k, v) })
+        b.recyclerView.adapter = adapter
 
-        b.btnExport.setOnClickListener     { ExportUtils.exportToFile(requireContext(), "System", latestData) }
-        b.btnExportJson.setOnClickListener { ExportUtils.exportToJson(requireContext(), "System", latestData) }
+        b.btnExport.setOnClickListener {
+            ExportUtils.exportToFile(requireContext(), "System", latestData)
+        }
+
+        b.etSearch.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) { adapter?.filter(s?.toString() ?: "") }
+            override fun beforeTextChanged(s: CharSequence?, st: Int, cnt: Int, aft: Int) {}
+            override fun onTextChanged(s: CharSequence?, st: Int, bf: Int, cnt: Int) {}
+        })
     }
 
     override fun getShareText(): String {

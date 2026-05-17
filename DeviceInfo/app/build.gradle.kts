@@ -20,8 +20,8 @@ android {
         applicationId = "com.example.deviceinfo"
         minSdk = 24
         targetSdk = 35
-        versionCode = 5
-        versionName = "5.0"
+        versionCode = 7
+        versionName = "7.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -79,6 +79,7 @@ dependencies {
     implementation(project(":feature-about"))
     implementation(project(":feature-network"))
     implementation(project(":feature-camera"))
+    implementation(project(":feature-audio"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

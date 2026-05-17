@@ -3,22 +3,22 @@ package com.example.deviceinfo.feature.sensors
 import android.content.Context
 import android.hardware.*
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.*
-import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.deviceinfo.core.model.InfoItem
 import com.example.deviceinfo.core.ui.InfoAdapter
 import com.example.deviceinfo.core.ui.ShareableFragment
-import com.example.deviceinfo.core.util.ExportUtils
 import com.example.deviceinfo.feature.sensors.databinding.FragmentSensorsBinding
 
 class SensorsFragment : Fragment(), SensorEventListener, ShareableFragment {
     private var _b: FragmentSensorsBinding? = null
     private val b get() = _b!!
     private lateinit var sm: SensorManager
-    private var allSensors: List<Sensor> = emptyList()
-    private var allItems: List<InfoItem> = emptyList()
+    private var sensorList: List<Sensor> = emptyList()
+    private var adapter: InfoAdapter? = null
 
     override fun onCreateView(i: LayoutInflater, c: ViewGroup?, s: Bundle?) =
         FragmentSensorsBinding.inflate(i, c, false).also { _b = it }.root
@@ -26,46 +26,21 @@ class SensorsFragment : Fragment(), SensorEventListener, ShareableFragment {
     override fun onViewCreated(view: View, s: Bundle?) {
         super.onViewCreated(view, s)
         sm = requireContext().getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        allSensors = sm.getSensorList(Sensor.TYPE_ALL)
-        allItems = allSensors.map { InfoItem(it.name, typeLabel(it.type), it.isWakeUpSensor) }
-
+        sensorList = sm.getSensorList(Sensor.TYPE_ALL)
+        val items = sensorList.map { InfoItem(it.name, typeLabel(it.type), it.isWakeUpSensor) }
+        adapter = InfoAdapter(items)
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        updateList("")
+        b.recyclerView.adapter = adapter
 
-        // SearchView filter
-        b.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(q: String?) = false
-            override fun onQueryTextChange(q: String?): Boolean {
-                updateList(q.orEmpty())
-                return true
-            }
+        b.etSearch.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) { adapter?.filter(s?.toString() ?: "") }
+            override fun beforeTextChanged(s: CharSequence?, st: Int, cnt: Int, aft: Int) {}
+            override fun onTextChanged(s: CharSequence?, st: Int, bf: Int, cnt: Int) {}
         })
-        b.searchView.queryHint = "Search sensors…"
     }
 
-    private fun updateList(query: String) {
-        if (_b == null) return
-        val filtered = if (query.isBlank()) allItems
-        else allItems.filter {
-            it.label.contains(query, ignoreCase = true) ||
-            it.value.contains(query, ignoreCase = true)
-        }
-        val count = filtered.size
-        val total = allItems.size
-        b.tvCount.text = if (query.isBlank()) "$total sensors found"
-                         else "$count of $total sensors match \"$query\""
-        b.recyclerView.adapter = SensorsAdapter(filtered)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        allSensors.forEach { sm.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL) }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        sm.unregisterListener(this)
-    }
+    override fun onResume() { super.onResume(); sensorList.forEach { sm.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL) } }
+    override fun onPause()  { super.onPause();  sm.unregisterListener(this) }
 
     private fun typeLabel(t: Int) = when (t) {
         Sensor.TYPE_ACCELEROMETER        -> "Accelerometer"
@@ -89,9 +64,9 @@ class SensorsFragment : Fragment(), SensorEventListener, ShareableFragment {
 
     override fun getShareText(): String {
         val sb = StringBuilder()
-        sb.appendLine("📡 Sensors (${allSensors.size} total)")
+        sb.appendLine("📡 Sensors (${sensorList.size} total)")
         sb.appendLine("─────────────────")
-        allSensors.forEach { sb.appendLine("${it.name} — ${typeLabel(it.type)}") }
+        sensorList.forEach { sb.appendLine("${it.name} — ${typeLabel(it.type)}") }
         sb.appendLine("\nShared from CPU-A Device Info app")
         return sb.toString()
     }
