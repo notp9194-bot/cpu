@@ -19,14 +19,15 @@ android {
     signingConfigs {
         create("release") {
             // local.properties se padhega — keystore file project root me rakhna
-            val props = java.util.Properties().apply {
-                val f = rootProject.file("local.properties")
-                if (f.exists()) load(f.inputStream())
+            val propsFile = rootProject.file("local.properties")
+            if (propsFile.exists()) {
+                val props = java.util.Properties()
+                propsFile.inputStream().use { props.load(it) }
+                storeFile     = file(props["KEYSTORE_FILE"]     ?: "keystore.jks")
+                storePassword = (props["KEYSTORE_PASSWORD"]     ?: "") as String
+                keyAlias      = (props["KEY_ALIAS"]             ?: "") as String
+                keyPassword   = (props["KEY_PASSWORD"]          ?: "") as String
             }
-            storeFile     = file(props.getProperty("KEYSTORE_FILE", "keystore.jks"))
-            storePassword = props.getProperty("KEYSTORE_PASSWORD", "")
-            keyAlias      = props.getProperty("KEY_ALIAS", "")
-            keyPassword   = props.getProperty("KEY_PASSWORD", "")
         }
     }
 
