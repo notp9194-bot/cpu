@@ -23,22 +23,15 @@ class InfoAdapter(private val allItems: List<InfoItem>) : RecyclerView.Adapter<I
     override fun onBindViewHolder(holder: VH, pos: Int) {
         val item = filteredItems[pos]
 
-        // Reset visibility defaults
-        holder.b.tvLabel.visibility = View.VISIBLE
-        holder.b.tvValue.visibility = View.VISIBLE
-        holder.b.btnCopy.visibility = View.VISIBLE
-        holder.b.accentBar.visibility = View.GONE
-        holder.b.tvLabel.letterSpacing = 0.01f
-        holder.b.tvLabel.textSize = 13f
-
         // Section header row (isHighlighted + no value)
         if (item.isHighlighted && item.value.isEmpty()) {
+            holder.b.tvLabel.visibility = View.VISIBLE
             holder.b.tvValue.visibility = View.GONE
             holder.b.btnCopy.visibility = View.GONE
             holder.b.tvLabel.text = item.label
             holder.b.tvLabel.setTextColor(0xFF00E5FF.toInt())
-            holder.b.tvLabel.textSize = 10f
-            holder.b.tvLabel.letterSpacing = 0.10f
+            holder.b.tvLabel.textSize = 11f
+            holder.b.tvLabel.letterSpacing = 0.08f
             holder.b.cardRoot.setCardBackgroundColor(0xFF0A0E1A.toInt())
             holder.b.cardRoot.strokeWidth = 0
             return
@@ -50,26 +43,30 @@ class InfoAdapter(private val allItems: List<InfoItem>) : RecyclerView.Adapter<I
             holder.b.tvValue.visibility = View.INVISIBLE
             holder.b.btnCopy.visibility = View.INVISIBLE
             holder.b.cardRoot.setCardBackgroundColor(android.graphics.Color.TRANSPARENT)
-            holder.b.cardRoot.strokeWidth = 0
             return
         }
 
+        holder.b.tvLabel.visibility = View.VISIBLE
+        holder.b.tvValue.visibility = View.VISIBLE
+        holder.b.btnCopy.visibility = View.VISIBLE
+        holder.b.tvLabel.letterSpacing = 0.01f
+        holder.b.tvLabel.textSize = 13f
+
         holder.b.tvLabel.text = item.label
         holder.b.tvValue.text = item.value
-        holder.b.tvLabel.setTextColor(0xFF8B9AB5.toInt())
-        holder.b.tvValue.setTextColor(0xFF00E5FF.toInt())
 
         if (item.isHighlighted) {
-            // Highlighted data row — cyan tinted card with accent bar
-            holder.b.cardRoot.setCardBackgroundColor(0x0F00E5FF.toInt())
+            // Highlighted data row — subtle cyan tint card
+            holder.b.cardRoot.setCardBackgroundColor(0x1200E5FF.toInt())
             holder.b.cardRoot.strokeWidth = 1
-            holder.b.cardRoot.strokeColor = 0x2000E5FF.toInt()
-            holder.b.accentBar.visibility = View.VISIBLE
-            holder.b.accentBar.setBackgroundColor(0x6600E5FF.toInt())
+            holder.b.cardRoot.strokeColor = 0x2200E5FF.toInt()
         } else {
-            holder.b.cardRoot.setCardBackgroundColor(0x09AABBCC.toInt())
+            holder.b.cardRoot.setCardBackgroundColor(0x08AABBCC.toInt())
             holder.b.cardRoot.strokeWidth = 0
         }
+
+        holder.b.tvLabel.setTextColor(0xFF8B9AB5.toInt())
+        holder.b.tvValue.setTextColor(0xFF00E5FF.toInt())
 
         holder.b.btnCopy.setOnClickListener {
             val ctx = holder.itemView.context

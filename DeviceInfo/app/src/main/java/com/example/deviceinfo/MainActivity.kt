@@ -12,15 +12,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.deviceinfo.core.ui.ShareableFragment
 import com.example.deviceinfo.databinding.ActivityMainBinding
 import com.example.deviceinfo.feature.soc.SocFragment
 import com.example.deviceinfo.feature.device.DeviceFragment
+import com.example.deviceinfo.feature.display.DisplayFragment
 import com.example.deviceinfo.feature.system.SystemFragment
 import com.example.deviceinfo.feature.battery.BatteryFragment
 import com.example.deviceinfo.feature.thermal.ThermalFragment
@@ -29,12 +27,17 @@ import com.example.deviceinfo.feature.about.AboutFragment
 import com.example.deviceinfo.feature.network.NetworkFragment
 import com.example.deviceinfo.feature.camera.CameraFragment
 import com.example.deviceinfo.feature.audio.AudioFragment
+import com.example.deviceinfo.feature.benchmark.BenchmarkFragment
 import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var prefs: SharedPreferences
-    private val tabs = listOf("SOC", "DEVICE", "SYSTEM", "BATTERY", "THERMAL", "SENSORS", "NETWORK", "CAMERA", "AUDIO", "ABOUT")
+    private val tabs = listOf(
+        "SOC", "DEVICE", "DISPLAY", "SYSTEM", "BATTERY",
+        "THERMAL", "SENSORS", "NETWORK", "CAMERA", "AUDIO",
+        "BENCH", "ABOUT"
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         prefs = getSharedPreferences("settings", MODE_PRIVATE)
@@ -42,29 +45,11 @@ class MainActivity : AppCompatActivity() {
         AppCompatDelegate.setDefaultNightMode(
             if (isDark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
         )
-
-        // Edge-to-edge: let our app draw behind system bars
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
-
-        // Apply status bar height as top padding to headerContainer
-        ViewCompat.setOnApplyWindowInsetsListener(binding.rootLayout) { _, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            // Resize the spacer view to exactly the status bar height
-            binding.statusBarSpacer.layoutParams =
-                binding.statusBarSpacer.layoutParams.also { lp ->
-                    lp.height = systemBars.top
-                }
-            // Bottom inset: give ViewPager breathing room above nav bar
-            binding.viewPager.setPadding(0, 0, 0, systemBars.bottom)
-            binding.viewPager.clipToPadding = false
-            insets
-        }
 
         val adapter = MainPagerAdapter(this)
         binding.viewPager.adapter = adapter
@@ -106,10 +91,7 @@ class MainActivity : AppCompatActivity() {
                 recreate()
                 true
             }
-            R.id.action_share -> {
-                shareCurrentTab()
-                true
-            }
+            R.id.action_share -> { shareCurrentTab(); true }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -135,16 +117,18 @@ class MainActivity : AppCompatActivity() {
     private inner class MainPagerAdapter(activity: AppCompatActivity) : FragmentStateAdapter(activity) {
         override fun getItemCount() = tabs.size
         override fun createFragment(position: Int): Fragment = when (position) {
-            0 -> SocFragment()
-            1 -> DeviceFragment()
-            2 -> SystemFragment()
-            3 -> BatteryFragment()
-            4 -> ThermalFragment()
-            5 -> SensorsFragment()
-            6 -> NetworkFragment()
-            7 -> CameraFragment()
-            8 -> AudioFragment()
-            9 -> AboutFragment()
+            0  -> SocFragment()
+            1  -> DeviceFragment()
+            2  -> DisplayFragment()
+            3  -> SystemFragment()
+            4  -> BatteryFragment()
+            5  -> ThermalFragment()
+            6  -> SensorsFragment()
+            7  -> NetworkFragment()
+            8  -> CameraFragment()
+            9  -> AudioFragment()
+            10 -> BenchmarkFragment()
+            11 -> AboutFragment()
             else -> SocFragment()
         }
     }

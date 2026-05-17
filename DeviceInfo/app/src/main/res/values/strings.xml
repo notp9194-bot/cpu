@@ -1,2 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources><string name="app_name">CPU-A</string></resources>
+<resources>
+    <string name="app_name">CPU-A Device Info</string>
+    <string name="widget_label">CPU-A Widget</string>
+    <string name="widget_description">Shows battery, CPU, RAM and storage at a glance</string>
+</resources>

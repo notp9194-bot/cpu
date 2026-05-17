@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.deviceinfo.core.model.InfoItem
 import com.example.deviceinfo.core.ui.InfoAdapter
 import com.example.deviceinfo.core.ui.ShareableFragment
-import com.example.deviceinfo.core.util.DeviceUtils
 import com.example.deviceinfo.feature.device.databinding.FragmentDeviceBinding
 import kotlin.math.sqrt
 
@@ -62,8 +61,6 @@ class DeviceFragment : Fragment(), ShareableFragment {
         val totalSt = sf.totalBytes / (1024 * 1024 * 1024)
         val availSt = sf.availableBytes / (1024 * 1024 * 1024)
 
-        val displayCaps = DeviceUtils.getDisplayCapabilities(requireContext())
-
         latestData = linkedMapOf(
             "Model"             to "${Build.MODEL} (${Build.DEVICE})",
             "Brand"             to Build.BRAND,
@@ -71,7 +68,7 @@ class DeviceFragment : Fragment(), ShareableFragment {
             "Board"             to Build.BOARD,
             "Hardware"          to Build.HARDWARE,
             "Screen Size"       to String.format("%.2f inches", inches),
-            "Screen Resolution" to "$widthPx x $heightPx px",
+            "Screen Resolution" to "$widthPx × $heightPx px",
             "Screen Density"    to "${dm.densityDpi} dpi",
             "Refresh Rate"      to "${refreshRate.toInt()} Hz",
             "Total RAM"         to "$totalRam MB",
@@ -79,11 +76,10 @@ class DeviceFragment : Fragment(), ShareableFragment {
             "Internal Storage"  to "$totalSt GB",
             "Available Storage" to "$availSt GB (${availSt * 100 / (if (totalSt > 0) totalSt else 1)}%)",
             "Supported ABIs"    to Build.SUPPORTED_ABIS.joinToString(", ")
-        ).also { it.putAll(displayCaps) }
+        )
 
         val items = latestData.entries.map { (k, v) ->
-            val highlight = k.contains("Available") || k.contains("HDR") || k.contains("Wide Color")
-            InfoItem(k, v, highlight)
+            InfoItem(k, v, k.contains("Available"))
         }
 
         adapter = InfoAdapter(items)

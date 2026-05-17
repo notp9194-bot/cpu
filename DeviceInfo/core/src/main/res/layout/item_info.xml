@@ -7,9 +7,9 @@
     android:layout_height="wrap_content"
     android:layout_marginStart="12dp"
     android:layout_marginEnd="12dp"
-    android:layout_marginTop="3dp"
-    android:layout_marginBottom="3dp"
-    app:cardCornerRadius="14dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
+    app:cardCornerRadius="12dp"
     app:cardElevation="0dp"
     app:strokeWidth="0dp"
     app:cardBackgroundColor="?attr/colorSurface">
@@ -18,20 +18,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="8dp"
-        android:paddingTop="13dp"
-        android:paddingBottom="13dp"
+        android:paddingStart="14dp"
+        android:paddingEnd="6dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
         android:gravity="center_vertical">
-
-        <!-- Left accent bar -->
-        <View
-            android:id="@+id/accentBar"
-            android:layout_width="3dp"
-            android:layout_height="28dp"
-            android:layout_marginEnd="12dp"
-            android:background="#2200E5FF"
-            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/tvLabel"
@@ -53,13 +44,14 @@
             android:gravity="end"
             android:paddingEnd="4dp"/>
 
-        <ImageView
+        <TextView
             android:id="@+id/btnCopy"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
-            android:src="@drawable/ic_copy"
-            android:tint="#3A607080"
-            android:padding="8dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:text="⎘"
+            android:textColor="#607080"
+            android:textSize="15sp"
+            android:gravity="center"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Copy"/>
 

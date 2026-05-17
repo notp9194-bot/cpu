@@ -1,10 +1,9 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    id("com.google.devtools.ksp") version "1.9.23-1.0.20"
 }
 android {
-    namespace = "com.example.deviceinfo.feature.battery"
+    namespace = "com.example.deviceinfo.feature.benchmark"
     compileSdk = 35
     defaultConfig { minSdk = 24 }
     compileOptions {
@@ -23,8 +22,5 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.fragment.ktx)
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
     testImplementation(libs.junit)
 }
