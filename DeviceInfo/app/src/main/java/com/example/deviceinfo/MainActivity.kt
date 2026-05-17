@@ -12,6 +12,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.deviceinfo.core.ui.ShareableFragment
@@ -39,11 +42,29 @@ class MainActivity : AppCompatActivity() {
         AppCompatDelegate.setDefaultNightMode(
             if (isDark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
         )
+
+        // Edge-to-edge: let our app draw behind system bars
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
+
+        // Apply status bar height as top padding to headerContainer
+        ViewCompat.setOnApplyWindowInsetsListener(binding.rootLayout) { _, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            // Resize the spacer view to exactly the status bar height
+            binding.statusBarSpacer.layoutParams =
+                binding.statusBarSpacer.layoutParams.also { lp ->
+                    lp.height = systemBars.top
+                }
+            // Bottom inset: give ViewPager breathing room above nav bar
+            binding.viewPager.setPadding(0, 0, 0, systemBars.bottom)
+            binding.viewPager.clipToPadding = false
+            insets
+        }
 
         val adapter = MainPagerAdapter(this)
         binding.viewPager.adapter = adapter

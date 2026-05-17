@@ -8,11 +8,12 @@
         <item name="colorOnSurface">#E8EAED</item>
         <item name="android:colorBackground">#0D1117</item>
         <item name="android:windowBackground">#0D1117</item>
-        <item name="android:statusBarColor">#0D1117</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">#0D1117</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:textColorPrimary">#E8EAED</item>
         <item name="android:textColorSecondary">#8B9AB5</item>
-        <item name="android:windowLightStatusBar">false</item>
     </style>
 
     <style name="TabTextStyle" parent="TextAppearance.Design.Tab">
