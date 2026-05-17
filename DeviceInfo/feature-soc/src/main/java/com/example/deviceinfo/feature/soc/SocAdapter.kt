@@ -1,16 +1,16 @@
-package com.example.deviceinfo.feature.system
+package com.example.deviceinfo.feature.soc
 
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.deviceinfo.core.model.InfoItem
-import com.example.deviceinfo.feature.system.databinding.ItemSystemBinding
+import com.example.deviceinfo.feature.soc.databinding.ItemSocBinding
 
-class SystemAdapter(private val items: List<InfoItem>) : RecyclerView.Adapter<SystemAdapter.ViewHolder>() {
-    inner class ViewHolder(val b: ItemSystemBinding) : RecyclerView.ViewHolder(b.root)
+class SocAdapter(private val items: List<InfoItem>) : RecyclerView.Adapter<SocAdapter.ViewHolder>() {
+    inner class ViewHolder(val b: ItemSocBinding) : RecyclerView.ViewHolder(b.root)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-        ViewHolder(ItemSystemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+        ViewHolder(ItemSocBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
         holder.b.tvLabel.text = item.label
