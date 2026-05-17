@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.DeviceInfo" parent="Theme.MaterialComponents.NoActionBar.Bridge">
-        <item name="colorPrimary">#7B2FBE</item>
-        <item name="colorPrimaryVariant">#5C1A9C</item>
-        <item name="colorOnPrimary">#FFFFFF</item>
-        <item name="colorSurface">#F5F5F5</item>
-        <item name="colorOnSurface">#1A1A1A</item>
+        <item name="colorPrimary">#00E5FF</item>
+        <item name="colorPrimaryVariant">#00B8D4</item>
+        <item name="colorOnPrimary">#000000</item>
+        <item name="colorSurface">#F0F4FF</item>
+        <item name="colorOnSurface">#0A0E1A</item>
         <item name="android:colorBackground">#FFFFFF</item>
         <item name="android:windowBackground">#FFFFFF</item>
-        <item name="android:statusBarColor">#7B2FBE</item>
-        <item name="android:navigationBarColor">#FFFFFF</item>
-        <item name="android:textColorPrimary">#1A1A1A</item>
-        <item name="android:textColorSecondary">#555555</item>
+        <item name="android:statusBarColor">#0D1117</item>
+        <item name="android:navigationBarColor">#0D1117</item>
+        <item name="android:textColorPrimary">#0A0E1A</item>
+        <item name="android:textColorSecondary">#4A5568</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <style name="TabTextStyle" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.06</item>
+        <item name="textAllCaps">true</item>
     </style>
 </resources>

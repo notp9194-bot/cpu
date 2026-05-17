@@ -6,42 +6,75 @@
     android:orientation="vertical"
     android:background="?attr/colorSurface">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        app:titleTextColor="?attr/colorOnPrimary">
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/ic_chip"
-                android:layout_marginEnd="10dp"
-                android:tint="?attr/colorOnPrimary"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="CPU-A"
-                android:textColor="?attr/colorOnPrimary"
-                android:textSize="20sp"
-                android:textStyle="bold"/>
-        </LinearLayout>
-    </androidx.appcompat.widget.Toolbar>
-
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabLayout"
+    <!-- Modern Header -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        app:tabTextColor="#CCFFFFFF"
-        app:tabSelectedTextColor="?attr/colorOnPrimary"
-        app:tabIndicatorColor="?attr/colorOnPrimary"
-        app:tabMode="scrollable"/>
+        android:orientation="vertical"
+        android:background="#0D1117"
+        android:elevation="8dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:background="@android:color/transparent">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_chip"
+                    android:layout_marginEnd="10dp"
+                    android:tint="#00E5FF"
+                    android:contentDescription="Logo"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CPU"
+                    android:textColor="#FFFFFF"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="-0.02"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="-A"
+                    android:textColor="#00E5FF"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="-0.02"/>
+
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
+
+        <!-- Tab Layout -->
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:background="@android:color/transparent"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:paddingBottom="6dp"
+            app:tabTextColor="#607080"
+            app:tabSelectedTextColor="#00E5FF"
+            app:tabIndicatorColor="#00E5FF"
+            app:tabIndicatorHeight="2dp"
+            app:tabIndicatorGravity="bottom"
+            app:tabMode="scrollable"
+            app:tabTextAppearance="@style/TabTextStyle"/>
+
+    </LinearLayout>
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
