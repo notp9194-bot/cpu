@@ -41,7 +41,9 @@
 
     </LinearLayout>
 
-    <include layout="@layout/layout_search_bar"/>
+    <include
+        android:id="@+id/searchBar"
+        layout="@layout/layout_search_bar"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"

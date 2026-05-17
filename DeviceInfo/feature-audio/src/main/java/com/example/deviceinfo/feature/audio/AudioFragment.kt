@@ -33,7 +33,7 @@ class AudioFragment : Fragment(), ShareableFragment {
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         b.recyclerView.adapter = adapter
 
-        b.etSearch.addTextChangedListener(object : TextWatcher {
+        b.searchBar.etSearch.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) { adapter?.filter(s?.toString() ?: "") }
             override fun beforeTextChanged(s: CharSequence?, st: Int, cnt: Int, aft: Int) {}
             override fun onTextChanged(s: CharSequence?, st: Int, bf: Int, cnt: Int) {}
@@ -102,8 +102,13 @@ class AudioFragment : Fragment(), ShareableFragment {
                 AudioFormat.ENCODING_AAC_HE_V1  to "AAC-HE v1",
                 AudioFormat.ENCODING_AAC_HE_V2  to "AAC-HE v2",
             )
+            val linearPcmEncodings = setOf(
+                AudioFormat.ENCODING_PCM_16BIT,
+                AudioFormat.ENCODING_PCM_8BIT,
+                AudioFormat.ENCODING_PCM_FLOAT
+            )
             encodingMap.forEach { (encoding, name) ->
-                if (AudioFormat.isEncodingLinearPcm(encoding) ||
+                if (encoding in linearPcmEncodings ||
                     try { AudioFormat.Builder().setEncoding(encoding); true } catch (e: Exception) { false }) {
                     encodings.add(name)
                 }
