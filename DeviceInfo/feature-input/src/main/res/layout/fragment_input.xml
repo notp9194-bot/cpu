@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?attr/colorSurface"
+    android:paddingTop="4dp">
+
+    <!-- Input Radar Chart -->
+    <com.example.deviceinfo.feature.input.InputRadarChartView
+        android:id="@+id/inputRadarChart"
+        android:layout_width="match_parent"
+        android:layout_height="210dp"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="8dp"/>
+
+    <include
+        android:id="@+id/searchBar"
+        layout="@layout/layout_search_bar"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp"/>
+
+</LinearLayout>

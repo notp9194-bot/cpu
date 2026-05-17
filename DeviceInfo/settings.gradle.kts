@@ -1,25 +1,29 @@
 pluginManagement {
-      repositories { google(); mavenCentral(); gradlePluginPortal() }
-  }
-  dependencyResolutionManagement {
-      repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-      repositories { google(); mavenCentral() }
-  }
-  rootProject.name = "DeviceInfo"
-  include(":app")
-  include(":core")
-  include(":feature-soc")
-  include(":feature-device")
-  include(":feature-system")
-  include(":feature-battery")
-  include(":feature-thermal")
-  include(":feature-sensors")
-  include(":feature-about")
-  include(":feature-network")
-  include(":feature-camera")
-  include(":feature-audio")
-  include(":feature-display")
-  include(":feature-codec")
-  include(":feature-benchmark")
-  include(":feature-connectivity")
-  include(":feature-power")
+    repositories { google(); mavenCentral(); gradlePluginPortal() }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories { google(); mavenCentral() }
+}
+rootProject.name = "DeviceInfo"
+include(":app")
+include(":core")
+include(":feature-soc")
+include(":feature-device")
+include(":feature-system")
+include(":feature-battery")
+include(":feature-thermal")
+include(":feature-sensors")
+include(":feature-about")
+include(":feature-network")
+include(":feature-camera")
+include(":feature-audio")
+include(":feature-display")
+include(":feature-codec")
+include(":feature-benchmark")
+include(":feature-connectivity")
+include(":feature-power")
+include(":feature-gpu")
+include(":feature-memory")
+include(":feature-build")
+include(":feature-input")

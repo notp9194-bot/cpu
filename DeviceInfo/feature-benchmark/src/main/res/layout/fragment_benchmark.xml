@@ -7,10 +7,10 @@
     android:background="?attr/colorSurface"
     android:paddingTop="4dp">
 
-    <!-- Two gauges side by side: ST and MT -->
+    <!-- Two CPU gauges: ST and MT -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="180dp"
+        android:layout_height="168dp"
         android:orientation="horizontal"
         android:layout_marginHorizontal="12dp"
         android:layout_marginTop="8dp">
@@ -35,7 +35,155 @@
 
     </LinearLayout>
 
-    <!-- Status text + progress bar -->
+    <!-- Memory | Disk | Crypto mini cards -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="6dp"
+        android:gravity="center_vertical">
+
+        <!-- Memory card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#1A2196F3">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="💾 MEM"
+                    android:textSize="9sp"
+                    android:textColor="#882196F3"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08"/>
+
+                <TextView
+                    android:id="@+id/tvMemWrite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="W: —"
+                    android:textSize="11sp"
+                    android:textColor="#FF2196F3"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/tvMemRead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="R: —"
+                    android:textSize="11sp"
+                    android:textColor="#BB2196F3"/>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Disk card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#1AFF9800">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="💿 DISK"
+                    android:textSize="9sp"
+                    android:textColor="#88FF9800"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08"/>
+
+                <TextView
+                    android:id="@+id/tvDiskWrite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="W: —"
+                    android:textSize="11sp"
+                    android:textColor="#FFFF9800"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/tvDiskRead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="R: —"
+                    android:textSize="11sp"
+                    android:textColor="#BBFF9800"/>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Crypto card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#1AE91E63">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🔐 AES"
+                    android:textSize="9sp"
+                    android:textColor="#88E91E63"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08"/>
+
+                <TextView
+                    android:id="@+id/tvCryptoMbps"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="— MB/s"
+                    android:textSize="11sp"
+                    android:textColor="#FFE91E63"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/tvCryptoClass"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="AES-256"
+                    android:textSize="11sp"
+                    android:textColor="#BBE91E63"/>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+    <!-- Status + progress -->
     <TextView
         android:id="@+id/statusText"
         android:layout_width="match_parent"
@@ -61,7 +209,7 @@
     <com.example.deviceinfo.feature.benchmark.BenchmarkHistoryChartView
         android:id="@+id/historyChart"
         android:layout_width="match_parent"
-        android:layout_height="110dp"
+        android:layout_height="100dp"
         android:layout_marginHorizontal="12dp"
         android:layout_marginTop="6dp"/>
 
@@ -72,7 +220,7 @@
         android:orientation="horizontal"
         android:gravity="center"
         android:paddingHorizontal="16dp"
-        android:paddingTop="6dp"
+        android:paddingTop="4dp"
         android:paddingBottom="4dp">
 
         <com.google.android.material.button.MaterialButton
