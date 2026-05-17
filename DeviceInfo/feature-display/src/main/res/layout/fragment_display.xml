@@ -19,6 +19,16 @@
         android:id="@+id/searchBar"
         layout="@layout/layout_search_bar"/>
 
+    <Button
+        android:id="@+id/btnExport"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_margin="8dp"
+        android:text="Export Info"
+        android:textSize="12sp"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
