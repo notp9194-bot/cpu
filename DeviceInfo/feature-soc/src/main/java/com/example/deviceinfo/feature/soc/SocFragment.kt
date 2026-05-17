@@ -34,7 +34,7 @@ class SocFragment : Fragment(), ShareableFragment {
     override fun onViewCreated(view: View, s: Bundle?) {
         super.onViewCreated(view, s)
         loadData()
-        b.etSearch.addTextChangedListener(object : TextWatcher {
+        b.searchBar.etSearch.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) { adapter?.filter(s?.toString() ?: "") }
             override fun beforeTextChanged(s: CharSequence?, st: Int, cnt: Int, aft: Int) {}
             override fun onTextChanged(s: CharSequence?, st: Int, bf: Int, cnt: Int) {}
@@ -71,7 +71,7 @@ class SocFragment : Fragment(), ShareableFragment {
             InfoItem("Vulkan Support",    if (Build.VERSION.SDK_INT >= 24) "Yes (API ${Build.VERSION.SDK_INT})" else "No")
         )
         latestItems = items
-        val query = b.etSearch.text?.toString() ?: ""
+        val query = b.searchBar.etSearch.text?.toString() ?: ""
         adapter = InfoAdapter(items)
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         b.recyclerView.adapter = adapter

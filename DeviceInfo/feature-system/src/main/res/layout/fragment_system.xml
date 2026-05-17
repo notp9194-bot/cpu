@@ -5,7 +5,9 @@
     android:orientation="vertical"
     android:background="?attr/colorSurface">
 
-    <include layout="@layout/layout_search_bar"/>
+    <include
+        android:id="@+id/searchBar"
+        layout="@layout/layout_search_bar"/>
 
     <Button
         android:id="@+id/btnExport"

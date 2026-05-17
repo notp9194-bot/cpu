@@ -36,7 +36,7 @@ class ThermalFragment : Fragment(), ShareableFragment {
             ExportUtils.exportToFile(requireContext(), "Thermal", map)
         }
 
-        b.etSearch.addTextChangedListener(object : TextWatcher {
+        b.searchBar.etSearch.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) { adapter?.filter(s?.toString() ?: "") }
             override fun beforeTextChanged(s: CharSequence?, st: Int, cnt: Int, aft: Int) {}
             override fun onTextChanged(s: CharSequence?, st: Int, bf: Int, cnt: Int) {}
