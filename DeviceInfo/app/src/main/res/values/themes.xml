@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.DeviceInfo" parent="Theme.MaterialComponents.NoActionBar.Bridge">
-        <item name="colorPrimary">#00E5FF</item>
-        <item name="colorPrimaryVariant">#00B8D4</item>
-        <item name="colorOnPrimary">#000000</item>
+        <item name="colorPrimary">#0097A7</item>
+        <item name="colorPrimaryVariant">#006064</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
         <item name="colorSurface">#F0F4FF</item>
         <item name="colorOnSurface">#0A0E1A</item>
         <item name="android:colorBackground">#FFFFFF</item>
         <item name="android:windowBackground">#FFFFFF</item>
-        <item name="android:statusBarColor">#0D1117</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">#0D1117</item>
-        <item name="android:textColorPrimary">#0A0E1A</item>
-        <item name="android:textColorSecondary">#4A5568</item>
         <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <!-- Light mode text: strong dark tones for readability -->
+        <item name="android:textColorPrimary">#0A0E1A</item>
+        <item name="android:textColorSecondary">#1A2840</item>
     </style>
 
     <style name="TabTextStyle" parent="TextAppearance.Design.Tab">

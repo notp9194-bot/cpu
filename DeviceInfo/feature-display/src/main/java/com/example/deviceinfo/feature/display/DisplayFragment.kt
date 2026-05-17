@@ -1,9 +1,12 @@
 package com.example.deviceinfo.feature.display
 
+import android.app.ActivityManager
 import android.content.Context
 import android.hardware.display.DisplayManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.DisplayMetrics
@@ -27,11 +30,7 @@ class DisplayFragment : Fragment(), ShareableFragment {
 
     override fun onViewCreated(view: View, s: Bundle?) {
         super.onViewCreated(view, s)
-        val items = buildDisplayInfo()
-        latestItems = items
-        adapter = InfoAdapter(items)
-        b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        b.recyclerView.adapter = adapter
+        loadData()
 
         b.searchBar.etSearch.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) { adapter?.filter(s?.toString() ?: "") }
@@ -40,20 +39,21 @@ class DisplayFragment : Fragment(), ShareableFragment {
         })
     }
 
-    private fun buildDisplayInfo(): List<InfoItem> {
+    private fun loadData() {
+        if (_b == null) return
         val items = mutableListOf<InfoItem>()
-        val ctx = requireContext()
 
-        // ── Screen basics ────────────────────────────────────
-        items.add(InfoItem("── Screen ──", "", true))
+        // ── Resolution & Size ─────────────────────────────────────────
+        items.add(InfoItem("── Resolution & Size ──", "", true))
 
         val widthPx: Int; val heightPx: Int
         val xdpi: Float; val ydpi: Float; val refreshRate: Float
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val wm = ctx.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            val wm = requireContext().getSystemService(Context.WINDOW_SERVICE) as WindowManager
             val metrics = wm.currentWindowMetrics
-            widthPx = metrics.bounds.width(); heightPx = metrics.bounds.height()
+            widthPx  = metrics.bounds.width()
+            heightPx = metrics.bounds.height()
             val dm = resources.displayMetrics
             xdpi = dm.xdpi; ydpi = dm.ydpi
             refreshRate = requireActivity().display?.refreshRate ?: 60f
@@ -71,53 +71,45 @@ class DisplayFragment : Fragment(), ShareableFragment {
             (widthPx / xdpi).toDouble().let { it * it } +
             (heightPx / ydpi).toDouble().let { it * it }
         )
-        val aspectRatio = simplifyRatio(widthPx, heightPx)
 
-        items.add(InfoItem("Resolution",      "$widthPx × $heightPx px"))
-        items.add(InfoItem("Screen Size",     String.format("%.2f inches", inches)))
-        items.add(InfoItem("Aspect Ratio",    aspectRatio))
-        items.add(InfoItem("Density",         "${dm.densityDpi} dpi  (${densityBucket(dm.densityDpi)})"))
-        items.add(InfoItem("X DPI",           String.format("%.1f", xdpi)))
-        items.add(InfoItem("Y DPI",           String.format("%.1f", ydpi)))
-        items.add(InfoItem("Density Scale",   String.format("%.2f×", dm.density)))
+        items.add(InfoItem("Screen Resolution", "$widthPx × $heightPx px", true))
+        items.add(InfoItem("Screen Size",       String.format("%.2f inches", inches)))
+        items.add(InfoItem("Density",           "${dm.densityDpi} dpi"))
+        items.add(InfoItem("Density Class",     densityClass(dm.densityDpi)))
+        items.add(InfoItem("Logical Density",   "×${dm.density}"))
+        items.add(InfoItem("Font Scale",        "×${dm.scaledDensity / dm.density}"))
 
-        // ── Refresh rates ─────────────────────────────────────
+        // ── Refresh Rate ──────────────────────────────────────────────
         items.add(InfoItem("── Refresh Rate ──", "", true))
-        items.add(InfoItem("Current Rate", "${refreshRate.toInt()} Hz", true))
+        items.add(InfoItem("Current Rate",      "${refreshRate.toInt()} Hz", true))
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val display = requireActivity().display
-            if (display != null) {
-                try {
-                    val modes = display.supportedModes
-                    if (modes.size > 1) {
-                        modes.forEachIndexed { i, mode ->
-                            items.add(InfoItem(
-                                "Mode ${i + 1}",
-                                "${mode.physicalWidth}×${mode.physicalHeight}  @  ${String.format("%.0f", mode.refreshRate)} Hz"
-                            ))
-                        }
-                    } else {
-                        items.add(InfoItem("Supported Modes", "Single mode only"))
-                    }
-                } catch (e: Exception) { }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val displayManager = requireContext().getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
+            val display = displayManager.getDisplay(android.view.Display.DEFAULT_DISPLAY)
+            val supportedModes = display?.supportedModes
+            if (!supportedModes.isNullOrEmpty()) {
+                val rates = supportedModes.map { it.refreshRate.toInt() }.distinct().sorted()
+                items.add(InfoItem("Supported Rates", rates.joinToString(", ") { "$it Hz" }))
+                val maxRate = rates.maxOrNull() ?: 0
+                items.add(InfoItem("Peak Refresh Rate", "$maxRate Hz"))
             }
         }
 
-        // ── Color / HDR ──────────────────────────────────────
-        items.add(InfoItem("── Color & HDR ──", "", true))
-        val dm2 = ctx.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
-        val display0 = dm2.getDisplay(android.view.Display.DEFAULT_DISPLAY)
+        // ── Color Capabilities ────────────────────────────────────────
+        items.add(InfoItem("── Color ──", "", true))
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val displayManager = requireContext().getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
+            val display = displayManager.getDisplay(android.view.Display.DEFAULT_DISPLAY)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && display0 != null) {
-            items.add(InfoItem("Wide Color Gamut",
-                if (display0.isWideColorGamut) "✅ Yes (P3 / BT.2020)" else "❌ No (sRGB)", display0.isWideColorGamut))
-        }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                items.add(InfoItem("Wide Color Gamut",
+                    if (display?.isWideColorGamut == true) "Yes (P3 / BT.2020)" else "No (sRGB)", true))
+            }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && display0 != null) {
-            val hdrCaps = display0.hdrCapabilities
-            if (hdrCaps != null && hdrCaps.supportedHdrTypes.isNotEmpty()) {
-                val labels = hdrCaps.supportedHdrTypes.map { type ->
+            val hdrCaps = display?.hdrCapabilities
+            val hdrTypes = hdrCaps?.supportedHdrTypes ?: intArrayOf()
+            if (hdrTypes.isNotEmpty()) {
+                val labels = hdrTypes.map { type ->
                     when (type) {
                         android.view.Display.HdrCapabilities.HDR_TYPE_DOLBY_VISION -> "Dolby Vision"
                         android.view.Display.HdrCapabilities.HDR_TYPE_HDR10         -> "HDR10"
@@ -126,95 +118,65 @@ class DisplayFragment : Fragment(), ShareableFragment {
                         else -> "Type $type"
                     }
                 }
-                items.add(InfoItem("HDR Support",      labels.joinToString(", "), true))
-                items.add(InfoItem("Max Luminance",    "${hdrCaps.desiredMaxLuminance.toInt()} nits"))
-                items.add(InfoItem("Min Luminance",    "${hdrCaps.desiredMinLuminance} nits"))
-                items.add(InfoItem("Max Avg Luminance","${hdrCaps.desiredMaxAverageLuminance.toInt()} nits"))
+                items.add(InfoItem("HDR Support",    labels.joinToString(", "), true))
+                items.add(InfoItem("Max Luminance",  "${hdrCaps?.desiredMaxLuminance?.toInt()} nits"))
+                items.add(InfoItem("Min Luminance",  "${hdrCaps?.desiredMinLuminance} nits"))
+                items.add(InfoItem("Max Avg Lum",    "${hdrCaps?.desiredMaxAverageLuminance?.toInt()} nits"))
             } else {
                 items.add(InfoItem("HDR Support", "Not Supported"))
             }
         }
 
-        // Color mode (API 26+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && display0 != null) {
-            try {
-                val colorMode = when (display0.colorMode) {
-                    android.view.Display.COLOR_MODE_DEFAULT  -> "Default"
-                    android.view.Display.COLOR_MODE_SRGB     -> "sRGB"
-                    android.view.Display.COLOR_MODE_DISPLAY_P3 -> "Display P3"
-                    else -> "Mode ${display0.colorMode}"
-                }
-                items.add(InfoItem("Color Mode", colorMode))
-
-                val supportedModes = display0.supportedColorModes
-                if (supportedModes.isNotEmpty()) {
-                    items.add(InfoItem("Supported Color Modes",
-                        supportedModes.joinToString(", ") { m ->
-                            when (m) {
-                                android.view.Display.COLOR_MODE_DEFAULT    -> "Default"
-                                android.view.Display.COLOR_MODE_SRGB       -> "sRGB"
-                                android.view.Display.COLOR_MODE_DISPLAY_P3 -> "P3"
-                                else -> "Mode $m"
-                            }
-                        }
-                    ))
-                }
-            } catch (e: Exception) { }
+        // ── Brightness ────────────────────────────────────────────────
+        items.add(InfoItem("── Brightness ──", "", true))
+        try {
+            val brightness = android.provider.Settings.System.getInt(
+                requireContext().contentResolver,
+                android.provider.Settings.System.SCREEN_BRIGHTNESS
+            )
+            val pct = (brightness * 100 / 255)
+            items.add(InfoItem("Current Brightness", "$pct% ($brightness/255)"))
+            val autoBrightness = android.provider.Settings.System.getInt(
+                requireContext().contentResolver,
+                android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE,
+                android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL
+            )
+            items.add(InfoItem("Auto Brightness",
+                if (autoBrightness == android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC)
+                    "Enabled" else "Disabled"))
+        } catch (e: Exception) {
+            items.add(InfoItem("Brightness", "Permission needed"))
         }
 
-        // ── Orientation & rotation ────────────────────────────
-        items.add(InfoItem("── Orientation ──", "", true))
-        val rotation = when (requireActivity().windowManager.defaultDisplay.rotation) {
-            Surface.ROTATION_0   -> "Portrait (0°)"
-            Surface.ROTATION_90  -> "Landscape (90°)"
-            Surface.ROTATION_180 -> "Reverse Portrait (180°)"
-            Surface.ROTATION_270 -> "Reverse Landscape (270°)"
-            else -> "Unknown"
-        }
-        items.add(InfoItem("Current Rotation", rotation))
-        items.add(InfoItem("Natural Orientation",
-            if (widthPx < heightPx) "Portrait" else "Landscape"))
+        // ── Touch ────────────────────────────────────────────────────
+        items.add(InfoItem("── Touch ──", "", true))
+        val hasTouchscreen = requireContext().packageManager
+            .hasSystemFeature("android.hardware.touchscreen")
+        val hasMultitouch = requireContext().packageManager
+            .hasSystemFeature("android.hardware.touchscreen.multitouch.jazzhand")
+        items.add(InfoItem("Touchscreen",  if (hasTouchscreen) "Yes" else "No"))
+        items.add(InfoItem("Multi-touch",  if (hasMultitouch) "5+ fingers" else "Limited"))
 
-        // ── Cutout ───────────────────────────────────────────
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            val cutout = requireActivity().window.decorView.rootWindowInsets?.displayCutout
-            items.add(InfoItem("── Display Cutout ──", "", true))
-            if (cutout != null) {
-                items.add(InfoItem("Cutout Present", "Yes", true))
-                items.add(InfoItem("Safe Area Top",    "${cutout.safeInsetTop} px"))
-                items.add(InfoItem("Safe Area Bottom", "${cutout.safeInsetBottom} px"))
-                items.add(InfoItem("Safe Area Left",   "${cutout.safeInsetLeft} px"))
-                items.add(InfoItem("Safe Area Right",  "${cutout.safeInsetRight} px"))
-            } else {
-                items.add(InfoItem("Cutout", "No cutout / Fullscreen"))
-            }
-        }
-
-        return items
+        latestItems = items
+        adapter = InfoAdapter(items)
+        b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        b.recyclerView.adapter = adapter
     }
 
-    private fun densityBucket(dpi: Int) = when {
-        dpi <= 120  -> "ldpi"
-        dpi <= 160  -> "mdpi"
-        dpi <= 240  -> "hdpi"
-        dpi <= 320  -> "xhdpi"
-        dpi <= 480  -> "xxhdpi"
-        dpi <= 640  -> "xxxhdpi"
-        else        -> "Ultra HD"
-    }
-
-    private fun simplifyRatio(w: Int, h: Int): String {
-        fun gcd(a: Int, b: Int): Int = if (b == 0) a else gcd(b, a % b)
-        val g = gcd(w, h)
-        return "${w / g}:${h / g}"
+    private fun densityClass(dpi: Int) = when {
+        dpi <= 120 -> "LDPI (Low)"
+        dpi <= 160 -> "MDPI (Medium)"
+        dpi <= 240 -> "HDPI (High)"
+        dpi <= 320 -> "XHDPI (X-High)"
+        dpi <= 480 -> "XXHDPI (XX-High)"
+        else       -> "XXXHDPI (XXX-High)"
     }
 
     override fun getShareText(): String {
         val sb = StringBuilder()
         sb.appendLine("🖥️ Display Info")
         sb.appendLine("─────────────────")
-        latestItems.filter { it.label.isNotEmpty() && it.value.isNotEmpty() }
-            .forEach { sb.appendLine("${it.label}: ${it.value}") }
+        latestItems.filter { it.value.isNotEmpty() }.forEach { sb.appendLine("${it.label}: ${it.value}") }
         sb.appendLine("\nShared from CPU-A Device Info app")
         return sb.toString()
     }

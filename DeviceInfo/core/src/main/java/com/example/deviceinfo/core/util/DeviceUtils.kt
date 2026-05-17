@@ -293,3 +293,91 @@ object DeviceUtils {
     private fun intToIp(i: Int): String =
         "${i and 0xFF}.${i shr 8 and 0xFF}.${i shr 16 and 0xFF}.${i shr 24 and 0xFF}"
 }
+
+
+    /**
+     * Reads /proc/stat twice (100ms apart) to compute per-core CPU usage %.
+     * Returns list of usage 0-100 per core, or empty list on failure.
+     * Call from background thread only.
+     */
+    fun getCpuUsagePercent(): List<Int> {
+        fun readCpuStats(): List<LongArray> {
+            val result = mutableListOf<LongArray>()
+            try {
+                BufferedReader(FileReader("/proc/stat")).use { reader ->
+                    reader.lineSequence().forEach { line ->
+                        if (line.startsWith("cpu") && line.length > 3 && line[3].isDigit()) {
+                            val parts = line.trim().split("\\s+".toRegex())
+                            if (parts.size >= 5) {
+                                val user   = parts[1].toLongOrNull() ?: 0L
+                                val nice   = parts[2].toLongOrNull() ?: 0L
+                                val system = parts[3].toLongOrNull() ?: 0L
+                                val idle   = parts[4].toLongOrNull() ?: 0L
+                                val iowait = if (parts.size > 5) parts[5].toLongOrNull() ?: 0L else 0L
+                                val irq    = if (parts.size > 6) parts[6].toLongOrNull() ?: 0L else 0L
+                                val softirq= if (parts.size > 7) parts[7].toLongOrNull() ?: 0L else 0L
+                                result.add(longArrayOf(user+nice+system+irq+softirq, idle+iowait))
+                            }
+                        }
+                    }
+                }
+            } catch (e: Exception) { }
+            return result
+        }
+
+        val snap1 = readCpuStats()
+        Thread.sleep(200)
+        val snap2 = readCpuStats()
+
+        val usages = mutableListOf<Int>()
+        val count = minOf(snap1.size, snap2.size)
+        for (i in 0 until count) {
+            val activeD = snap2[i][0] - snap1[i][0]
+            val idleD   = snap2[i][1] - snap1[i][1]
+            val total   = activeD + idleD
+            val pct = if (total > 0) ((activeD * 100) / total).toInt().coerceIn(0, 100) else 0
+            usages.add(pct)
+        }
+        return usages
+    }
+
+    /**
+     * Battery time remaining estimate (API 28+).
+     * Returns null if not available.
+     */
+    fun getBatteryTimeRemaining(context: Context): String? {
+        if (android.os.Build.VERSION.SDK_INT < 28) return null
+        return try {
+            val bm = context.getSystemService(Context.BATTERY_SERVICE) as android.os.BatteryManager
+            // BATTERY_PROPERTY_REMAINING_ENERGY not available; use charge counter + current
+            val currentUa = bm.getLongProperty(android.os.BatteryManager.BATTERY_PROPERTY_CURRENT_NOW)
+            val chargeUah = bm.getLongProperty(android.os.BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER)
+            if (currentUa == Long.MIN_VALUE || chargeUah == Long.MIN_VALUE || currentUa == 0L) return null
+
+            val filter = android.content.IntentFilter(android.content.Intent.ACTION_BATTERY_CHANGED)
+            val intent = context.registerReceiver(null, filter)
+            val level = intent?.getIntExtra(android.os.BatteryManager.EXTRA_LEVEL, -1) ?: -1
+            val scale = intent?.getIntExtra(android.os.BatteryManager.EXTRA_SCALE, 100) ?: 100
+            val isCharging = (intent?.getIntExtra(android.os.BatteryManager.EXTRA_STATUS, -1) ?: -1) ==
+                android.os.BatteryManager.BATTERY_STATUS_CHARGING
+
+            if (isCharging && currentUa > 0) {
+                // Time to full
+                val remainingToFull = chargeUah * (100 - level) / level.coerceAtLeast(1)
+                val hoursToFull = remainingToFull.toDouble() / currentUa
+                if (hoursToFull > 0 && hoursToFull < 24) {
+                    val hrs = hoursToFull.toInt()
+                    val mins = ((hoursToFull - hrs) * 60).toInt()
+                    "~${hrs}h ${mins}m to full"
+                } else null
+            } else if (!isCharging && currentUa < 0) {
+                // Time to empty
+                val hoursLeft = chargeUah.toDouble() / Math.abs(currentUa)
+                if (hoursLeft > 0 && hoursLeft < 48) {
+                    val hrs = hoursLeft.toInt()
+                    val mins = ((hoursLeft - hrs) * 60).toInt()
+                    "~${hrs}h ${mins}m remaining"
+                } else null
+            } else null
+        } catch (e: Exception) { null }
+    }

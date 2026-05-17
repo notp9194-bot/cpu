@@ -21,21 +21,25 @@ class AboutFragment : Fragment() {
             val pi = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
             b.tvVersion.text = "Version ${pi.versionName}"
         } catch (e: Exception) {
-            b.tvVersion.text = "Version 9.0"
+            b.tvVersion.text = "Version 10.0"
         }
-        b.btnExportAll.setOnClickListener { exportAllTabs() }
+
+        b.btnExportAll.setOnClickListener { exportAllTabs(asJson = false) }
+        b.btnExportJson.setOnClickListener { exportAllTabs(asJson = true) }
     }
 
-    private fun exportAllTabs() {
+    private fun exportAllTabs(asJson: Boolean) {
         val fm = requireActivity().supportFragmentManager
         val allData = linkedMapOf<String, Map<String, String>>()
-        // Positions: 0=SOC,1=Device,2=Display,3=System,4=Battery,5=Thermal,6=Sensors,7=Network,8=Camera,9=Audio,10=Bench
-        val tabNames = listOf("SOC","Device","Display","System","Battery","Thermal","Sensors","Network","Camera","Audio","Benchmark")
+        val tabNames = listOf("SOC", "Device", "Display", "System", "Battery",
+                              "Thermal", "Sensors", "Network", "Camera", "Audio")
+        var collected = 0
 
         for (pos in 0 until tabNames.size) {
             val fragment = fm.findFragmentByTag("f$pos")
             if (fragment is ShareableFragment) {
                 allData[tabNames.getOrElse(pos) { "Tab $pos" }] = fragment.getExportData()
+                collected++
             }
         }
 
@@ -44,7 +48,12 @@ class AboutFragment : Fragment() {
                 "Please visit each tab once before exporting all data.", Toast.LENGTH_LONG).show()
             return
         }
-        ExportUtils.exportAllToFile(requireContext(), allData)
+
+        if (asJson) {
+            ExportUtils.exportAllToJson(requireContext(), allData)
+        } else {
+            ExportUtils.exportAllToFile(requireContext(), allData)
+        }
     }
 
     override fun onDestroyView() { super.onDestroyView(); _b = null }

@@ -1,97 +1,145 @@
 package com.example.deviceinfo.feature.benchmark
 
-import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.*
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.deviceinfo.core.model.InfoItem
+import com.example.deviceinfo.core.ui.InfoAdapter
 import com.example.deviceinfo.core.ui.ShareableFragment
 import com.example.deviceinfo.feature.benchmark.databinding.FragmentBenchmarkBinding
-import kotlinx.coroutines.*
+import java.util.concurrent.Executors
+import kotlin.math.*
 
 class BenchmarkFragment : Fragment(), ShareableFragment {
     private var _b: FragmentBenchmarkBinding? = null
     private val b get() = _b!!
-    private var lastResult: BenchmarkEngine.BenchmarkResult? = null
+    private val handler = Handler(Looper.getMainLooper())
+    private val executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
     private var isRunning = false
+    private var latestResults: List<InfoItem> = emptyList()
 
     override fun onCreateView(i: LayoutInflater, c: ViewGroup?, s: Bundle?) =
         FragmentBenchmarkBinding.inflate(i, c, false).also { _b = it }.root
 
     override fun onViewCreated(view: View, s: Bundle?) {
         super.onViewCreated(view, s)
-
-        b.tvDeviceInfo.text = "${Build.MODEL}  •  ${Runtime.getRuntime().availableProcessors()} cores  •  Android ${Build.VERSION.RELEASE}"
-        b.tvStatus.text = "Tap RUN to start benchmark"
-
-        b.btnRun.setOnClickListener {
-            if (!isRunning) startBenchmark()
-        }
+        b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        b.btnRun.setOnClickListener { if (!isRunning) startBenchmark() }
     }
 
     private fun startBenchmark() {
         isRunning = true
         b.btnRun.isEnabled = false
         b.progressBar.visibility = View.VISIBLE
-        b.tvStatus.text = "Preparing…"
-        b.scoreGaugeTotal.setScore(0, "Running…")
+        b.tvStatus.text = "Running single-core test…"
+        b.tvSingleScore.text = "…"
+        b.tvMultiScore.text = "…"
+        b.tvMemScore.text = "…"
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            val result = withContext(Dispatchers.IO) {
-                BenchmarkEngine.run(requireContext()) { msg ->
-                    launch(Dispatchers.Main) { b.tvStatus.text = msg }
-                }
+        executor.execute {
+            // ── Single-core: integer + float math ─────────────────────
+            val singleScore = benchmarkSingleCore()
+            handler.post {
+                if (_b == null) return@post
+                b.tvSingleScore.text = singleScore.toString()
+                b.tvStatus.text = "Running multi-core test…"
             }
-            lastResult = result
-            displayResult(result)
-            isRunning = false
-            b.btnRun.isEnabled = true
-            b.progressBar.visibility = View.GONE
+
+            // ── Multi-core: parallel across all cores ──────────────────
+            val cores = Runtime.getRuntime().availableProcessors()
+            val multiScore = benchmarkMultiCore(cores)
+            handler.post {
+                if (_b == null) return@post
+                b.tvMultiScore.text = multiScore.toString()
+                b.tvStatus.text = "Running memory test…"
+            }
+
+            // ── Memory bandwidth ──────────────────────────────────────
+            val memBandwidthMbs = benchmarkMemory()
+            handler.post {
+                if (_b == null) return@post
+                b.tvMemScore.text = "$memBandwidthMbs MB/s"
+                b.tvStatus.text = "Benchmark complete ✓"
+                b.progressBar.visibility = View.INVISIBLE
+                b.btnRun.isEnabled = true
+                isRunning = false
+
+                val tier = scoreTier(singleScore)
+                val results = mutableListOf(
+                    InfoItem("── Results ──", "", true),
+                    InfoItem("Single-Core Score",  singleScore.toString(), true),
+                    InfoItem("Multi-Core Score",   multiScore.toString(), true),
+                    InfoItem("Memory Bandwidth",   "$memBandwidthMbs MB/s", true),
+                    InfoItem("CPU Cores Used",     cores.toString()),
+                    InfoItem("Performance Tier",   tier),
+                    InfoItem("── How it Works ──", "", true),
+                    InfoItem("Single-Core",  "Integer ops, float math, sqrt loops (1s)"),
+                    InfoItem("Multi-Core",   "Parallel execution across all cores"),
+                    InfoItem("Memory",       "Array fill + read bandwidth (64 MB)"),
+                    InfoItem("Score Base",   "Operations per millisecond × scaling factor"),
+                )
+                latestResults = results
+                val adapter = InfoAdapter(results)
+                b.recyclerView.adapter = adapter
+            }
         }
     }
 
-    private fun displayResult(r: BenchmarkEngine.BenchmarkResult) {
-        if (_b == null) return
-
-        b.scoreGaugeTotal.setScore(r.totalScore, "TOTAL")
-        b.scoreGaugeSingle.setScore(r.singleCore, "Single")
-        b.scoreGaugeMulti.setScore(r.multiCore, "Multi")
-        b.scoreGaugeMem.setScore(r.memoryScore, "Memory")
-
-        b.tvStatus.text = "Benchmark complete!"
-
-        b.tvDetails.text = buildString {
-            appendLine("📊 Detailed Results")
-            appendLine("─────────────────────────────")
-            appendLine("Single-Core   ${r.singleCore}/1000   (${r.singleMs} ms)")
-            appendLine("Multi-Core    ${r.multiCore}/1000   (${r.multiMs} ms)")
-            appendLine("Memory        ${r.memoryScore}/1000   (${r.memMs} ms)")
-            appendLine("Storage Read  ${r.storageReadScore}/1000   (${String.format("%.1f", r.storageReadMBps)} MB/s)")
-            appendLine("Storage Write ${r.storageWriteScore}/1000   (${String.format("%.1f", r.storageWriteMBps)} MB/s)")
-            appendLine()
-            appendLine("Device: ${Build.MODEL}")
-            appendLine("SoC:    ${Build.HARDWARE}")
-            appendLine("Cores:  ${Runtime.getRuntime().availableProcessors()}")
-            appendLine("ABI:    ${Build.SUPPORTED_ABIS.firstOrNull()}")
-            appendLine("Android ${Build.VERSION.RELEASE}  (API ${Build.VERSION.SDK_INT})")
+    /** Single-core: integer math + trigonometry + sqrt in 1 second */
+    private fun benchmarkSingleCore(): Int {
+        val endTime = System.currentTimeMillis() + 1000L
+        var ops = 0L
+        var x = 1.0
+        while (System.currentTimeMillis() < endTime) {
+            x = sqrt(x * 1.000001 + sin(x) * cos(x) + 1.0)
+            ops++
         }
+        return (ops / 1000).toInt()  // score in kilo-ops/s
+    }
+
+    /** Multi-core: run single-core benchmark on N threads simultaneously */
+    private fun benchmarkMultiCore(cores: Int): Int {
+        val futures = (0 until cores).map {
+            java.util.concurrent.Callable { benchmarkSingleCore() }
+        }
+        val results = executor.invokeAll(futures)
+        return results.sumOf { it.get() }
+    }
+
+    /** Memory bandwidth: fill + read 64 MB array, measure throughput */
+    private fun benchmarkMemory(): Int {
+        val SIZE = 64 * 1024 * 1024 / 8  // 64 MB in longs
+        val arr = LongArray(SIZE)
+        val start = System.nanoTime()
+        // Write pass
+        for (i in arr.indices) arr[i] = i.toLong()
+        // Read pass
+        var sum = 0L
+        for (i in arr.indices) sum += arr[i]
+        val elapsed = System.nanoTime() - start
+        val bytesTransferred = SIZE.toLong() * 8 * 2  // write + read
+        val mbPerSec = (bytesTransferred * 1_000_000_000L / elapsed / (1024 * 1024)).toInt()
+        return if (sum != 0L) mbPerSec else 0 // use sum to prevent dead-code elimination
+    }
+
+    private fun scoreTier(single: Int): String = when {
+        single >= 3000 -> "🔥 Flagship"
+        single >= 2000 -> "⚡ High-End"
+        single >= 1200 -> "✅ Mid-Range"
+        single >= 600  -> "📱 Budget"
+        else           -> "🐢 Entry-Level"
     }
 
     override fun getShareText(): String {
-        val r = lastResult ?: return "No benchmark run yet."
-        return buildString {
-            appendLine("⚡ CPU-A Benchmark Results")
-            appendLine("─────────────────────────────")
-            appendLine("Total Score:   ${r.totalScore}/1000")
-            appendLine("Single-Core:   ${r.singleCore}/1000")
-            appendLine("Multi-Core:    ${r.multiCore}/1000")
-            appendLine("Memory:        ${r.memoryScore}/1000")
-            appendLine("Storage Read:  ${r.storageReadScore}/1000  (${String.format("%.1f", r.storageReadMBps)} MB/s)")
-            appendLine("Storage Write: ${r.storageWriteScore}/1000  (${String.format("%.1f", r.storageWriteMBps)} MB/s)")
-            appendLine()
-            appendLine("Device: ${Build.MODEL}  •  Android ${Build.VERSION.RELEASE}")
-            appendLine("Shared from CPU-A Device Info app")
-        }
+        val sb = StringBuilder()
+        sb.appendLine("🏎️ CPU Benchmark")
+        sb.appendLine("─────────────────")
+        latestResults.filter { it.value.isNotEmpty() }.forEach { sb.appendLine("${it.label}: ${it.value}") }
+        sb.appendLine("\nShared from CPU-A Device Info app")
+        return sb.toString()
     }
 
     override fun onDestroyView() { super.onDestroyView(); _b = null }
