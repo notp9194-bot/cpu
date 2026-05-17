@@ -1,6 +1,16 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+}
+
+// local.properties reader — top level function, koi scope issue nahi
+fun localProps(): Properties {
+    val props = Properties()
+    val f = rootProject.file("local.properties")
+    if (f.exists()) f.inputStream().use { props.load(it) }
+    return props
 }
 
 android {
@@ -18,15 +28,13 @@ android {
 
     signingConfigs {
         create("release") {
-            // local.properties se padhega — keystore file project root me rakhna
-            val propsFile = rootProject.file("local.properties")
-            if (propsFile.exists()) {
-                val props = java.util.Properties()
-                propsFile.inputStream().use { props.load(it) }
-                storeFile     = file(props["KEYSTORE_FILE"]     ?: "keystore.jks")
-                storePassword = (props["KEYSTORE_PASSWORD"]     ?: "") as String
-                keyAlias      = (props["KEY_ALIAS"]             ?: "") as String
-                keyPassword   = (props["KEY_PASSWORD"]          ?: "") as String
+            val props = localProps()
+            val ksFile = props["KEYSTORE_FILE"]?.toString() ?: "keystore.jks"
+            if (rootProject.file(ksFile).exists()) {
+                storeFile     = rootProject.file(ksFile)
+                storePassword = props["KEYSTORE_PASSWORD"]?.toString() ?: ""
+                keyAlias      = props["KEY_ALIAS"]?.toString()         ?: ""
+                keyPassword   = props["KEY_PASSWORD"]?.toString()      ?: ""
             }
         }
     }
@@ -47,7 +55,7 @@ android {
         }
     }
 
-    // AAB ke liye bundle config — Play Store automatically ABI split karta hai
+    // AAB ke liye — Play Store automatically ABI/density/language split karta hai
     bundle {
         language { enableSplit = true }
         density  { enableSplit = true }
