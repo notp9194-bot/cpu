@@ -126,8 +126,10 @@ class NetworkFragment : Fragment(), ShareableFragment {
     override fun getExportData(): Map<String, String> = latestData
 
     override fun onDestroyView() {
-        val cm = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        networkCallback?.let { runCatching { cm.unregisterNetworkCallback(it) } }
+        try {
+            val cm = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+            networkCallback?.let { runCatching { cm?.unregisterNetworkCallback(it) } }
+        } catch (e: Exception) { /* ignore */ }
         networkCallback = null
         handler.removeCallbacksAndMessages(null)
         super.onDestroyView()

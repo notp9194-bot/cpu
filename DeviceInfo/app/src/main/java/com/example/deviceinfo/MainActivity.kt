@@ -98,7 +98,8 @@ class MainActivity : AppCompatActivity() {
 
         val adapter = MainPagerAdapter(this)
         binding.viewPager.adapter = adapter
-        binding.viewPager.offscreenPageLimit = tabs.size
+        // FIX: Removed offscreenPageLimit = tabs.size — loading all 21 fragments at once
+        // caused ANR/crash. Default lazy loading (1 neighbor) is correct behavior.
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, pos ->
             tab.text = tabs[pos]
         }.attach()

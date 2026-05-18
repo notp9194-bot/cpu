@@ -209,9 +209,12 @@ class PowerFragment : Fragment(), ShareableFragment {
         latestItems.filter { it.value.isNotEmpty() }.associate { it.label to it.value }
 
     override fun onDestroyView() {
-        super.onDestroyView()
-        receiver?.let { requireContext().unregisterReceiver(it) }
+        try {
+            receiver?.let { context?.unregisterReceiver(it) }
+        } catch (e: IllegalArgumentException) { /* not registered */ }
+        receiver = null
         handler.removeCallbacksAndMessages(null)
+        super.onDestroyView()
         _b = null
     }
 }
