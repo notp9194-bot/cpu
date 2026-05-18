@@ -32,11 +32,22 @@ class BatteryFragment : Fragment(), ShareableFragment {
     private val b get() = _b!!
     private var receiver: BroadcastReceiver? = null
     private var latestData: Map<String, String> = emptyMap()
+    private var wearInfoCache: Map<String, String> = emptyMap()
     private var adapter: InfoAdapter? = null
     private var lastBatteryFullNotifPct = -1
     private var lastRamAlertPct = -1
 
     private val handler = Handler(Looper.getMainLooper())
+
+    // ── Wear gauge live poll (every 3s) ────────────────────────────────
+    private val wearRunnable = object : Runnable {
+        override fun run() {
+            if (_b == null) return
+            refreshWearGauge()
+            handler.postDelayed(this, 3000L)
+        }
+    }
+
 
     // ── RAM live poll ──────────────────────────────────────────────────
     private val ramRunnable = object : Runnable {
@@ -112,6 +123,7 @@ class BatteryFragment : Fragment(), ShareableFragment {
 
     override fun onResume() {
         super.onResume()
+        handler.post(wearRunnable)
         handler.post(ramRunnable)
         handler.postDelayed(historyRunnable, 5 * 60 * 1000L)
         refreshHistoryChart()
@@ -119,8 +131,43 @@ class BatteryFragment : Fragment(), ShareableFragment {
 
     override fun onPause() {
         super.onPause()
+        handler.removeCallbacks(wearRunnable)
         handler.removeCallbacks(ramRunnable)
         handler.removeCallbacks(historyRunnable)
+    }
+
+
+    private fun refreshWearGauge() {
+        val ctx = context ?: return
+        val result = BatteryWearManager.compute(ctx)
+        val wearData = BatteryWearGaugeView.WearData(
+            chargeMah   = result.chargeMah,
+            currentMa   = result.currentMa,
+            designMah   = result.designMah,
+            wearPct     = result.wearPct,
+            isCharging  = result.isCharging,
+            voltageMv   = result.voltageMv,
+            tempC       = result.tempC
+        )
+        b.wearGauge.update(wearData)
+
+        // Also inject wear info into the info list
+        wearInfoCache = linkedMapOf(
+            "Design Capacity" to "~${result.designMah} mAh  (${result.sourceLabel})",
+            "Charge Remaining" to "${result.chargeMah} mAh",
+            "Learned Capacity" to if (result.learnedMah > 0) "${result.learnedMah} mAh" else "Unknown",
+            "Wear Level" to "${result.wearPct}%  •  ${gradeLabel(result.wearPct)}",
+            "Current Flow" to if (result.currentMa > 0) "${result.currentMa} mA  ${if (result.isCharging) "(⚡ In)" else "(🔋 Out)"}" else "Unknown",
+            "Power" to if (result.currentMa > 0 && result.voltageMv > 0) "%.2f W".format(result.currentMa * result.voltageMv / 1_000_000f) else "Unknown"
+        )
+    }
+
+    private fun gradeLabel(wearPct: Int): String = when {
+        wearPct <= 15 -> "Excellent"
+        wearPct <= 30 -> "Good"
+        wearPct <= 50 -> "Fair"
+        wearPct <= 70 -> "Poor"
+        else          -> "⚠ Replace"
     }
 
     private fun refreshHistoryChart() {
@@ -212,6 +259,8 @@ class BatteryFragment : Fragment(), ShareableFragment {
         sb.appendLine("\uD83D\uDD0B Battery Info")
         sb.appendLine("─────────────────")
         latestData.forEach { (k, v) -> sb.appendLine("$k: $v") }
+        sb.appendLine("── Wear Level ──")
+        wearInfoCache.forEach { (k, v) -> sb.appendLine("$k: $v") }
         sb.appendLine("\nShared from CPU-A Device Info app")
         return sb.toString()
     }

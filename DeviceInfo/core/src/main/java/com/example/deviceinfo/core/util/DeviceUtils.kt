@@ -113,18 +113,21 @@ object DeviceUtils {
             "$ma mA ($dir)"
         } else "Unknown"
 
-        val chargeMah = if (chargeCounter > 0) "${chargeCounter / 1000} mAh remaining" else "Unknown"
+        val chargeMah = if (chargeCounter > 0) "${chargeCounter / 1000} mAh" else "Unknown"
 
+        val currentNowRaw = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW)
+        val capacityPct   = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
         return linkedMapOf(
             "Health"           to health,
             "Level"            to "$pct %",
+            "Capacity (API)"   to if (capacityPct > 0) "$capacityPct %" else "Unknown",
             "Power Source"     to plugged,
             "Status"           to status,
             "Technology"       to tech,
             "Temperature"      to "$temp °C",
             "Voltage"          to "$voltage mV",
             "Current Now"      to currentMa,
-            "Charge Remaining" to chargeMah
+            "Charge Counter"   to chargeMah
         )
     }
 

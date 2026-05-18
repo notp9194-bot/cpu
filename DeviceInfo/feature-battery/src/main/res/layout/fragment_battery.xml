@@ -36,6 +36,26 @@
         android:layout_marginHorizontal="12dp"
         android:background="@android:color/transparent"/>
 
+    <!-- Battery Wear Level + mAh Live Card -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="🔋 Battery Wear Level"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="?attr/colorOnSurface"
+        android:alpha="0.7"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="2dp"/>
+
+    <com.example.deviceinfo.feature.battery.BatteryWearGaugeView
+        android:id="@+id/wearGauge"
+        android:layout_width="match_parent"
+        android:layout_height="230dp"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginBottom="4dp"/>
+
     <!-- ═══════════════════════════════════════════════════════ -->
     <!-- 24-Hour Battery History Chart                          -->
     <!-- ═══════════════════════════════════════════════════════ -->

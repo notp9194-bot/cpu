@@ -46,6 +46,10 @@ class SocFragment : Fragment(), ShareableFragment {
             override fun beforeTextChanged(s: CharSequence?, st: Int, cnt: Int, aft: Int) {}
             override fun onTextChanged(s: CharSequence?, st: Int, bf: Int, cnt: Int) {}
         })
+        // ── Compare button → open SoC comparison bottom sheet ─────────
+        b.btnCompare.setOnClickListener {
+            SocCompareBottomSheet().show(parentFragmentManager, SocCompareBottomSheet.TAG)
+        }
     }
 
     override fun onResume() {
