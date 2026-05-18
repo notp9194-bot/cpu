@@ -41,6 +41,27 @@ import com.example.deviceinfo.feature.sensors.SensorsFragment
 import com.example.deviceinfo.feature.soc.SocFragment
 import com.example.deviceinfo.feature.system.SystemFragment
 import com.example.deviceinfo.feature.thermal.ThermalFragment
+// ── 20 New Advanced Feature Modules ───────────────────────────────────────
+import com.example.deviceinfo.feature.cpucore.CpuCoreFragment
+import com.example.deviceinfo.feature.chargesession.ChargeSessionFragment
+import com.example.deviceinfo.feature.pingmonitor.PingMonitorFragment
+import com.example.deviceinfo.feature.storageio.StorageIoFragment
+import com.example.deviceinfo.feature.appmemory.AppMemoryFragment
+import com.example.deviceinfo.feature.screentime.ScreenTimeFragment
+import com.example.deviceinfo.feature.dischargerate.DischargeRateFragment
+import com.example.deviceinfo.feature.cpuheatmap.CpuHeatmapFragment
+import com.example.deviceinfo.feature.throttle.ThrottleFragment
+import com.example.deviceinfo.feature.wifichannel.WifiChannelFragment
+import com.example.deviceinfo.feature.loadavg.LoadAvgFragment
+import com.example.deviceinfo.feature.nettraffic.NetTrafficFragment
+import com.example.deviceinfo.feature.chargecurve.ChargeCurveFragment
+import com.example.deviceinfo.feature.sensorlive.SensorLiveFragment
+import com.example.deviceinfo.feature.devcompare.DeviceCompareFragment
+import com.example.deviceinfo.feature.processmon.ProcessMonFragment
+import com.example.deviceinfo.feature.powerestimate.PowerEstimateFragment
+import com.example.deviceinfo.feature.brightness.BrightnessFragment
+import com.example.deviceinfo.feature.bootspeed.BootSpeedFragment
+import com.example.deviceinfo.feature.featurematrix.FeatureMatrixFragment
 import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
@@ -48,29 +69,51 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var prefs: SharedPreferences
 
-    // ── Tab order (21 tabs — FAVORITES at 0, HEALTH at 19) ────────────
+    // ── Tab order: 21 original + 20 new = 41 tabs ─────────────────────────
     private val tabs = listOf(
-        "★ FAV",        // 0  ← NEW
-        "SOC",          // 1
-        "DEVICE",       // 2
-        "SYSTEM",       // 3
-        "BATTERY",      // 4
-        "THERMAL",      // 5
-        "SENSORS",      // 6
-        "NETWORK",      // 7
-        "CAMERA",       // 8
-        "AUDIO",        // 9
-        "DISPLAY",      // 10
-        "CODEC",        // 11
-        "BENCHMARK",    // 12
-        "CONNECTIVITY", // 13
-        "POWER",        // 14
-        "GPU",          // 15
-        "MEMORY",       // 16
-        "BUILD",        // 17
-        "INPUT",        // 18
-        "HEALTH",       // 19
-        "ABOUT"          // 20
+        // ── Original 21 ──────────────────────────────────────────────────
+        "★ FAV",          //  0
+        "SOC",            //  1
+        "DEVICE",         //  2
+        "SYSTEM",         //  3
+        "BATTERY",        //  4
+        "THERMAL",        //  5
+        "SENSORS",        //  6
+        "NETWORK",        //  7
+        "CAMERA",         //  8
+        "AUDIO",          //  9
+        "DISPLAY",        // 10
+        "CODEC",          // 11
+        "BENCHMARK",      // 12
+        "CONNECTIVITY",   // 13
+        "POWER",          // 14
+        "GPU",            // 15
+        "MEMORY",         // 16
+        "BUILD",          // 17
+        "INPUT",          // 18
+        "HEALTH",         // 19
+        "ABOUT",          // 20
+        // ── New 20 Advanced Features ──────────────────────────────────────
+        "CPU CORES",      // 21
+        "CHG SESSION",    // 22
+        "PING",           // 23
+        "DISK I/O",       // 24
+        "APP MEM",        // 25
+        "SCREEN TIME",    // 26
+        "DISCHARGE",      // 27
+        "CPU HEATMAP",    // 28
+        "THROTTLE",       // 29
+        "WIFI CHAN",       // 30
+        "LOAD AVG",       // 31
+        "NET TRAFFIC",    // 32
+        "CHG CURVE",      // 33
+        "SENSOR LIVE",    // 34
+        "DEV COMPARE",    // 35
+        "PROCESSES",      // 36
+        "PWR ESTIMATE",   // 37
+        "BRIGHTNESS",     // 38
+        "BOOT SPEED",     // 39
+        "FEAT MATRIX"     // 40
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,13 +141,10 @@ class MainActivity : AppCompatActivity() {
 
         val adapter = MainPagerAdapter(this)
         binding.viewPager.adapter = adapter
-        // FIX: Removed offscreenPageLimit = tabs.size — loading all 21 fragments at once
-        // caused ANR/crash. Default lazy loading (1 neighbor) is correct behavior.
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, pos ->
             tab.text = tabs[pos]
         }.attach()
 
-        // Request POST_NOTIFICATIONS (Android 13+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -133,8 +173,8 @@ class MainActivity : AppCompatActivity() {
             )
             recreate(); true
         }
-        R.id.action_share         -> { shareCurrentTab(); true }
-        R.id.action_export_pdf    -> { exportCurrentTabPdf(); true }
+        R.id.action_share          -> { shareCurrentTab(); true }
+        R.id.action_export_pdf     -> { exportCurrentTabPdf(); true }
         R.id.action_alert_settings -> {
             startActivity(Intent(this, AlertSettingsActivity::class.java)); true
         }
@@ -142,9 +182,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun shareCurrentTab() {
-        val pos = binding.viewPager.currentItem
-        val fragment = supportFragmentManager.findFragmentByTag("f$pos")
-        val text = (fragment as? ShareableFragment)?.getShareText()
+        val pos  = binding.viewPager.currentItem
+        val frag = supportFragmentManager.findFragmentByTag("f$pos")
+        val text = (frag as? ShareableFragment)?.getShareText()
             ?: "\uD83D\uDCF1 Device Info — ${tabs[pos]}\nChecked with CPU-A Device Info app."
         startActivity(
             Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
@@ -156,17 +196,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun exportCurrentTabPdf() {
-        val pos = binding.viewPager.currentItem
-        val fragment = supportFragmentManager.findFragmentByTag("f$pos")
-        val data = (fragment as? ShareableFragment)?.getExportData() ?: emptyMap()
+        val pos  = binding.viewPager.currentItem
+        val frag = supportFragmentManager.findFragmentByTag("f$pos")
+        val data = (frag as? ShareableFragment)?.getExportData() ?: emptyMap()
         ExportUtils.exportToPdf(this, tabs[pos], data)
     }
 
-    // ── Pager adapter ─────────────────────────────────────────────────
+    // ── Pager adapter ──────────────────────────────────────────────────────
     private inner class MainPagerAdapter(a: AppCompatActivity) : FragmentStateAdapter(a) {
         override fun getItemCount() = tabs.size
         override fun createFragment(pos: Int): Fragment = when (pos) {
-            0  -> FavoritesFragment()    // ← NEW
+            // ── Original 21 ──────────────────────────────────────────────
+            0  -> FavoritesFragment()
             1  -> SocFragment()
             2  -> DeviceFragment()
             3  -> SystemFragment()
@@ -187,7 +228,28 @@ class MainActivity : AppCompatActivity() {
             18 -> InputFragment()
             19 -> HealthFragment()
             20 -> AboutFragment()
-            else -> SocFragment() // fallback
+            // ── New 20 Advanced Modules ───────────────────────────────────
+            21 -> CpuCoreFragment()
+            22 -> ChargeSessionFragment()
+            23 -> PingMonitorFragment()
+            24 -> StorageIoFragment()
+            25 -> AppMemoryFragment()
+            26 -> ScreenTimeFragment()
+            27 -> DischargeRateFragment()
+            28 -> CpuHeatmapFragment()
+            29 -> ThrottleFragment()
+            30 -> WifiChannelFragment()
+            31 -> LoadAvgFragment()
+            32 -> NetTrafficFragment()
+            33 -> ChargeCurveFragment()
+            34 -> SensorLiveFragment()
+            35 -> DeviceCompareFragment()
+            36 -> ProcessMonFragment()
+            37 -> PowerEstimateFragment()
+            38 -> BrightnessFragment()
+            39 -> BootSpeedFragment()
+            40 -> FeatureMatrixFragment()
+            else -> SocFragment()
         }
     }
 
