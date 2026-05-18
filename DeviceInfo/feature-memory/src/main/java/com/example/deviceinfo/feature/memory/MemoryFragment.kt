@@ -68,12 +68,15 @@ class MemoryFragment : Fragment(), ShareableFragment {
         b.memoryLineChart.addDataPoint(usedMb, availMb)
         b.memorySegmentBar.update(usedMb, availMb, totalMb)
 
-        // Alert if RAM > 90%
-        if (usedPct >= 90 && lastHighRamNotifPct < 90) {
+        // Alert if RAM exceeds user-configured threshold
+        val ramThreshold = com.example.deviceinfo.AlertPrefs.getRamPct(ctx)
+        val ramEnabled   = com.example.deviceinfo.AlertPrefs.isRamEnabled(ctx)
+        val hysteresis   = (ramThreshold - 10).coerceAtLeast(0)
+        if (ramEnabled && usedPct >= ramThreshold && lastHighRamNotifPct < ramThreshold) {
             lastHighRamNotifPct = usedPct
-            sendHighRamNotification(ctx, usedPct)
+            sendHighRamNotification(ctx, usedPct, ramThreshold)
         }
-        if (usedPct < 80) lastHighRamNotifPct = -1
+        if (usedPct < hysteresis) lastHighRamNotifPct = -1
 
         // Update recycler live rows
         loadStaticData()
@@ -178,7 +181,7 @@ class MemoryFragment : Fragment(), ShareableFragment {
         if (q.isNotBlank()) adapter?.filter(q)
     }
 
-    private fun sendHighRamNotification(ctx: Context, usedPct: Int) {
+    private fun sendHighRamNotification(ctx: Context, usedPct: Int, threshold: Int = 90) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val ch = NotificationChannel("ram_alert_mem", "RAM Alerts",
                 NotificationManager.IMPORTANCE_DEFAULT)

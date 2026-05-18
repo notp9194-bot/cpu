@@ -189,31 +189,51 @@ class BatteryFragment : Fragment(), ShareableFragment {
         val pct    = if (level >= 0 && scale > 0) level * 100 / scale else 0
         val status = intent?.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
 
-        if (pct >= 100 &&
-            (status == BatteryManager.BATTERY_STATUS_FULL || status == BatteryManager.BATTERY_STATUS_CHARGING) &&
-            lastBatteryFullNotifPct != 100
-        ) {
-            lastBatteryFullNotifPct = 100
-            sendNotification(ctx,
-                channelId = "battery_full", channelName = "Battery Full", notifId = 2001,
-                title = "\u26A1 Battery Full — 100%",
-                text  = "Battery is fully charged. You can unplug the charger."
-            )
+        // Battery Full alert (user-configurable toggle)
+        if (com.example.deviceinfo.AlertPrefs.isBattFullEnabled(ctx)) {
+            if (pct >= 100 &&
+                (status == BatteryManager.BATTERY_STATUS_FULL || status == BatteryManager.BATTERY_STATUS_CHARGING) &&
+                lastBatteryFullNotifPct != 100
+            ) {
+                lastBatteryFullNotifPct = 100
+                sendNotification(ctx,
+                    channelId = "battery_full", channelName = "Battery Full", notifId = 2001,
+                    title = "\u26A1 Battery Full \u2014 100%",
+                    text  = "Battery is fully charged. You can unplug the charger."
+                )
+            }
         }
         if (pct < 95) lastBatteryFullNotifPct = -1
-    }
 
+        // Battery Low alert (user-configurable threshold)
+        if (com.example.deviceinfo.AlertPrefs.isBattLowEnabled(ctx)) {
+            val lowThreshold = com.example.deviceinfo.AlertPrefs.getBattLowPct(ctx)
+            val isDischarging = status == BatteryManager.BATTERY_STATUS_DISCHARGING
+            if (pct <= lowThreshold && isDischarging && lastRamAlertPct != lowThreshold) {
+                lastRamAlertPct = lowThreshold
+                sendNotification(ctx,
+                    channelId = "battery_low_custom", channelName = "Battery Low", notifId = 2003,
+                    title = "\uD83D\uDD0B Low Battery \u2014 $pct%",
+                    text  = "Battery at $pct% (below your $lowThreshold% threshold). Please charge soon."
+                )
+            }
+            if (pct > lowThreshold + 5) lastRamAlertPct = -1
+        }
+    }
     private fun checkRamAlert(usedPct: Int) {
         val ctx = context ?: return
-        if (usedPct >= 90 && lastRamAlertPct < 90) {
+        if (!com.example.deviceinfo.AlertPrefs.isRamEnabled(ctx)) return
+        val threshold = com.example.deviceinfo.AlertPrefs.getRamPct(ctx)
+        val hysteresis = (threshold - 10).coerceAtLeast(0)
+        if (usedPct >= threshold && lastRamAlertPct < threshold) {
             lastRamAlertPct = usedPct
             sendNotification(ctx,
                 channelId = "ram_alert", channelName = "RAM Alerts", notifId = 2002,
                 title = "\uD83D\uDCA1 High RAM Usage",
-                text  = "RAM usage is $usedPct%. Consider closing background apps."
+                text  = "RAM usage is $usedPct% (threshold: $threshold%). Consider closing background apps."
             )
         }
-        if (usedPct < 80) lastRamAlertPct = -1
+        if (usedPct < hysteresis) lastRamAlertPct = -1
     }
 
     private fun sendNotification(ctx: Context, channelId: String, channelName: String,

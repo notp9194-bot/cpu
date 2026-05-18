@@ -133,8 +133,11 @@ class MainActivity : AppCompatActivity() {
             )
             recreate(); true
         }
-        R.id.action_share      -> { shareCurrentTab(); true }
-        R.id.action_export_pdf -> { exportCurrentTabPdf(); true }
+        R.id.action_share         -> { shareCurrentTab(); true }
+        R.id.action_export_pdf    -> { exportCurrentTabPdf(); true }
+        R.id.action_alert_settings -> {
+            startActivity(Intent(this, AlertSettingsActivity::class.java)); true
+        }
         else -> super.onOptionsItemSelected(item)
     }
 
