@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.powerestimate
+package com.cpua.deviceinfo.feature.powerestimate
 
 import android.content.Context; import android.graphics.*; import android.util.AttributeSet; import android.view.View; import kotlin.math.cos; import kotlin.math.sin
 

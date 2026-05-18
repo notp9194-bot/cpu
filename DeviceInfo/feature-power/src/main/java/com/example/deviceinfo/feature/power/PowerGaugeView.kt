@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.power
+package com.cpua.deviceinfo.feature.power
 
 import android.content.Context
 import android.graphics.*

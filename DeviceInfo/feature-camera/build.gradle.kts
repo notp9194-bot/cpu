@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 android {
-    namespace = "com.example.deviceinfo.feature.camera"
+    namespace = "com.cpua.deviceinfo.feature.camera"
     compileSdk = 35
     defaultConfig { minSdk = 24 }
     compileOptions {

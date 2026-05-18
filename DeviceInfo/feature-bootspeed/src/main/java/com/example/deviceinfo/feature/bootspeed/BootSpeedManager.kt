@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.bootspeed
+package com.cpua.deviceinfo.feature.bootspeed
 
 import android.content.Context; import org.json.JSONArray; import org.json.JSONObject; import java.text.SimpleDateFormat; import java.util.*
 

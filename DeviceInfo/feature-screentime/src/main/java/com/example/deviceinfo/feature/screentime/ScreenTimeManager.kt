@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.screentime
+package com.cpua.deviceinfo.feature.screentime
 
 import android.content.Context
 import java.text.SimpleDateFormat

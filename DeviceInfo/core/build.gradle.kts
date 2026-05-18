@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 android {
-    namespace = "com.example.deviceinfo.core"
+    namespace = "com.cpua.deviceinfo.core"
     compileSdk = 35
     defaultConfig { minSdk = 24 }
     compileOptions {

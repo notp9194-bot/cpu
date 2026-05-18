@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 android {
-    namespace = "com.example.deviceinfo.feature.featurematrix"
+    namespace = "com.cpua.deviceinfo.feature.featurematrix"
     compileSdk = 35
     defaultConfig { minSdk = 24 }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }

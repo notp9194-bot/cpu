@@ -1,4 +1,4 @@
-package com.example.deviceinfo.core.util
+package com.cpua.deviceinfo.core.util
 
   import android.content.ContentValues
   import android.content.Context

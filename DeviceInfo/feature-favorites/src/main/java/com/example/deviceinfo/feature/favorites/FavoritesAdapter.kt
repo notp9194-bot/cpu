@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.favorites
+package com.cpua.deviceinfo.feature.favorites
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -8,8 +8,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.example.deviceinfo.core.favorites.FavoritesManager
-import com.example.deviceinfo.feature.favorites.databinding.ItemFavoriteBinding
+import com.cpua.deviceinfo.core.favorites.FavoritesManager
+import com.cpua.deviceinfo.feature.favorites.databinding.ItemFavoriteBinding
 
 class FavoritesAdapter(
     private var items: List<FavoritesManager.FavoriteItem>,

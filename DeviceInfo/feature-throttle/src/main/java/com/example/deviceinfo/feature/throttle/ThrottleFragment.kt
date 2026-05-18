@@ -1,7 +1,7 @@
-package com.example.deviceinfo.feature.throttle
+package com.cpua.deviceinfo.feature.throttle
 
 import android.os.*; import android.view.*; import android.widget.*; import androidx.fragment.app.Fragment
-import com.example.deviceinfo.core.ui.ShareableFragment; import java.io.BufferedReader; import java.io.FileReader
+import com.cpua.deviceinfo.core.ui.ShareableFragment; import java.io.BufferedReader; import java.io.FileReader
 
 class ThrottleFragment : Fragment(), ShareableFragment {
     private var rootView: View? = null; private var chart: ThrottleAnnotatedChart? = null; private var tvStats: TextView? = null

@@ -1,8 +1,8 @@
-package com.example.deviceinfo.feature.dischargerate
+package com.cpua.deviceinfo.feature.dischargerate
 
 import android.content.*; import android.graphics.*; import android.os.*; import android.util.AttributeSet
 import android.view.*; import android.widget.*; import androidx.fragment.app.Fragment
-import com.example.deviceinfo.core.ui.ShareableFragment; import java.text.SimpleDateFormat; import java.util.*
+import com.cpua.deviceinfo.core.ui.ShareableFragment; import java.text.SimpleDateFormat; import java.util.*
 
 class DischargeScatterChart @JvmOverloads constructor(ctx: android.content.Context, attrs: AttributeSet?=null) : android.view.View(ctx,attrs) {
     data class Point(val timeMin: Float, val pct: Int)

@@ -1,4 +1,4 @@
-package com.example.deviceinfo.core.favorites
+package com.cpua.deviceinfo.core.favorites
 
 import android.content.Context
 import org.json.JSONArray

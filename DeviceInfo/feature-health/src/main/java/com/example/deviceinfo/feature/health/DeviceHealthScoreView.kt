@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.health
+package com.cpua.deviceinfo.feature.health
 
 import android.content.Context
 import android.graphics.*

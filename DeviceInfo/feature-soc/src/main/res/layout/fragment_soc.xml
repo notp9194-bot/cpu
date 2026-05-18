@@ -30,7 +30,7 @@
     </LinearLayout>
 
     <!-- Current core load bar chart -->
-    <com.example.deviceinfo.feature.soc.CpuBarChartView
+    <com.cpua.deviceinfo.feature.soc.CpuBarChartView
         android:id="@+id/cpuBarChart"
         android:layout_width="match_parent"
         android:layout_height="140dp"
@@ -38,7 +38,7 @@
         android:layout_marginBottom="0dp"/>
 
     <!-- 60-second clock history line chart -->
-    <com.example.deviceinfo.feature.soc.CpuClockHistoryChartView
+    <com.cpua.deviceinfo.feature.soc.CpuClockHistoryChartView
         android:id="@+id/cpuHistoryChart"
         android:layout_width="match_parent"
         android:layout_height="200dp"

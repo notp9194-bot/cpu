@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.thermal
+package com.cpua.deviceinfo.feature.thermal
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -14,10 +14,10 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.deviceinfo.core.ui.ShareableFragment
-import com.example.deviceinfo.core.util.DeviceUtils
-import com.example.deviceinfo.core.util.ExportUtils
-import com.example.deviceinfo.feature.thermal.databinding.FragmentThermalBinding
+import com.cpua.deviceinfo.core.ui.ShareableFragment
+import com.cpua.deviceinfo.core.util.DeviceUtils
+import com.cpua.deviceinfo.core.util.ExportUtils
+import com.cpua.deviceinfo.feature.thermal.databinding.FragmentThermalBinding
 
 class ThermalFragment : Fragment(), ShareableFragment {
     private var _b: FragmentThermalBinding? = null
@@ -78,8 +78,8 @@ class ThermalFragment : Fragment(), ShareableFragment {
 
     private fun checkThermalAlert(maxTemp: Float) {
         val ctx = context ?: return
-        if (!com.example.deviceinfo.AlertPrefs.isTempEnabled(ctx)) return
-        val threshold = com.example.deviceinfo.AlertPrefs.getTempC(ctx).toFloat()
+        if (!com.cpua.deviceinfo.AlertPrefs.isTempEnabled(ctx)) return
+        val threshold = com.cpua.deviceinfo.AlertPrefs.getTempC(ctx).toFloat()
         if (maxTemp >= threshold && lastThermalAlertTemp < threshold) {
             lastThermalAlertTemp = maxTemp
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {

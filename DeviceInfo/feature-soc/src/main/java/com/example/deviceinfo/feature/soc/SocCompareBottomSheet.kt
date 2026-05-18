@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.soc
+package com.cpua.deviceinfo.feature.soc
 
 import android.os.Bundle
 import android.text.Editable
@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
-import com.example.deviceinfo.feature.soc.databinding.BottomSheetSocCompareBinding
+import com.cpua.deviceinfo.feature.soc.databinding.BottomSheetSocCompareBinding
 
 /**
  * Bottom sheet that lets the user:

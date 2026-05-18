@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.benchmark
+package com.cpua.deviceinfo.feature.benchmark
 
 // ──────────────────────────────────────────────────────────────────────────────
 // REPLACE the existing BenchmarkFragment.kt with this file.
@@ -12,10 +12,10 @@ import android.os.Looper
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.deviceinfo.core.model.InfoItem
-import com.example.deviceinfo.core.ui.InfoAdapter
-import com.example.deviceinfo.core.ui.ShareableFragment
-import com.example.deviceinfo.feature.benchmark.databinding.FragmentBenchmarkBinding
+import com.cpua.deviceinfo.core.model.InfoItem
+import com.cpua.deviceinfo.core.ui.InfoAdapter
+import com.cpua.deviceinfo.core.ui.ShareableFragment
+import com.cpua.deviceinfo.feature.benchmark.databinding.FragmentBenchmarkBinding
 import java.util.concurrent.Executors
 
 class BenchmarkFragment : Fragment(), ShareableFragment {

@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.battery
+package com.cpua.deviceinfo.feature.battery
 
 import android.content.Context
 import android.content.Intent

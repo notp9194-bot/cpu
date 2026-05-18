@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.security
+package com.cpua.deviceinfo.feature.security
 
 import android.content.Context
 import android.graphics.*

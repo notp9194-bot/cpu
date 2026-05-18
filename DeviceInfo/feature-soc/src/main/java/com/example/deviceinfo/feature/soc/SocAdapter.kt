@@ -1,11 +1,11 @@
-package com.example.deviceinfo.feature.soc
+package com.cpua.deviceinfo.feature.soc
 
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.deviceinfo.core.model.InfoItem
-import com.example.deviceinfo.feature.soc.databinding.ItemSocBinding
+import com.cpua.deviceinfo.core.model.InfoItem
+import com.cpua.deviceinfo.feature.soc.databinding.ItemSocBinding
 
 class SocAdapter(private val items: List<InfoItem>) : RecyclerView.Adapter<SocAdapter.ViewHolder>() {
     inner class ViewHolder(val b: ItemSocBinding) : RecyclerView.ViewHolder(b.root)

@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.benchmark
+package com.cpua.deviceinfo.feature.benchmark
 
 import android.content.Context
 import java.io.File

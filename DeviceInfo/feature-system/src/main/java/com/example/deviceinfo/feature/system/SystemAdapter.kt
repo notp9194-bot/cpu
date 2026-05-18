@@ -1,11 +1,11 @@
-package com.example.deviceinfo.feature.system
+package com.cpua.deviceinfo.feature.system
 
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.deviceinfo.core.model.InfoItem
-import com.example.deviceinfo.feature.system.databinding.ItemSystemBinding
+import com.cpua.deviceinfo.core.model.InfoItem
+import com.cpua.deviceinfo.feature.system.databinding.ItemSystemBinding
 
 class SystemAdapter(private val items: List<InfoItem>) : RecyclerView.Adapter<SystemAdapter.ViewHolder>() {
     inner class ViewHolder(val b: ItemSystemBinding) : RecyclerView.ViewHolder(b.root)

@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.pingmonitor
+package com.cpua.deviceinfo.feature.pingmonitor
 
 import android.content.Context
 import android.graphics.*

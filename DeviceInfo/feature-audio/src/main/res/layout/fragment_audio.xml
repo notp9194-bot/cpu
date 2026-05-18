@@ -7,7 +7,7 @@
     android:paddingTop="4dp">
 
     <!-- Volume bar chart -->
-    <com.example.deviceinfo.feature.audio.VolumeBarChartView
+    <com.cpua.deviceinfo.feature.audio.VolumeBarChartView
         android:id="@+id/volumeBarChart"
         android:layout_width="match_parent"
         android:layout_height="160dp"

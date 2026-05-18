@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.gpu
+package com.cpua.deviceinfo.feature.gpu
 
 import android.content.Context
 import android.opengl.EGL14
@@ -12,10 +12,10 @@ import android.text.TextWatcher
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.deviceinfo.core.model.InfoItem
-import com.example.deviceinfo.core.ui.InfoAdapter
-import com.example.deviceinfo.core.ui.ShareableFragment
-import com.example.deviceinfo.feature.gpu.databinding.FragmentGpuBinding
+import com.cpua.deviceinfo.core.model.InfoItem
+import com.cpua.deviceinfo.core.ui.InfoAdapter
+import com.cpua.deviceinfo.core.ui.ShareableFragment
+import com.cpua.deviceinfo.feature.gpu.databinding.FragmentGpuBinding
 
 class GpuFragment : Fragment(), ShareableFragment {
 

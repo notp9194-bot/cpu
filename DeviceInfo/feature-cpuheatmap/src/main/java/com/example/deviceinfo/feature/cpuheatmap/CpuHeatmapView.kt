@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.cpuheatmap
+package com.cpua.deviceinfo.feature.cpuheatmap
 
 import android.content.Context; import android.graphics.*; import android.util.AttributeSet; import android.view.View
 import java.io.BufferedReader; import java.io.FileReader

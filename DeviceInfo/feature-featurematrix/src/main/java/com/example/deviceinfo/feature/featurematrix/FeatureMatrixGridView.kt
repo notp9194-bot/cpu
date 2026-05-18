@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.featurematrix
+package com.cpua.deviceinfo.feature.featurematrix
 
 import android.content.Context; import android.graphics.*; import android.util.AttributeSet; import android.view.View
 

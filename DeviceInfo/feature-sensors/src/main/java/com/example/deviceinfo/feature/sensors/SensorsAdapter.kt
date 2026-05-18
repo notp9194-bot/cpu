@@ -1,10 +1,10 @@
-package com.example.deviceinfo.feature.sensors
+package com.cpua.deviceinfo.feature.sensors
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.deviceinfo.core.model.InfoItem
-import com.example.deviceinfo.feature.sensors.databinding.ItemSensorBinding
+import com.cpua.deviceinfo.core.model.InfoItem
+import com.cpua.deviceinfo.feature.sensors.databinding.ItemSensorBinding
 
 class SensorsAdapter(private val items: List<InfoItem>) : RecyclerView.Adapter<SensorsAdapter.VH>() {
     inner class VH(val b: ItemSensorBinding) : RecyclerView.ViewHolder(b.root)

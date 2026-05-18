@@ -7,7 +7,7 @@
     android:paddingTop="4dp">
 
     <!-- Refresh Rate Gauge + info cards -->
-    <com.example.deviceinfo.feature.display.RefreshRateGaugeView
+    <com.cpua.deviceinfo.feature.display.RefreshRateGaugeView
         android:id="@+id/refreshRateGauge"
         android:layout_width="match_parent"
         android:layout_height="180dp"

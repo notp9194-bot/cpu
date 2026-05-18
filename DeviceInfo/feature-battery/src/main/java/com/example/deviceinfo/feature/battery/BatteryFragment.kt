@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.battery
+package com.cpua.deviceinfo.feature.battery
 
 import android.app.ActivityManager
 import android.app.NotificationChannel
@@ -20,12 +20,12 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.deviceinfo.core.model.InfoItem
-import com.example.deviceinfo.core.ui.InfoAdapter
-import com.example.deviceinfo.core.ui.ShareableFragment
-import com.example.deviceinfo.core.util.DeviceUtils
-import com.example.deviceinfo.core.util.ExportUtils
-import com.example.deviceinfo.feature.battery.databinding.FragmentBatteryBinding
+import com.cpua.deviceinfo.core.model.InfoItem
+import com.cpua.deviceinfo.core.ui.InfoAdapter
+import com.cpua.deviceinfo.core.ui.ShareableFragment
+import com.cpua.deviceinfo.core.util.DeviceUtils
+import com.cpua.deviceinfo.core.util.ExportUtils
+import com.cpua.deviceinfo.feature.battery.databinding.FragmentBatteryBinding
 
 class BatteryFragment : Fragment(), ShareableFragment {
     private var _b: FragmentBatteryBinding? = null
@@ -190,7 +190,7 @@ class BatteryFragment : Fragment(), ShareableFragment {
         val status = intent?.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
 
         // Battery Full alert (user-configurable toggle)
-        if (com.example.deviceinfo.AlertPrefs.isBattFullEnabled(ctx)) {
+        if (com.cpua.deviceinfo.AlertPrefs.isBattFullEnabled(ctx)) {
             if (pct >= 100 &&
                 (status == BatteryManager.BATTERY_STATUS_FULL || status == BatteryManager.BATTERY_STATUS_CHARGING) &&
                 lastBatteryFullNotifPct != 100
@@ -206,8 +206,8 @@ class BatteryFragment : Fragment(), ShareableFragment {
         if (pct < 95) lastBatteryFullNotifPct = -1
 
         // Battery Low alert (user-configurable threshold)
-        if (com.example.deviceinfo.AlertPrefs.isBattLowEnabled(ctx)) {
-            val lowThreshold = com.example.deviceinfo.AlertPrefs.getBattLowPct(ctx)
+        if (com.cpua.deviceinfo.AlertPrefs.isBattLowEnabled(ctx)) {
+            val lowThreshold = com.cpua.deviceinfo.AlertPrefs.getBattLowPct(ctx)
             val isDischarging = status == BatteryManager.BATTERY_STATUS_DISCHARGING
             if (pct <= lowThreshold && isDischarging && lastRamAlertPct != lowThreshold) {
                 lastRamAlertPct = lowThreshold
@@ -222,8 +222,8 @@ class BatteryFragment : Fragment(), ShareableFragment {
     }
     private fun checkRamAlert(usedPct: Int) {
         val ctx = context ?: return
-        if (!com.example.deviceinfo.AlertPrefs.isRamEnabled(ctx)) return
-        val threshold = com.example.deviceinfo.AlertPrefs.getRamPct(ctx)
+        if (!com.cpua.deviceinfo.AlertPrefs.isRamEnabled(ctx)) return
+        val threshold = com.cpua.deviceinfo.AlertPrefs.getRamPct(ctx)
         val hysteresis = (threshold - 10).coerceAtLeast(0)
         if (usedPct >= threshold && lastRamAlertPct < threshold) {
             lastRamAlertPct = usedPct

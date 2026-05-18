@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.throttle
+package com.cpua.deviceinfo.feature.throttle
 
 import android.content.Context; import android.graphics.*; import android.util.AttributeSet; import android.view.View
 

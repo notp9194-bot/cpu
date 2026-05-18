@@ -1,11 +1,11 @@
-package com.example.deviceinfo.feature.battery
+package com.cpua.deviceinfo.feature.battery
 
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.deviceinfo.core.model.InfoItem
-import com.example.deviceinfo.feature.battery.databinding.ItemBatteryBinding
+import com.cpua.deviceinfo.core.model.InfoItem
+import com.cpua.deviceinfo.feature.battery.databinding.ItemBatteryBinding
 
 class BatteryAdapter(private val items: List<InfoItem>) : RecyclerView.Adapter<BatteryAdapter.ViewHolder>() {
     inner class ViewHolder(val b: ItemBatteryBinding) : RecyclerView.ViewHolder(b.root)

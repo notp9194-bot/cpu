@@ -7,7 +7,7 @@
     android:paddingTop="4dp">
 
     <!-- Sensor category bar chart -->
-    <com.example.deviceinfo.feature.sensors.SensorBarChartView
+    <com.cpua.deviceinfo.feature.sensors.SensorBarChartView
         android:id="@+id/sensorBarChart"
         android:layout_width="match_parent"
         android:layout_height="180dp"

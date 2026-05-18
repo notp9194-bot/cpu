@@ -1,4 +1,4 @@
-package com.example.deviceinfo.core.ui
+package com.cpua.deviceinfo.core.ui
 
 /**
  * Fragments that want to provide real data to the Share button implement this.

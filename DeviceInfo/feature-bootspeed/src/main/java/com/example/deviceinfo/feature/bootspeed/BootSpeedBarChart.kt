@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.bootspeed
+package com.cpua.deviceinfo.feature.bootspeed
 
 import android.content.Context; import android.graphics.*; import android.util.AttributeSet; import android.view.View
 

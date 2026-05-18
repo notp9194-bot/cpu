@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.brightness
+package com.cpua.deviceinfo.feature.brightness
 
 import android.content.Context; import android.graphics.*; import android.util.AttributeSet; import android.view.View
 

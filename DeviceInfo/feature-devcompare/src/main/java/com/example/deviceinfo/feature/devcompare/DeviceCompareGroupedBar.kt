@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.devcompare
+package com.cpua.deviceinfo.feature.devcompare
 
 import android.content.Context; import android.graphics.*; import android.util.AttributeSet; import android.view.View
 

@@ -1,4 +1,4 @@
-package com.example.deviceinfo
+package com.cpua.deviceinfo
 
 import android.Manifest
 import android.content.Intent
@@ -17,51 +17,46 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.example.deviceinfo.core.ui.ShareableFragment
-import com.example.deviceinfo.core.util.ExportUtils
-import com.example.deviceinfo.databinding.ActivityMainBinding
-import com.example.deviceinfo.feature.about.AboutFragment
-import com.example.deviceinfo.feature.audio.AudioFragment
-import com.example.deviceinfo.feature.battery.BatteryFragment
-import com.example.deviceinfo.feature.benchmark.BenchmarkFragment
-import com.example.deviceinfo.feature.security.BuildFragment
-import com.example.deviceinfo.feature.camera.CameraFragment
-import com.example.deviceinfo.feature.codec.CodecFragment
-import com.example.deviceinfo.feature.connectivity.ConnectivityFragment
-import com.example.deviceinfo.feature.device.DeviceFragment
-import com.example.deviceinfo.feature.display.DisplayFragment
-import com.example.deviceinfo.feature.favorites.FavoritesFragment
-import com.example.deviceinfo.feature.health.HealthFragment
-import com.example.deviceinfo.feature.gpu.GpuFragment
-import com.example.deviceinfo.feature.input.InputFragment
-import com.example.deviceinfo.feature.memory.MemoryFragment
-import com.example.deviceinfo.feature.network.NetworkFragment
-import com.example.deviceinfo.feature.power.PowerFragment
-import com.example.deviceinfo.feature.sensors.SensorsFragment
-import com.example.deviceinfo.feature.soc.SocFragment
-import com.example.deviceinfo.feature.system.SystemFragment
-import com.example.deviceinfo.feature.thermal.ThermalFragment
-// ── 20 New Advanced Feature Modules ───────────────────────────────────────
-import com.example.deviceinfo.feature.cpucore.CpuCoreFragment
-import com.example.deviceinfo.feature.chargesession.ChargeSessionFragment
-import com.example.deviceinfo.feature.pingmonitor.PingMonitorFragment
-import com.example.deviceinfo.feature.storageio.StorageIoFragment
-import com.example.deviceinfo.feature.appmemory.AppMemoryFragment
-import com.example.deviceinfo.feature.screentime.ScreenTimeFragment
-import com.example.deviceinfo.feature.dischargerate.DischargeRateFragment
-import com.example.deviceinfo.feature.cpuheatmap.CpuHeatmapFragment
-import com.example.deviceinfo.feature.throttle.ThrottleFragment
-import com.example.deviceinfo.feature.wifichannel.WifiChannelFragment
-import com.example.deviceinfo.feature.loadavg.LoadAvgFragment
-import com.example.deviceinfo.feature.nettraffic.NetTrafficFragment
-import com.example.deviceinfo.feature.chargecurve.ChargeCurveFragment
-import com.example.deviceinfo.feature.sensorlive.SensorLiveFragment
-import com.example.deviceinfo.feature.devcompare.DeviceCompareFragment
-import com.example.deviceinfo.feature.processmon.ProcessMonFragment
-import com.example.deviceinfo.feature.powerestimate.PowerEstimateFragment
-import com.example.deviceinfo.feature.brightness.BrightnessFragment
-import com.example.deviceinfo.feature.bootspeed.BootSpeedFragment
-import com.example.deviceinfo.feature.featurematrix.FeatureMatrixFragment
+import com.cpua.deviceinfo.core.ui.ShareableFragment
+import com.cpua.deviceinfo.core.util.ExportUtils
+import com.cpua.deviceinfo.databinding.ActivityMainBinding
+import com.cpua.deviceinfo.feature.about.AboutFragment
+import com.cpua.deviceinfo.feature.audio.AudioFragment
+import com.cpua.deviceinfo.feature.battery.BatteryFragment
+import com.cpua.deviceinfo.feature.benchmark.BenchmarkFragment
+import com.cpua.deviceinfo.feature.security.BuildFragment
+import com.cpua.deviceinfo.feature.camera.CameraFragment
+import com.cpua.deviceinfo.feature.codec.CodecFragment
+import com.cpua.deviceinfo.feature.connectivity.ConnectivityFragment
+import com.cpua.deviceinfo.feature.device.DeviceFragment
+import com.cpua.deviceinfo.feature.display.DisplayFragment
+import com.cpua.deviceinfo.feature.favorites.FavoritesFragment
+import com.cpua.deviceinfo.feature.health.HealthFragment
+import com.cpua.deviceinfo.feature.gpu.GpuFragment
+import com.cpua.deviceinfo.feature.input.InputFragment
+import com.cpua.deviceinfo.feature.memory.MemoryFragment
+import com.cpua.deviceinfo.feature.network.NetworkFragment
+import com.cpua.deviceinfo.feature.power.PowerFragment
+import com.cpua.deviceinfo.feature.sensors.SensorsFragment
+import com.cpua.deviceinfo.feature.soc.SocFragment
+import com.cpua.deviceinfo.feature.system.SystemFragment
+import com.cpua.deviceinfo.feature.thermal.ThermalFragment
+// Advanced Feature Modules (Policy Compliant)
+import com.cpua.deviceinfo.feature.cpucore.CpuCoreFragment
+import com.cpua.deviceinfo.feature.chargesession.ChargeSessionFragment
+import com.cpua.deviceinfo.feature.pingmonitor.PingMonitorFragment
+import com.cpua.deviceinfo.feature.screentime.ScreenTimeFragment
+import com.cpua.deviceinfo.feature.dischargerate.DischargeRateFragment
+import com.cpua.deviceinfo.feature.cpuheatmap.CpuHeatmapFragment
+import com.cpua.deviceinfo.feature.throttle.ThrottleFragment
+import com.cpua.deviceinfo.feature.loadavg.LoadAvgFragment
+import com.cpua.deviceinfo.feature.chargecurve.ChargeCurveFragment
+import com.cpua.deviceinfo.feature.sensorlive.SensorLiveFragment
+import com.cpua.deviceinfo.feature.devcompare.DeviceCompareFragment
+import com.cpua.deviceinfo.feature.powerestimate.PowerEstimateFragment
+import com.cpua.deviceinfo.feature.brightness.BrightnessFragment
+import com.cpua.deviceinfo.feature.bootspeed.BootSpeedFragment
+import com.cpua.deviceinfo.feature.featurematrix.FeatureMatrixFragment
 import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
@@ -69,9 +64,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var prefs: SharedPreferences
 
-    // ── Tab order: 21 original + 20 new = 41 tabs ─────────────────────────
+    // 21 original + 15 advanced (5 policy-violating removed) = 36 tabs
     private val tabs = listOf(
-        // ── Original 21 ──────────────────────────────────────────────────
+        // Original 21
         "★ FAV",          //  0
         "SOC",            //  1
         "DEVICE",         //  2
@@ -93,27 +88,22 @@ class MainActivity : AppCompatActivity() {
         "INPUT",          // 18
         "HEALTH",         // 19
         "ABOUT",          // 20
-        // ── New 20 Advanced Features ──────────────────────────────────────
+        // Advanced 15 (Policy Compliant)
         "CPU CORES",      // 21
         "CHG SESSION",    // 22
         "PING",           // 23
-        "DISK I/O",       // 24
-        "APP MEM",        // 25
-        "SCREEN TIME",    // 26
-        "DISCHARGE",      // 27
-        "CPU HEATMAP",    // 28
-        "THROTTLE",       // 29
-        "WIFI CHAN",       // 30
-        "LOAD AVG",       // 31
-        "NET TRAFFIC",    // 32
-        "CHG CURVE",      // 33
-        "SENSOR LIVE",    // 34
-        "DEV COMPARE",    // 35
-        "PROCESSES",      // 36
-        "PWR ESTIMATE",   // 37
-        "BRIGHTNESS",     // 38
-        "BOOT SPEED",     // 39
-        "FEAT MATRIX"     // 40
+        "SCREEN TIME",    // 24
+        "DISCHARGE",      // 25
+        "CPU HEATMAP",    // 26
+        "THROTTLE",       // 27
+        "LOAD AVG",       // 28
+        "CHG CURVE",      // 29
+        "SENSOR LIVE",    // 30
+        "DEV COMPARE",    // 31
+        "PWR ESTIMATE",   // 32
+        "BRIGHTNESS",     // 33
+        "BOOT SPEED",     // 34
+        "FEAT MATRIX"     // 35
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -202,11 +192,10 @@ class MainActivity : AppCompatActivity() {
         ExportUtils.exportToPdf(this, tabs[pos], data)
     }
 
-    // ── Pager adapter ──────────────────────────────────────────────────────
     private inner class MainPagerAdapter(a: AppCompatActivity) : FragmentStateAdapter(a) {
         override fun getItemCount() = tabs.size
         override fun createFragment(pos: Int): Fragment = when (pos) {
-            // ── Original 21 ──────────────────────────────────────────────
+            // Original 21
             0  -> FavoritesFragment()
             1  -> SocFragment()
             2  -> DeviceFragment()
@@ -228,27 +217,22 @@ class MainActivity : AppCompatActivity() {
             18 -> InputFragment()
             19 -> HealthFragment()
             20 -> AboutFragment()
-            // ── New 20 Advanced Modules ───────────────────────────────────
+            // Advanced 15
             21 -> CpuCoreFragment()
             22 -> ChargeSessionFragment()
             23 -> PingMonitorFragment()
-            24 -> StorageIoFragment()
-            25 -> AppMemoryFragment()
-            26 -> ScreenTimeFragment()
-            27 -> DischargeRateFragment()
-            28 -> CpuHeatmapFragment()
-            29 -> ThrottleFragment()
-            30 -> WifiChannelFragment()
-            31 -> LoadAvgFragment()
-            32 -> NetTrafficFragment()
-            33 -> ChargeCurveFragment()
-            34 -> SensorLiveFragment()
-            35 -> DeviceCompareFragment()
-            36 -> ProcessMonFragment()
-            37 -> PowerEstimateFragment()
-            38 -> BrightnessFragment()
-            39 -> BootSpeedFragment()
-            40 -> FeatureMatrixFragment()
+            24 -> ScreenTimeFragment()
+            25 -> DischargeRateFragment()
+            26 -> CpuHeatmapFragment()
+            27 -> ThrottleFragment()
+            28 -> LoadAvgFragment()
+            29 -> ChargeCurveFragment()
+            30 -> SensorLiveFragment()
+            31 -> DeviceCompareFragment()
+            32 -> PowerEstimateFragment()
+            33 -> BrightnessFragment()
+            34 -> BootSpeedFragment()
+            35 -> FeatureMatrixFragment()
             else -> SocFragment()
         }
     }

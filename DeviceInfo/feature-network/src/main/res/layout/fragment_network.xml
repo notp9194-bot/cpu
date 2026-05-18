@@ -10,7 +10,7 @@
         android:id="@+id/searchBar"
         layout="@layout/layout_search_bar"/>
 
-    <com.example.deviceinfo.feature.network.NetworkSpeedChartView
+    <com.cpua.deviceinfo.feature.network.NetworkSpeedChartView
         android:id="@+id/networkSpeedChart"
         android:layout_width="match_parent"
         android:layout_height="150dp"

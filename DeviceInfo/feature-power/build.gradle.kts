@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 android {
-    namespace = "com.example.deviceinfo.feature.power"
+    namespace = "com.cpua.deviceinfo.feature.power"
     compileSdk = 35
     defaultConfig { minSdk = 24 }
     compileOptions {

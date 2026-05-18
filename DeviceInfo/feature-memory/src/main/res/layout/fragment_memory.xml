@@ -7,7 +7,7 @@
     android:paddingTop="4dp">
 
     <!-- Live dual-line RAM chart -->
-    <com.example.deviceinfo.feature.memory.MemoryLineChartView
+    <com.cpua.deviceinfo.feature.memory.MemoryLineChartView
         android:id="@+id/memoryLineChart"
         android:layout_width="match_parent"
         android:layout_height="140dp"
@@ -15,7 +15,7 @@
         android:layout_marginTop="8dp"/>
 
     <!-- Segmented bar (Used | Free) -->
-    <com.example.deviceinfo.feature.memory.MemorySegmentBarView
+    <com.cpua.deviceinfo.feature.memory.MemorySegmentBarView
         android:id="@+id/memorySegmentBar"
         android:layout_width="match_parent"
         android:layout_height="76dp"

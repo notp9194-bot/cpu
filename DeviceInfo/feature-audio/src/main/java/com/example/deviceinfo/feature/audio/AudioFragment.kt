@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.audio
+package com.cpua.deviceinfo.feature.audio
 
 import android.bluetooth.BluetoothManager
 import android.content.Context
@@ -11,10 +11,10 @@ import android.text.TextWatcher
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.deviceinfo.core.model.InfoItem
-import com.example.deviceinfo.core.ui.InfoAdapter
-import com.example.deviceinfo.core.ui.ShareableFragment
-import com.example.deviceinfo.feature.audio.databinding.FragmentAudioBinding
+import com.cpua.deviceinfo.core.model.InfoItem
+import com.cpua.deviceinfo.core.ui.InfoAdapter
+import com.cpua.deviceinfo.core.ui.ShareableFragment
+import com.cpua.deviceinfo.feature.audio.databinding.FragmentAudioBinding
 
 class AudioFragment : Fragment(), ShareableFragment {
     private var _b: FragmentAudioBinding? = null

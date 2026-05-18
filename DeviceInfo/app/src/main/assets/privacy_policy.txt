@@ -1,0 +1,22 @@
+PRIVACY POLICY — CPU-A Device Info
+Last updated: May 2026
+
+This app collects the following device information ONLY for display purposes within the app:
+- Hardware info: CPU, GPU, SoC, Memory, Storage, Display, Camera specs
+- Battery status: level, temperature, voltage, charging state
+- Network info: connection type, WiFi signal strength, IP address
+- Sensor data: accelerometer, gyroscope, proximity, light sensor readings
+- System info: Android version, build number, security patch
+
+DATA USAGE:
+- All data is displayed locally on your device only
+- No data is sent to any server or third party
+- No data is sold or shared with advertisers
+- Export feature saves data to your device Downloads folder only
+
+PERMISSIONS USED:
+- ACCESS_NETWORK_STATE / ACCESS_WIFI_STATE: To display network info
+- POST_NOTIFICATIONS: For battery alert notifications
+- RECEIVE_BOOT_COMPLETED: To restore battery alerts after reboot
+
+Contact: your@email.com

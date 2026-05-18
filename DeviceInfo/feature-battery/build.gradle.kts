@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 android {
-    namespace = "com.example.deviceinfo.feature.battery"
+    namespace = "com.cpua.deviceinfo.feature.battery"
     compileSdk = 35
     defaultConfig { minSdk = 24 }
     compileOptions {

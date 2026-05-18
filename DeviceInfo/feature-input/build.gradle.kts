@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.deviceinfo.feature.input"
+    namespace = "com.cpua.deviceinfo.feature.input"
     compileSdk = 35
     defaultConfig { minSdk = 24 }
     compileOptions {

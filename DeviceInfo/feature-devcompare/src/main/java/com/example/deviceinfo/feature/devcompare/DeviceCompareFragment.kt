@@ -1,7 +1,7 @@
-package com.example.deviceinfo.feature.devcompare
+package com.cpua.deviceinfo.feature.devcompare
 
 import android.app.ActivityManager; import android.content.Context; import android.os.*; import android.view.*
-import android.widget.*; import androidx.fragment.app.Fragment; import com.example.deviceinfo.core.ui.ShareableFragment
+import android.widget.*; import androidx.fragment.app.Fragment; import com.cpua.deviceinfo.core.ui.ShareableFragment
 
 data class PhoneSpec(val name: String, val ramGb: Float, val storageGb: Float, val battMah: Int, val camMp: Float, val displayInch: Float, val cpuScore: Int)
 

@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.sensorlive
+package com.cpua.deviceinfo.feature.sensorlive
 
 import android.animation.ValueAnimator; import android.content.Context; import android.graphics.*; import android.util.AttributeSet; import android.view.View; import kotlin.math.*
 

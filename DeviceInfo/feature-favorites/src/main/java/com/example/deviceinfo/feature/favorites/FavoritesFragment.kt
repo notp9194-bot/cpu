@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.favorites
+package com.cpua.deviceinfo.feature.favorites
 
 import android.os.Bundle
 import android.text.Editable
@@ -7,8 +7,8 @@ import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.deviceinfo.core.favorites.FavoritesManager
-import com.example.deviceinfo.feature.favorites.databinding.FragmentFavoritesBinding
+import com.cpua.deviceinfo.core.favorites.FavoritesManager
+import com.cpua.deviceinfo.feature.favorites.databinding.FragmentFavoritesBinding
 
 class FavoritesFragment : Fragment() {
 

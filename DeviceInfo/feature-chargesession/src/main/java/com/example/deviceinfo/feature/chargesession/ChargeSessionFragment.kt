@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.chargesession
+package com.cpua.deviceinfo.feature.chargesession
 
 import android.content.*
 import android.os.*
@@ -6,7 +6,7 @@ import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import com.example.deviceinfo.core.ui.ShareableFragment
+import com.cpua.deviceinfo.core.ui.ShareableFragment
 
 class ChargeSessionFragment : Fragment(), ShareableFragment {
 

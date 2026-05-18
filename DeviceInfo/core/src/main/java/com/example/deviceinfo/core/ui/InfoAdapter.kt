@@ -1,4 +1,4 @@
-package com.example.deviceinfo.core.ui
+package com.cpua.deviceinfo.core.ui
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -9,9 +9,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.example.deviceinfo.core.databinding.ItemInfoBinding
-import com.example.deviceinfo.core.favorites.FavoritesManager
-import com.example.deviceinfo.core.model.InfoItem
+import com.cpua.deviceinfo.core.databinding.ItemInfoBinding
+import com.cpua.deviceinfo.core.favorites.FavoritesManager
+import com.cpua.deviceinfo.core.model.InfoItem
 
 /**
  * Main adapter for all info tabs.

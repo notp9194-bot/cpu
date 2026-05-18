@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.chargesession
+package com.cpua.deviceinfo.feature.chargesession
 
 import android.content.Context
 import android.graphics.*

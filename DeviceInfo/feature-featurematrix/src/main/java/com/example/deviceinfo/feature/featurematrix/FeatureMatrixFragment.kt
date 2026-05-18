@@ -1,8 +1,8 @@
-package com.example.deviceinfo.feature.featurematrix
+package com.cpua.deviceinfo.feature.featurematrix
 
 import android.content.pm.PackageManager; import android.hardware.camera2.*; import android.nfc.NfcAdapter; import android.os.*
 import android.view.*; import android.widget.*; import androidx.fragment.app.Fragment
-import com.example.deviceinfo.core.ui.ShareableFragment; import java.util.concurrent.Executors
+import com.cpua.deviceinfo.core.ui.ShareableFragment; import java.util.concurrent.Executors
 
 class FeatureMatrixFragment : Fragment(), ShareableFragment {
     private var rootView: View?=null; private var gridView: FeatureMatrixGridView?=null; private var tvStats: TextView?=null

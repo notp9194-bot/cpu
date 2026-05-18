@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.cpucore
+package com.cpua.deviceinfo.feature.cpucore
 
 import android.os.Bundle
 import android.os.Handler
@@ -6,7 +6,7 @@ import android.os.Looper
 import android.view.*
 import android.widget.*
 import androidx.fragment.app.Fragment
-import com.example.deviceinfo.core.ui.ShareableFragment
+import com.cpua.deviceinfo.core.ui.ShareableFragment
 import java.io.BufferedReader
 import java.io.FileReader
 

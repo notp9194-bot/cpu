@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.system
+package com.cpua.deviceinfo.feature.system
 
 import android.app.ActivityManager
 import android.content.Context
@@ -9,11 +9,11 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.deviceinfo.core.model.InfoItem
-import com.example.deviceinfo.core.ui.InfoAdapter
-import com.example.deviceinfo.core.ui.ShareableFragment
-import com.example.deviceinfo.core.util.ExportUtils
-import com.example.deviceinfo.feature.system.databinding.FragmentSystemBinding
+import com.cpua.deviceinfo.core.model.InfoItem
+import com.cpua.deviceinfo.core.ui.InfoAdapter
+import com.cpua.deviceinfo.core.ui.ShareableFragment
+import com.cpua.deviceinfo.core.util.ExportUtils
+import com.cpua.deviceinfo.feature.system.databinding.FragmentSystemBinding
 import java.io.File
 import java.util.*
 import java.util.concurrent.Executors

@@ -10,7 +10,7 @@
         android:id="@+id/searchBar"
         layout="@layout/layout_search_bar"/>
 
-    <com.example.deviceinfo.feature.thermal.TempLineChartView
+    <com.cpua.deviceinfo.feature.thermal.TempLineChartView
         android:id="@+id/tempChart"
         android:layout_width="match_parent"
         android:layout_height="150dp"

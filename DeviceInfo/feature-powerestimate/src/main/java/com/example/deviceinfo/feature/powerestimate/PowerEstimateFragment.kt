@@ -1,8 +1,8 @@
-package com.example.deviceinfo.feature.powerestimate
+package com.cpua.deviceinfo.feature.powerestimate
 
 import android.app.ActivityManager; import android.content.*; import android.net.TrafficStats; import android.os.*
 import android.view.*; import android.widget.*; import androidx.fragment.app.Fragment
-import com.example.deviceinfo.core.ui.ShareableFragment; import java.io.BufferedReader; import java.io.FileReader
+import com.cpua.deviceinfo.core.ui.ShareableFragment; import java.io.BufferedReader; import java.io.FileReader
 
 class PowerEstimateFragment : Fragment(), ShareableFragment {
     private var rootView: View?=null; private var chart: PowerPieChart?=null; private var tvTotal: TextView?=null

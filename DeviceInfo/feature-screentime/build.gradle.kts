@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 android {
-    namespace = "com.example.deviceinfo.feature.screentime"
+    namespace = "com.cpua.deviceinfo.feature.screentime"
     compileSdk = 35
     defaultConfig { minSdk = 24 }
     compileOptions {

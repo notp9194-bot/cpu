@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.power
+package com.cpua.deviceinfo.feature.power
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -14,10 +14,10 @@ import android.text.TextWatcher
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.deviceinfo.core.model.InfoItem
-import com.example.deviceinfo.core.ui.InfoAdapter
-import com.example.deviceinfo.core.ui.ShareableFragment
-import com.example.deviceinfo.feature.power.databinding.FragmentPowerBinding
+import com.cpua.deviceinfo.core.model.InfoItem
+import com.cpua.deviceinfo.core.ui.InfoAdapter
+import com.cpua.deviceinfo.core.ui.ShareableFragment
+import com.cpua.deviceinfo.feature.power.databinding.FragmentPowerBinding
 import kotlin.math.abs
 
 class PowerFragment : Fragment(), ShareableFragment {

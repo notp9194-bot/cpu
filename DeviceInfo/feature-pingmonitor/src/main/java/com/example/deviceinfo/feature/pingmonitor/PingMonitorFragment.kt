@@ -1,10 +1,10 @@
-package com.example.deviceinfo.feature.pingmonitor
+package com.cpua.deviceinfo.feature.pingmonitor
 
 import android.os.*
 import android.view.*
 import android.widget.*
 import androidx.fragment.app.Fragment
-import com.example.deviceinfo.core.ui.ShareableFragment
+import com.cpua.deviceinfo.core.ui.ShareableFragment
 import java.net.InetAddress
 import java.util.concurrent.Executors
 

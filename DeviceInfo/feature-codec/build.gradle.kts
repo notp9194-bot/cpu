@@ -3,7 +3,7 @@ plugins {
       alias(libs.plugins.kotlin.android)
   }
   android {
-      namespace = "com.example.deviceinfo.feature.codec"
+      namespace = "com.cpua.deviceinfo.feature.codec"
       compileSdk = 35
       defaultConfig { minSdk = 24 }
       compileOptions { sourceCompatibility = JavaVersion.VERSION_1_8; targetCompatibility = JavaVersion.VERSION_1_8 }

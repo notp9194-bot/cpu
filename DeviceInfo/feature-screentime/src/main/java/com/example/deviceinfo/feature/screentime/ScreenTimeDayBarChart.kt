@@ -1,4 +1,4 @@
-package com.example.deviceinfo.feature.screentime
+package com.cpua.deviceinfo.feature.screentime
 
 import android.content.Context; import android.graphics.*; import android.util.AttributeSet; import android.view.View
 
