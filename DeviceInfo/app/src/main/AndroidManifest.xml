@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Network & Connectivity -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -10,16 +11,14 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
-    <!-- Nearby WiFi Devices - API 33+ (no location inference) -->
+    <!-- Nearby WiFi Devices - API 33+ -->
     <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES"
         android:usesPermissionFlags="neverForLocation"
-        tools:targetApi="tiramisu"
-        xmlns:tools="http://schemas.android.com/tools"/>
+        tools:targetApi="tiramisu" />
 
-    <!-- Notifications & Alerts -->
+    <!-- Notifications -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -38,29 +37,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- Alert Thresholds Settings -->
-        <activity
-            android:name=".AlertSettingsActivity"
-            android:exported="false"
-            android:label="Alert Thresholds"
-            android:parentActivityName=".MainActivity" />
-
-        <!-- Battery LOW alert -->
-        <receiver android:name=".BatteryAlertReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BATTERY_LOW" />
-            </intent-filter>
-        </receiver>
-
-        <!-- Battery FULL alert -->
-        <receiver android:name=".BatteryFullReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
-            </intent-filter>
-        </receiver>
 
         <!-- Home Screen Widget -->
         <receiver android:name=".DeviceInfoWidget"

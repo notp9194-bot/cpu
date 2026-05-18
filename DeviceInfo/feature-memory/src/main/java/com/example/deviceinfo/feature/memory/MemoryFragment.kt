@@ -69,8 +69,6 @@ class MemoryFragment : Fragment(), ShareableFragment {
         b.memorySegmentBar.update(usedMb, availMb, totalMb)
 
         // Alert if RAM exceeds user-configured threshold
-        val ramThreshold = com.cpua.deviceinfo.AlertPrefs.getRamPct(ctx)
-        val ramEnabled   = com.cpua.deviceinfo.AlertPrefs.isRamEnabled(ctx)
         val hysteresis   = (ramThreshold - 10).coerceAtLeast(0)
         if (ramEnabled && usedPct >= ramThreshold && lastHighRamNotifPct < ramThreshold) {
             lastHighRamNotifPct = usedPct

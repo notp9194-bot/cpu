@@ -78,8 +78,6 @@ class ThermalFragment : Fragment(), ShareableFragment {
 
     private fun checkThermalAlert(maxTemp: Float) {
         val ctx = context ?: return
-        if (!com.cpua.deviceinfo.AlertPrefs.isTempEnabled(ctx)) return
-        val threshold = com.cpua.deviceinfo.AlertPrefs.getTempC(ctx).toFloat()
         if (maxTemp >= threshold && lastThermalAlertTemp < threshold) {
             lastThermalAlertTemp = maxTemp
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
