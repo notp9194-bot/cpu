@@ -14,7 +14,9 @@ import com.example.deviceinfo.core.ui.InfoAdapter
 import com.example.deviceinfo.core.ui.ShareableFragment
 import com.example.deviceinfo.core.util.ExportUtils
 import com.example.deviceinfo.feature.system.databinding.FragmentSystemBinding
+import java.io.File
 import java.util.*
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 class SystemFragment : Fragment(), ShareableFragment {
@@ -22,6 +24,8 @@ class SystemFragment : Fragment(), ShareableFragment {
     private val b get() = _b!!
     private var latestData: LinkedHashMap<String, String> = linkedMapOf()
     private var adapter: InfoAdapter? = null
+    private val executor = Executors.newSingleThreadExecutor()
+    private val handler  = Handler(Looper.getMainLooper())
 
     override fun onCreateView(i: LayoutInflater, c: ViewGroup?, s: Bundle?) =
         FragmentSystemBinding.inflate(i, c, false).also { _b = it }.root
@@ -29,7 +33,7 @@ class SystemFragment : Fragment(), ShareableFragment {
     override fun onViewCreated(view: View, s: Bundle?) {
         super.onViewCreated(view, s)
 
-        val up  = SystemClock.elapsedRealtime()
+        val up   = SystemClock.elapsedRealtime()
         val days = TimeUnit.MILLISECONDS.toDays(up)
         val hrs  = TimeUnit.MILLISECONDS.toHours(up) % 24
         val min  = TimeUnit.MILLISECONDS.toMinutes(up) % 60
@@ -47,7 +51,6 @@ class SystemFragment : Fragment(), ShareableFragment {
         val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         val currentIme = imm.currentInputMethodSubtype?.languageTag?.takeIf { it.isNotBlank() } ?: locale.language
 
-        // ── Storage info ─────────────────────────────────────────────────
         val stat = StatFs(Environment.getDataDirectory().path)
         val storageTotalBytes = stat.totalBytes
         val storageFreeBytes  = stat.availableBytes
@@ -55,13 +58,11 @@ class SystemFragment : Fragment(), ShareableFragment {
         val storageTotalGb    = storageTotalBytes / (1024f * 1024f * 1024f)
         val storageUsedGb     = storageUsedBytes  / (1024f * 1024f * 1024f)
 
-        // ── RAM info ─────────────────────────────────────────────────────
         val am = requireContext().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         val mi = ActivityManager.MemoryInfo().also { am.getMemoryInfo(it) }
         val ramTotalGb = mi.totalMem / (1024f * 1024f * 1024f)
         val ramUsedGb  = (mi.totalMem - mi.availMem) / (1024f * 1024f * 1024f)
 
-        // ── Feed doughnut chart ───────────────────────────────────────────
         b.storageDoughnut.update(storageTotalGb, storageUsedGb, ramTotalGb, ramUsedGb)
 
         latestData = linkedMapOf(
@@ -101,6 +102,58 @@ class SystemFragment : Fragment(), ShareableFragment {
             override fun beforeTextChanged(s: CharSequence?, st: Int, cnt: Int, aft: Int) {}
             override fun onTextChanged(s: CharSequence?, st: Int, bf: Int, cnt: Int) {}
         })
+
+        loadStorageCategories(storageTotalBytes, storageFreeBytes)
+    }
+
+    private fun loadStorageCategories(totalBytes: Long, freeBytes: Long) {
+        executor.execute {
+            val images    = dirSize(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES))   +
+                            dirSize(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_SCREENSHOTS)) +
+                            dirSize(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM))
+            val videos    = dirSize(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES))
+            val audio     = dirSize(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC))      +
+                            dirSize(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PODCASTS))   +
+                            dirSize(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES))
+            val downloads = dirSize(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS))
+            val docs      = dirSize(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS))
+
+            val usedBytes = totalBytes - freeBytes
+            val knownDirs = images + videos + audio + downloads + docs
+            val apps      = (usedBytes - knownDirs).coerceAtLeast(0L)
+            val other     = (usedBytes - apps - images - videos - audio - downloads - docs).coerceAtLeast(0L)
+
+            val cats = buildList {
+                if (apps > 0)      add(StorageCategoryBarView.CategoryItem("Apps",      apps,      0xFF7B2FBE.toInt()))
+                if (images > 0)    add(StorageCategoryBarView.CategoryItem("Images",    images,    0xFF2196F3.toInt()))
+                if (videos > 0)    add(StorageCategoryBarView.CategoryItem("Videos",    videos,    0xFFE91E63.toInt()))
+                if (audio > 0)     add(StorageCategoryBarView.CategoryItem("Audio",     audio,     0xFF4CAF50.toInt()))
+                if (downloads > 0) add(StorageCategoryBarView.CategoryItem("Downloads", downloads, 0xFFFF9800.toInt()))
+                if (docs > 0)      add(StorageCategoryBarView.CategoryItem("Documents", docs,      0xFF009688.toInt()))
+                if (other > 0)     add(StorageCategoryBarView.CategoryItem("Other",     other,     0xFF78909C.toInt()))
+                add(StorageCategoryBarView.CategoryItem("Free", freeBytes, 0xFFE0E0E0.toInt()))
+            }
+
+            handler.post {
+                if (_b == null) return@post
+                b.storageCategoryBar.setCategories(cats, totalBytes)
+            }
+        }
+    }
+
+    private fun dirSize(dir: File?): Long {
+        if (dir == null || !dir.exists() || !dir.isDirectory) return 0L
+        var size = 0L
+        try {
+            val stack = ArrayDeque<File>()
+            stack.addLast(dir)
+            while (stack.isNotEmpty()) {
+                val f = stack.removeLast()
+                if (f.isFile) size += f.length()
+                else if (f.isDirectory) f.listFiles()?.forEach { stack.addLast(it) }
+            }
+        } catch (_: Exception) { }
+        return size
     }
 
     override fun getShareText(): String {
