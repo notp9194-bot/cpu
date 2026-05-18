@@ -26,7 +26,7 @@ class FeatureMatrixFragment : Fragment(), ShareableFragment {
         executor.submit {
             val pm=ctx.packageManager
             fun has(f: String)=pm.hasSystemFeature(f)
-            fun st(b: Boolean)=if(b)FeatureMatrixGridView.Feature.Status.YES else FeatureMatrixGridView.Feature.Status.NO
+            fun st(b: Boolean)=if(b)FeatureMatrixGridView.Status.YES else FeatureMatrixGridView.Status.NO
 
             val nfcAvail=NfcAdapter.getDefaultAdapter(ctx)!=null
             val cameraCount=try{(ctx.getSystemService(android.content.Context.CAMERA_SERVICE) as CameraManager).cameraIdList.size}catch(_:Exception){0}
@@ -36,9 +36,9 @@ class FeatureMatrixFragment : Fragment(), ShareableFragment {
                 // Connectivity
                 FeatureMatrixGridView.Feature("NFC","Connectivity",st(nfcAvail),"Near Field Communication"),
                 FeatureMatrixGridView.Feature("WiFi 6 (802.11ax)","Connectivity",st(has("android.hardware.wifi.passpoint")||Build.VERSION.SDK_INT>=29&&has("android.hardware.wifi")),"High-speed WiFi"),
-                FeatureMatrixGridView.Feature("Bluetooth 5.0+","Connectivity",if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O)FeatureMatrixGridView.Feature.Status.YES else FeatureMatrixGridView.Feature.Status.UNKNOWN,"BT LE Audio support"),
+                FeatureMatrixGridView.Feature("Bluetooth 5.0+","Connectivity",if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O)FeatureMatrixGridView.Status.YES else FeatureMatrixGridView.Status.UNKNOWN,"BT LE Audio support"),
                 FeatureMatrixGridView.Feature("5G Modem","Connectivity",st(has("android.hardware.telephony.radio.access")||has("android.hardware.telephony.5gsa")),"Sub-6 / mmWave 5G"),
-                FeatureMatrixGridView.Feature("USB-C","Connectivity",FeatureMatrixGridView.Feature.Status.UNKNOWN,"Check device spec"),
+                FeatureMatrixGridView.Feature("USB-C","Connectivity",FeatureMatrixGridView.Status.UNKNOWN,"Check device spec"),
                 // Display
                 FeatureMatrixGridView.Feature("HDR Display","Display",st(has("android.hardware.sensor.hdrviewfinder")||Build.VERSION.SDK_INT>=24),"High Dynamic Range"),
                 FeatureMatrixGridView.Feature("High Refresh Rate","Display",st(requireActivity().windowManager.defaultDisplay.supportedModes.any{it.refreshRate>61f}),"90Hz / 120Hz / 144Hz"),
@@ -49,7 +49,7 @@ class FeatureMatrixFragment : Fragment(), ShareableFragment {
                 FeatureMatrixGridView.Feature("Face Unlock","Security",st(has(PackageManager.FEATURE_FACE)),"3D or 2D face auth"),
                 FeatureMatrixGridView.Feature("Iris Scanner","Security",st(has(PackageManager.FEATURE_IRIS)),"Biometric iris"),
                 FeatureMatrixGridView.Feature("Strongbox","Security",st(Build.VERSION.SDK_INT>=Build.VERSION_CODES.P&&has("android.hardware.strongbox_keystore")),"Hardware security module"),
-                FeatureMatrixGridView.Feature("Verified Boot","Security",FeatureMatrixGridView.Feature.Status.UNKNOWN,"ROM integrity check"),
+                FeatureMatrixGridView.Feature("Verified Boot","Security",FeatureMatrixGridView.Status.UNKNOWN,"ROM integrity check"),
                 // Camera
                 FeatureMatrixGridView.Feature("Multiple Cameras","Camera",st(cameraCount>2),"$cameraCount cameras detected"),
                 FeatureMatrixGridView.Feature("RAW Capture","Camera",st(has(PackageManager.FEATURE_CAMERA_ANY)&&Build.VERSION.SDK_INT>=21),"DNG/RAW format support"),
@@ -60,7 +60,7 @@ class FeatureMatrixFragment : Fragment(), ShareableFragment {
                 FeatureMatrixGridView.Feature("Gyroscope","Sensors",st(has(PackageManager.FEATURE_SENSOR_GYROSCOPE)),"Rotation sensor"),
                 FeatureMatrixGridView.Feature("Compass","Sensors",st(has(PackageManager.FEATURE_SENSOR_COMPASS)),"Magnetic field sensor"),
                 FeatureMatrixGridView.Feature("Thermometer","Sensors",st(has("android.hardware.sensor.ambient_temperature")),"Ambient temp sensor"),
-                FeatureMatrixGridView.Feature("$sensorList Total Sensors","Sensors",FeatureMatrixGridView.Feature.Status.YES,"All sensor count"),
+                FeatureMatrixGridView.Feature("$sensorList Total Sensors","Sensors",FeatureMatrixGridView.Status.YES,"All sensor count"),
                 // Performance
                 FeatureMatrixGridView.Feature("Hardware Vulkan","GPU",st(has(PackageManager.FEATURE_VULKAN_HARDWARE_LEVEL)),"Vulkan graphics API"),
                 FeatureMatrixGridView.Feature("OpenGL ES 3.1+","GPU",st(has(PackageManager.FEATURE_OPENGLES_EXTENSION_PACK)),"GLES 3.1 + AEP"),
@@ -71,8 +71,8 @@ class FeatureMatrixFragment : Fragment(), ShareableFragment {
                 FeatureMatrixGridView.Feature("USB OTG","USB",st(has(PackageManager.FEATURE_USB_HOST)),"USB Host / OTG")
             )
 
-            val yesCount=features.count{it.status==FeatureMatrixGridView.Feature.Status.YES}
-            val noCount=features.count{it.status==FeatureMatrixGridView.Feature.Status.NO}
+            val yesCount=features.count{it.status==FeatureMatrixGridView.Status.YES}
+            val noCount=features.count{it.status==FeatureMatrixGridView.Status.NO}
             requireActivity().runOnUiThread {
                 if(rootView==null)return@runOnUiThread
                 gridView?.setFeatures(features)

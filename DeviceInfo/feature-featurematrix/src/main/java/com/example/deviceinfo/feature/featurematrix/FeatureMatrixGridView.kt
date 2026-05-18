@@ -31,8 +31,8 @@ class FeatureMatrixGridView @JvmOverloads constructor(ctx: Context, attrs: Attri
                 tp.textSize=20f; tp.color=0xFFCCCCCC.toInt(); canvas.drawText(f.category.uppercase(),8f,y+20f,tp)
                 y+=28f
             }
-            val paint=when(f.status){Feature.Status.YES->yesPaint;Feature.Status.NO->noPaint;Feature.Status.UNKNOWN->unkPaint}
-            val icon=when(f.status){Feature.Status.YES->"✅";Feature.Status.NO->"❌";Feature.Status.UNKNOWN->"❓"}
+            val paint=when(f.status){Status.YES->yesPaint;Status.NO->noPaint;Status.UNKNOWN->unkPaint}
+            val icon=when(f.status){Status.YES->"✅";Status.NO->"❌";Status.UNKNOWN->"❓"}
             canvas.drawRoundRect(4f,y+4f,w-4f,y+52f,8f,8f,Paint().apply{color=0xFF222233.toInt();isAntiAlias=true})
             canvas.drawCircle(30f,y+28f,12f,paint)
             tp.textSize=22f; tp.color=0xFFFFFFFF.toInt(); canvas.drawText("$icon ${f.name}",52f,y+24f,tp)
