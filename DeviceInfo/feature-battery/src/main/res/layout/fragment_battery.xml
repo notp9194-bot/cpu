@@ -7,7 +7,7 @@
     android:background="?attr/colorSurface"
     android:paddingTop="4dp">
 
-    <!-- Doughnut + Line chart side by side in a horizontal row -->
+    <!-- Doughnut + Live chart row -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="120dp"
@@ -15,20 +15,17 @@
         android:layout_marginHorizontal="12dp"
         android:layout_marginTop="8dp">
 
-        <!-- Battery Doughnut (left, compact) -->
         <com.example.deviceinfo.feature.battery.BatteryDoughnutView
             android:id="@+id/batteryDoughnut"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"/>
 
-        <!-- Battery % Line chart (right) -->
         <com.example.deviceinfo.feature.battery.BatteryChartView
             android:id="@+id/batteryChart"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="2"/>
-
     </LinearLayout>
 
     <!-- RAM line chart -->
@@ -38,6 +35,49 @@
         android:layout_height="90dp"
         android:layout_marginHorizontal="12dp"
         android:background="@android:color/transparent"/>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 24-Hour Battery History Chart                          -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="6dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="24H Battery History"
+            android:textSize="12sp"
+            android:textColor="?attr/colorOnSurface"
+            android:alpha="0.7"
+            android:textStyle="bold"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnClearHistory"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:text="Clear"
+            android:textColor="#FF5252"
+            android:textSize="10sp"
+            app:strokeColor="#22FF5252"
+            app:cornerRadius="8dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"/>
+    </LinearLayout>
+
+    <com.example.deviceinfo.feature.battery.BatteryHistoryChartView
+        android:id="@+id/batteryHistoryChart"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="4dp"/>
 
     <!-- Export button -->
     <LinearLayout
@@ -59,7 +99,6 @@
             android:textSize="11sp"
             app:strokeColor="#2200E5FF"
             app:cornerRadius="10dp"/>
-
     </LinearLayout>
 
     <include

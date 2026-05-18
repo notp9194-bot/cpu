@@ -31,6 +31,7 @@ import com.example.deviceinfo.feature.connectivity.ConnectivityFragment
 import com.example.deviceinfo.feature.device.DeviceFragment
 import com.example.deviceinfo.feature.display.DisplayFragment
 import com.example.deviceinfo.feature.favorites.FavoritesFragment
+import com.example.deviceinfo.feature.health.HealthFragment
 import com.example.deviceinfo.feature.gpu.GpuFragment
 import com.example.deviceinfo.feature.input.InputFragment
 import com.example.deviceinfo.feature.memory.MemoryFragment
@@ -47,7 +48,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var prefs: SharedPreferences
 
-    // ── Tab order (20 tabs — FAVORITES added at position 0) ───────────
+    // ── Tab order (21 tabs — FAVORITES at 0, HEALTH at 19) ────────────
     private val tabs = listOf(
         "★ FAV",        // 0  ← NEW
         "SOC",          // 1
@@ -68,7 +69,8 @@ class MainActivity : AppCompatActivity() {
         "MEMORY",       // 16
         "BUILD",        // 17
         "INPUT",        // 18
-        "ABOUT"         // 19
+        "HEALTH",       // 19
+        "ABOUT"          // 20
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -179,8 +181,9 @@ class MainActivity : AppCompatActivity() {
             16 -> MemoryFragment()
             17 -> BuildFragment()
             18 -> InputFragment()
-            19 -> AboutFragment()
-            else -> SocFragment()
+            19 -> HealthFragment()
+            20 -> AboutFragment()
+            else -> SocFragment() // fallback
         }
     }
 

@@ -15,6 +15,7 @@ import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.*
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
@@ -36,6 +37,8 @@ class BatteryFragment : Fragment(), ShareableFragment {
     private var lastRamAlertPct = -1
 
     private val handler = Handler(Looper.getMainLooper())
+
+    // ── RAM live poll ──────────────────────────────────────────────────
     private val ramRunnable = object : Runnable {
         override fun run() {
             if (_b == null) return
@@ -50,12 +53,31 @@ class BatteryFragment : Fragment(), ShareableFragment {
         }
     }
 
+    // ── Battery history logger (every 5 min via Handler) ──────────────
+    private val historyRunnable = object : Runnable {
+        override fun run() {
+            if (_b == null) return
+            val ctx = context ?: return
+            val pct = DeviceUtils.getBatteryPercent(ctx)
+            BatteryHistoryManager.record(ctx, pct)
+            refreshHistoryChart()
+            handler.postDelayed(this, 5 * 60 * 1000L)
+        }
+    }
+
     override fun onCreateView(i: LayoutInflater, c: ViewGroup?, s: Bundle?) =
         FragmentBatteryBinding.inflate(i, c, false).also { _b = it }.root
 
     override fun onViewCreated(view: View, s: Bundle?) {
         super.onViewCreated(view, s)
         loadData()
+
+        // Record immediately on open
+        context?.let { ctx ->
+            val pct = DeviceUtils.getBatteryPercent(ctx)
+            BatteryHistoryManager.record(ctx, pct)
+            refreshHistoryChart()
+        }
 
         receiver = object : BroadcastReceiver() {
             override fun onReceive(ctx: Context?, intent: Intent?) {
@@ -69,6 +91,18 @@ class BatteryFragment : Fragment(), ShareableFragment {
             ExportUtils.exportToFile(requireContext(), "Battery", latestData)
         }
 
+        b.btnClearHistory.setOnClickListener {
+            AlertDialog.Builder(requireContext())
+                .setTitle("Clear battery history?")
+                .setMessage("All 24h history data will be deleted.")
+                .setPositiveButton("Clear") { _, _ ->
+                    BatteryHistoryManager.clearAll(requireContext())
+                    refreshHistoryChart()
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
+
         b.searchBar.etSearch.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) { adapter?.filter(s?.toString() ?: "") }
             override fun beforeTextChanged(s: CharSequence?, st: Int, cnt: Int, aft: Int) {}
@@ -76,8 +110,24 @@ class BatteryFragment : Fragment(), ShareableFragment {
         })
     }
 
-    override fun onResume() { super.onResume(); handler.post(ramRunnable) }
-    override fun onPause()  { super.onPause();  handler.removeCallbacks(ramRunnable) }
+    override fun onResume() {
+        super.onResume()
+        handler.post(ramRunnable)
+        handler.postDelayed(historyRunnable, 5 * 60 * 1000L)
+        refreshHistoryChart()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        handler.removeCallbacks(ramRunnable)
+        handler.removeCallbacks(historyRunnable)
+    }
+
+    private fun refreshHistoryChart() {
+        val ctx = context ?: return
+        val entries = BatteryHistoryManager.getAll(ctx)
+        b.batteryHistoryChart.setEntries(entries)
+    }
 
     private fun checkBatteryFullAlert() {
         val ctx = context ?: return
@@ -94,11 +144,9 @@ class BatteryFragment : Fragment(), ShareableFragment {
         ) {
             lastBatteryFullNotifPct = 100
             sendNotification(ctx,
-                channelId = "battery_full",
-                channelName = "Battery Full",
-                notifId = 2001,
+                channelId = "battery_full", channelName = "Battery Full", notifId = 2001,
                 title = "\u26A1 Battery Full — 100%",
-                text = "Battery is fully charged. You can unplug the charger."
+                text  = "Battery is fully charged. You can unplug the charger."
             )
         }
         if (pct < 95) lastBatteryFullNotifPct = -1
@@ -109,11 +157,9 @@ class BatteryFragment : Fragment(), ShareableFragment {
         if (usedPct >= 90 && lastRamAlertPct < 90) {
             lastRamAlertPct = usedPct
             sendNotification(ctx,
-                channelId = "ram_alert",
-                channelName = "RAM Alerts",
-                notifId = 2002,
+                channelId = "ram_alert", channelName = "RAM Alerts", notifId = 2002,
                 title = "\uD83D\uDCA1 High RAM Usage",
-                text = "RAM usage is $usedPct%. Consider closing background apps."
+                text  = "RAM usage is $usedPct%. Consider closing background apps."
             )
         }
         if (usedPct < 80) lastRamAlertPct = -1
@@ -152,12 +198,9 @@ class BatteryFragment : Fragment(), ShareableFragment {
             b.recyclerView.adapter = adapter
         }
 
-        // Update battery line chart
         latestData.entries.firstOrNull { it.key == "Level" }?.value?.let { level ->
             val pct = level.replace("%","").trim().toIntOrNull() ?: 0
             b.batteryChart.addDataPoint(pct)
-
-            // Update doughnut with live percent + charging status
             val isCharging = latestData["Status"]?.contains("Charging", ignoreCase = true) == true ||
                              latestData["Status"]?.contains("Full", ignoreCase = true) == true
             b.batteryDoughnut.update(pct, isCharging)
@@ -175,7 +218,7 @@ class BatteryFragment : Fragment(), ShareableFragment {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        receiver?.let { ctx -> requireContext().unregisterReceiver(ctx) }
+        receiver?.let { requireContext().unregisterReceiver(it) }
         _b = null
     }
 }

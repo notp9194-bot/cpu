@@ -90,6 +90,7 @@ dependencies {
     implementation(project(":feature-security"))
     implementation(project(":feature-input"))
     implementation(project(":feature-favorites"))
+    implementation(project(":feature-health"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

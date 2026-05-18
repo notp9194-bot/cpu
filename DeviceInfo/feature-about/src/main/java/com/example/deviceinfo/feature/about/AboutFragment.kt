@@ -21,7 +21,7 @@ class AboutFragment : Fragment() {
             val pi = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
             b.tvVersion.text = "Version ${pi.versionName}"
         } catch (e: Exception) {
-            b.tvVersion.text = "Version 7.0"
+            b.tvVersion.text = "Version 13.0"
         }
 
         b.btnExportAll.setOnClickListener { exportAllTabs() }
@@ -31,15 +31,18 @@ class AboutFragment : Fragment() {
         val fm = requireActivity().supportFragmentManager
         val allData = linkedMapOf<String, Map<String, String>>()
 
-        // Tab positions 0-7 (excluding About tab itself at position 8/9)
-        val tabNames = listOf("SOC", "Device", "System", "Battery", "Thermal", "Sensors", "Network", "Camera", "Audio")
-        var collected = 0
+        // All tabs in order (match MainActivity tab list, excluding About itself)
+        val tabNames = listOf(
+            "Favorites", "SOC", "Device", "System", "Battery", "Thermal",
+            "Sensors", "Network", "Camera", "Audio", "Display", "Codec",
+            "Benchmark", "Connectivity", "Power", "GPU", "Memory", "Build",
+            "Input", "Health"
+        )
 
-        for (pos in 0 until (tabNames.size)) {
+        for (pos in tabNames.indices) {
             val fragment = fm.findFragmentByTag("f$pos")
             if (fragment is ShareableFragment) {
-                allData[tabNames.getOrElse(pos) { "Tab $pos" }] = fragment.getExportData()
-                collected++
+                allData[tabNames[pos]] = fragment.getExportData()
             }
         }
 
