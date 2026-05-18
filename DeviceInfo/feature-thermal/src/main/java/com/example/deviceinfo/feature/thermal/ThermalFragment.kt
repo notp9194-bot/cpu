@@ -78,29 +78,28 @@ class ThermalFragment : Fragment(), ShareableFragment {
 
     private fun checkThermalAlert(maxTemp: Float) {
         val ctx = context ?: return
-        if (!com.example.deviceinfo.AlertPrefs.isTempEnabled(ctx)) return
-        val threshold = com.example.deviceinfo.AlertPrefs.getTempC(ctx).toFloat()
+        val threshold = 50f
         if (maxTemp >= threshold && lastThermalAlertTemp < threshold) {
             lastThermalAlertTemp = maxTemp
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                val ch = android.app.NotificationChannel("thermal_alert", "Thermal Alerts",
-                    android.app.NotificationManager.IMPORTANCE_HIGH)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val ch = NotificationChannel("thermal_alert", "Thermal Alerts", NotificationManager.IMPORTANCE_HIGH)
                     .apply { description = "Alerts when device temperature is too high" }
-                (ctx.getSystemService(android.content.Context.NOTIFICATION_SERVICE) as android.app.NotificationManager)
+                (ctx.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
                     .createNotificationChannel(ch)
             }
-            val n = androidx.core.app.NotificationCompat.Builder(ctx, "thermal_alert")
+            val n = NotificationCompat.Builder(ctx, "thermal_alert")
                 .setSmallIcon(android.R.drawable.ic_dialog_alert)
                 .setContentTitle("\ud83c\udf21\ufe0f Device Overheating")
-                .setContentText("Temperature is ${"%.1f".format(maxTemp)}\u00b0C (threshold: ${threshold.toInt()}\u00b0C). Let your device cool down.")
-                .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
+                .setContentText("Temperature is ${"%.1f".format(maxTemp)}\u00b0C. Let your device cool down.")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
                 .build()
-            try { androidx.core.app.NotificationManagerCompat.from(ctx).notify(3001, n) }
+            try { NotificationManagerCompat.from(ctx).notify(3001, n) }
             catch (e: SecurityException) { /* permission not granted */ }
         }
         if (maxTemp < threshold - 5f) lastThermalAlertTemp = -1f
     }
+
     override fun getShareText(): String {
         val sb = StringBuilder()
         sb.appendLine("\ud83c\udf21\ufe0f Thermal Info")
