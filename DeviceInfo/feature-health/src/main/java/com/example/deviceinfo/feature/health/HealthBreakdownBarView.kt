@@ -43,12 +43,15 @@ class HealthBreakdownBarView @JvmOverloads constructor(
         animator.start()
     }
 
-    override fun onMeasure(w: Int, h: Int) {
-        val rowH = 56
-        val desired = rowH * items.size + 16
+    private fun dp(v: Float) = (v * resources.displayMetrics.density + 0.5f).toInt()
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val rowH = dp(48f)
+        val count = items.size.coerceAtLeast(1)   // never 0 → no zero-height crash
+        val desired = rowH * count + dp(16f)
         setMeasuredDimension(
-            resolveSize(w, w),
-            resolveSize(desired, h)
+            resolveSize(MeasureSpec.getSize(widthMeasureSpec), widthMeasureSpec),
+            resolveSize(desired, heightMeasureSpec)
         )
     }
 
@@ -56,7 +59,7 @@ class HealthBreakdownBarView @JvmOverloads constructor(
         super.onDraw(canvas)
         if (items.isEmpty()) return
         val w = width.toFloat()
-        val rowH = height.toFloat() / items.size
+        val rowH = height.toFloat() / items.size.coerceAtLeast(1)
         val labelW = 200f
         val valW   = 80f
         val barX   = labelW + 8f

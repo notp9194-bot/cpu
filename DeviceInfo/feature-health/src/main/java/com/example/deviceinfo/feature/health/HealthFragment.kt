@@ -25,15 +25,14 @@ class HealthFragment : Fragment(), ShareableFragment {
 
     override fun onViewCreated(view: View, s: Bundle?) {
         super.onViewCreated(view, s)
-
         b.btnRefresh.setOnClickListener { computeScore() }
         b.btnShare.setOnClickListener  { shareScore() }
-
         computeScore()
         loadTrendChart()
     }
 
-    override fun onResume() { super.onResume(); computeScore() }
+    // onResume does NOT re-trigger computeScore to avoid duplicate calls
+    override fun onResume() { super.onResume() }
 
     private fun computeScore() {
         val ctx = context?.applicationContext ?: return
@@ -54,7 +53,7 @@ class HealthFragment : Fragment(), ShareableFragment {
         b.tvTip.text = s.tip
         b.breakdownBars.setItems(listOf(
             HealthBreakdownBarView.BarItem("🔋 Battery Level",  s.batteryLevel,  30, 0xFF4CAF50.toInt()),
-            HealthBreakdownBarView.BarItem("❤️ Battery Health",  s.batteryHealth, 20, 0xFF8BC34A.toInt()),
+            HealthBreakdownBarView.BarItem("❤️ Battery Health", s.batteryHealth, 20, 0xFF8BC34A.toInt()),
             HealthBreakdownBarView.BarItem("🌡 Temperature",    s.batteryTemp,   15, 0xFF03A9F4.toInt()),
             HealthBreakdownBarView.BarItem("💾 Free Storage",   s.freeStorage,   20, 0xFFFF9800.toInt()),
             HealthBreakdownBarView.BarItem("💡 Free RAM",       s.freeRam,       15, 0xFF9C27B0.toInt()),
@@ -79,9 +78,9 @@ class HealthFragment : Fragment(), ShareableFragment {
         val avg = HealthScoreHistory.average(ctx)
         if (avg != null) {
             b.tvTrendAvg.text = "7-Day Avg: $avg / 100"
-            b.tvTrendAvg.visibility = View.VISIBLE
+            b.tvTrendAvg.visibility = android.view.View.VISIBLE
         } else {
-            b.tvTrendAvg.visibility = View.GONE
+            b.tvTrendAvg.visibility = android.view.View.GONE
         }
     }
 
@@ -135,5 +134,10 @@ class HealthFragment : Fragment(), ShareableFragment {
         )
     }
 
-    override fun onDestroyView() { super.onDestroyView(); _b = null }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        executor.shutdownNow()
+        handler.removeCallbacksAndMessages(null)
+        _b = null
+    }
 }
