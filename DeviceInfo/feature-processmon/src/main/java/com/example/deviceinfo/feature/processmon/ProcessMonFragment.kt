@@ -45,8 +45,8 @@ class ProcessMonFragment : Fragment(), ShareableFragment {
     private fun countThreads(): Int {
         var count=0
         try {
-            java.io.File("/proc").listFiles()?.filter{it.name.matches(Regex("\d+"))}?.forEach{dir->
-                dir.listFiles()?.filter{it.name.matches(Regex("\d+"))}?.let{count+=it.size}
+            java.io.File("/proc").listFiles()?.filter{it.name.matches(Regex("\\d+"))}?.forEach{dir->
+                dir.listFiles()?.filter{it.name.matches(Regex("\\d+"))}?.let{count+=it.size}
             }
         } catch(_:Exception){}
         return count
@@ -55,7 +55,7 @@ class ProcessMonFragment : Fragment(), ShareableFragment {
     private fun countZombies(): Int {
         var count=0
         try {
-            java.io.File("/proc").listFiles()?.filter{it.name.matches(Regex("\d+"))}?.forEach{dir->
+            java.io.File("/proc").listFiles()?.filter{it.name.matches(Regex("\\d+"))}?.forEach{dir->
                 try{
                     val stat=BufferedReader(FileReader("${dir.path}/status")).use{it.readLines()}
                     if(stat.any{it.startsWith("State:")&&it.contains("Z")})count++

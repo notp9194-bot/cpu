@@ -107,7 +107,7 @@ class CpuCoreFragment : Fragment(), ShareableFragment {
             BufferedReader(FileReader("/proc/stat")).use { reader ->
                 reader.lineSequence().forEach { line ->
                     if (line.startsWith("cpu") && line.length > 3 && line[3].isDigit()) {
-                        val parts = line.trim().split("\s+".toRegex())
+                        val parts = line.trim().split("\\s+".toRegex())
                         val vals = LongArray(parts.size - 1) { parts[it + 1].toLongOrNull() ?: 0L }
                         result.add(vals)
                     }

@@ -43,7 +43,7 @@ class StorageIoFragment : Fragment(), ShareableFragment {
             try {
                 BufferedReader(FileReader("/proc/diskstats")).use { reader ->
                     reader.lineSequence().forEach { line ->
-                        val parts=line.trim().split("\s+".toRegex())
+                        val parts=line.trim().split("\\s+".toRegex())
                         if (parts.size>=14) { rBytes+=parts[5].toLongOrNull()?:0L; wBytes+=parts[9].toLongOrNull()?:0L }
                     }
                 }
