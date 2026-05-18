@@ -20,8 +20,11 @@ class SocFragment : Fragment(), ShareableFragment {
     private val b get() = _b!!
     private var latestItems: List<InfoItem> = emptyList()
     private var adapter: InfoAdapter? = null
+    private var maxFreqMhz: Long = 2000L
 
     private val handler = Handler(Looper.getMainLooper())
+
+    // ── Every 2s: poll freqs, push to history, refresh both charts ────
     private val refreshRunnable = object : Runnable {
         override fun run() {
             if (_b == null) return
@@ -35,6 +38,8 @@ class SocFragment : Fragment(), ShareableFragment {
 
     override fun onViewCreated(view: View, s: Bundle?) {
         super.onViewCreated(view, s)
+        // Compute max freq once (doesn't change at runtime)
+        maxFreqMhz = DeviceUtils.getMaxCpuFreq(0).let { if (it > 0) it else 2000L }
         loadData()
         b.searchBar.etSearch.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) { adapter?.filter(s?.toString() ?: "") }
@@ -43,29 +48,51 @@ class SocFragment : Fragment(), ShareableFragment {
         })
     }
 
-    override fun onResume() { super.onResume(); handler.postDelayed(refreshRunnable, REFRESH_INTERVAL_MS) }
-    override fun onPause()  { super.onPause();  handler.removeCallbacks(refreshRunnable) }
+    override fun onResume() {
+        super.onResume()
+        handler.post(refreshRunnable)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        handler.removeCallbacks(refreshRunnable)
+    }
+
+    override fun onDestroyView() {
+        handler.removeCallbacks(refreshRunnable)
+        super.onDestroyView()
+        _b = null
+    }
 
     private fun loadData() {
         if (_b == null) return
-        val freqs   = DeviceUtils.getCpuFrequencies()
-        val cores   = Runtime.getRuntime().availableProcessors()
-        val maxFreq = DeviceUtils.getMaxCpuFreq(0).let { if (it > 0) "$it MHz" else "Unknown" }
-        val minFreq = if (freqs.isNotEmpty()) "${freqs.minOrNull()} MHz" else "Unknown"
-        val cpuInfo = DeviceUtils.getCpuInfo()
-        val hw      = cpuInfo["Hardware"] ?: Build.HARDWARE
-        val gpuInfo = DeviceUtils.getGpuInfo()
+        val freqs  = DeviceUtils.getCpuFrequencies()
+        val cores  = Runtime.getRuntime().availableProcessors()
 
-        // ── Update CPU Bar Chart ─────────────────────────────────────────
-        val maxMhzGlobal = DeviceUtils.getMaxCpuFreq(0)
+        // ── Push snapshot into history ring buffer ────────────────────
+        val snapshot = CpuClockHistoryManager.Snapshot(
+            coreFreqsMhz = (0 until cores).map { i ->
+                if (i < freqs.size) freqs[i] else 0L
+            }
+        )
+        CpuClockHistoryManager.push(snapshot)
+
+        // ── Update current bar chart ──────────────────────────────────
         val coreDataList = (0 until cores).map { i ->
             val freq = if (i < freqs.size) freqs[i] else 0L
-            val max  = if (maxMhzGlobal > 0) maxMhzGlobal else
-                       DeviceUtils.getMaxCpuFreq(i).let { if (it > 0) it else 2000L }
-            CpuBarChartView.CoreData(freq, max)
+            CpuBarChartView.CoreData(freq, maxFreqMhz)
         }
         b.cpuBarChart.updateCores(coreDataList)
-        // ────────────────────────────────────────────────────────────────
+
+        // ── Update history line chart ─────────────────────────────────
+        b.cpuHistoryChart.setData(CpuClockHistoryManager.getHistory(), maxFreqMhz)
+
+        // ── Info list ─────────────────────────────────────────────────
+        val maxFreqLabel = if (maxFreqMhz > 0) "$maxFreqMhz MHz" else "Unknown"
+        val minFreqLabel = if (freqs.isNotEmpty()) "${freqs.minOrNull()} MHz" else "Unknown"
+        val cpuInfo  = DeviceUtils.getCpuInfo()
+        val hw       = cpuInfo["Hardware"] ?: Build.HARDWARE
+        val gpuInfo  = DeviceUtils.getGpuInfo()
 
         val items = mutableListOf(
             InfoItem("SoC",           hw,                                                         true),
@@ -73,7 +100,7 @@ class SocFragment : Fragment(), ShareableFragment {
             InfoItem("Cores",         cores.toString()),
             InfoItem("Architecture",  Build.SUPPORTED_ABIS.firstOrNull() ?: "Unknown"),
             InfoItem("Processor",     cpuInfo["model name"] ?: cpuInfo["Processor"] ?: "Unknown"),
-            InfoItem("Clock Speed",   "$minFreq – $maxFreq"),
+            InfoItem("Clock Speed",   "$minFreqLabel – $maxFreqLabel"),
         )
         repeat(cores) { i ->
             items.add(InfoItem("CPU $i", if (i < freqs.size) "${freqs[i]} MHz" else "Unknown", true))
@@ -86,6 +113,7 @@ class SocFragment : Fragment(), ShareableFragment {
             InfoItem("Vulkan Support",    if (Build.VERSION.SDK_INT >= 24) "Yes (API ${Build.VERSION.SDK_INT})" else "No")
         )
         latestItems = items
+
         val query = b.searchBar.etSearch.text?.toString() ?: ""
         adapter = InfoAdapter(items, "SOC")
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -95,8 +123,8 @@ class SocFragment : Fragment(), ShareableFragment {
 
     override fun getShareText(): String {
         val sb = StringBuilder()
-        sb.appendLine("\u26a1 SOC / CPU Info")
-        sb.appendLine("\u2500".repeat(17))
+        sb.appendLine("⚡ SOC / CPU Info")
+        sb.appendLine("─".repeat(17))
         latestItems.forEach { sb.appendLine("${it.label}: ${it.value}") }
         sb.appendLine("\nShared from CPU-A Device Info app")
         return sb.toString()
@@ -104,12 +132,6 @@ class SocFragment : Fragment(), ShareableFragment {
 
     override fun getExportData(): Map<String, String> =
         latestItems.associate { it.label to it.value }
-
-    override fun onDestroyView() {
-        handler.removeCallbacks(refreshRunnable)
-        super.onDestroyView()
-        _b = null
-    }
 
     companion object { private const val REFRESH_INTERVAL_MS = 2000L }
 }
