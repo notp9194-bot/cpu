@@ -90,14 +90,6 @@ class BatteryFragment : Fragment(), ShareableFragment {
             refreshHistoryChart()
         }
 
-        receiver = object : BroadcastReceiver() {
-            override fun onReceive(ctx: Context?, intent: Intent?) {
-                loadData()
-                checkBatteryFullAlert()
-            }
-        }
-        requireContext().registerReceiver(receiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-
         b.btnExport.setOnClickListener {
             ExportUtils.exportToFile(requireContext(), "Battery", latestData)
         }
@@ -123,6 +115,15 @@ class BatteryFragment : Fragment(), ShareableFragment {
 
     override fun onResume() {
         super.onResume()
+        if (receiver == null) {
+            receiver = object : BroadcastReceiver() {
+                override fun onReceive(ctx: Context?, intent: Intent?) {
+                    loadData()
+                    checkBatteryFullAlert()
+                }
+            }
+        }
+        requireContext().registerReceiver(receiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
         handler.post(wearRunnable)
         handler.post(ramRunnable)
         handler.postDelayed(historyRunnable, 5 * 60 * 1000L)
@@ -134,6 +135,9 @@ class BatteryFragment : Fragment(), ShareableFragment {
         handler.removeCallbacks(wearRunnable)
         handler.removeCallbacks(ramRunnable)
         handler.removeCallbacks(historyRunnable)
+        try {
+            receiver?.let { context?.unregisterReceiver(it) }
+        } catch (e: IllegalArgumentException) { /* not registered */ }
     }
 
 
@@ -267,7 +271,10 @@ class BatteryFragment : Fragment(), ShareableFragment {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        receiver?.let { requireContext().unregisterReceiver(it) }
+        handler.removeCallbacks(wearRunnable)
+        handler.removeCallbacks(ramRunnable)
+        handler.removeCallbacks(historyRunnable)
+        receiver = null
         _b = null
     }
 }

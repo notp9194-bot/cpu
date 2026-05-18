@@ -80,6 +80,11 @@ class BatteryWearGaugeView @JvmOverloads constructor(
         animator.start()
     }
 
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        animator.cancel()
+    }
+
     private fun gradeColor(wearPct: Int): Int = when {
         wearPct <= 15 -> 0xFF4CAF50.toInt()   // green  – Excellent
         wearPct <= 30 -> 0xFF8BC34A.toInt()   // light green – Good
