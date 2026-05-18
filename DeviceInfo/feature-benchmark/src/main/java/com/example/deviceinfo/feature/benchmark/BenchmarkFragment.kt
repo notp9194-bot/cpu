@@ -130,7 +130,7 @@ class BenchmarkFragment : Fragment(), ShareableFragment {
             items.add(InfoItem("CPU BENCHMARK", "", true))
             items.add(InfoItem("Single-Thread Score", "%,d".format(result.singleThreadScore), true))
             items.add(InfoItem("Multi-Thread Score",  "%,d".format(result.multiThreadScore),  true))
-            items.add(InfoItem("MT/ST Speedup", "${"%.2f".format(\nresult.multiThreadScore.toFloat() / result.singleThreadScore.toFloat())}×"))
+            items.add(InfoItem("MT/ST Speedup", "${"%.2f".format(result.multiThreadScore.toFloat() / result.singleThreadScore.toFloat())}×"))
             items.add(InfoItem("Duration",   "${result.durationMs} ms"))
             items.add(InfoItem("Cores Used", result.coreCount.toString()))
             val cpuClass = when {
