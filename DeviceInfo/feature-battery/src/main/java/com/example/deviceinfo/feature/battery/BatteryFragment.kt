@@ -144,11 +144,11 @@ class BatteryFragment : Fragment(), ShareableFragment {
             InfoItem(k, v, i % 2 == 0)
         }
         if (adapter == null) {
-            adapter = InfoAdapter(items)
+            adapter = InfoAdapter(items, "BATTERY")
             b.recyclerView.layoutManager = LinearLayoutManager(ctx)
             b.recyclerView.adapter = adapter
         } else {
-            adapter = InfoAdapter(items)
+            adapter = InfoAdapter(items, "BATTERY")
             b.recyclerView.adapter = adapter
         }
 

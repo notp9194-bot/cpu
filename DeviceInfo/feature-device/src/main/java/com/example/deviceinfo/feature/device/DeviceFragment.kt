@@ -86,7 +86,7 @@ class DeviceFragment : Fragment(), ShareableFragment {
             InfoItem(k, v, highlight)
         }
 
-        adapter = InfoAdapter(items)
+        adapter = InfoAdapter(items, "DEVICE")
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         b.recyclerView.adapter = adapter
 

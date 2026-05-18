@@ -1,11 +1,5 @@
 package com.example.deviceinfo
 
-// ──────────────────────────────────────────────────────────────────────────────
-// REPLACE existing MainActivity.kt with this file.
-// Adds 5 new tabs: GPU, MEMORY, BUILD, INPUT (+ Benchmark is upgraded in-place).
-// New tab order: … BENCHMARK, CONNECTIVITY, POWER, GPU, MEMORY, BUILD, INPUT, ABOUT
-// ──────────────────────────────────────────────────────────────────────────────
-
 import android.Manifest
 import android.content.Intent
 import android.content.SharedPreferences
@@ -36,6 +30,7 @@ import com.example.deviceinfo.feature.codec.CodecFragment
 import com.example.deviceinfo.feature.connectivity.ConnectivityFragment
 import com.example.deviceinfo.feature.device.DeviceFragment
 import com.example.deviceinfo.feature.display.DisplayFragment
+import com.example.deviceinfo.feature.favorites.FavoritesFragment
 import com.example.deviceinfo.feature.gpu.GpuFragment
 import com.example.deviceinfo.feature.input.InputFragment
 import com.example.deviceinfo.feature.memory.MemoryFragment
@@ -52,27 +47,28 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var prefs: SharedPreferences
 
-    // ── Tab order (20 tabs total) ──────────────────────────────────────────────
+    // ── Tab order (20 tabs — FAVORITES added at position 0) ───────────
     private val tabs = listOf(
-        "SOC",          // 0
-        "DEVICE",       // 1
-        "SYSTEM",       // 2
-        "BATTERY",      // 3
-        "THERMAL",      // 4
-        "SENSORS",      // 5
-        "NETWORK",      // 6
-        "CAMERA",       // 7
-        "AUDIO",        // 8
-        "DISPLAY",      // 9
-        "CODEC",        // 10
-        "BENCHMARK",    // 11
-        "CONNECTIVITY", // 12
-        "POWER",        // 13
-        "GPU",          // 14  ← NEW
-        "MEMORY",       // 15  ← NEW
-        "BUILD",        // 16  ← NEW
-        "INPUT",        // 17  ← NEW
-        "ABOUT"         // 18
+        "★ FAV",        // 0  ← NEW
+        "SOC",          // 1
+        "DEVICE",       // 2
+        "SYSTEM",       // 3
+        "BATTERY",      // 4
+        "THERMAL",      // 5
+        "SENSORS",      // 6
+        "NETWORK",      // 7
+        "CAMERA",       // 8
+        "AUDIO",        // 9
+        "DISPLAY",      // 10
+        "CODEC",        // 11
+        "BENCHMARK",    // 12
+        "CONNECTIVITY", // 13
+        "POWER",        // 14
+        "GPU",          // 15
+        "MEMORY",       // 16
+        "BUILD",        // 17
+        "INPUT",        // 18
+        "ABOUT"         // 19
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -134,8 +130,8 @@ class MainActivity : AppCompatActivity() {
             )
             recreate(); true
         }
-        R.id.action_share       -> { shareCurrentTab(); true }
-        R.id.action_export_pdf  -> { exportCurrentTabPdf(); true }
+        R.id.action_share      -> { shareCurrentTab(); true }
+        R.id.action_export_pdf -> { exportCurrentTabPdf(); true }
         else -> super.onOptionsItemSelected(item)
     }
 
@@ -160,29 +156,30 @@ class MainActivity : AppCompatActivity() {
         ExportUtils.exportToPdf(this, tabs[pos], data)
     }
 
-    // ── Pager adapter ─────────────────────────────────────────────────────────
+    // ── Pager adapter ─────────────────────────────────────────────────
     private inner class MainPagerAdapter(a: AppCompatActivity) : FragmentStateAdapter(a) {
         override fun getItemCount() = tabs.size
         override fun createFragment(pos: Int): Fragment = when (pos) {
-            0  -> SocFragment()
-            1  -> DeviceFragment()
-            2  -> SystemFragment()
-            3  -> BatteryFragment()
-            4  -> ThermalFragment()
-            5  -> SensorsFragment()
-            6  -> NetworkFragment()
-            7  -> CameraFragment()
-            8  -> AudioFragment()
-            9  -> DisplayFragment()
-            10 -> CodecFragment()
-            11 -> BenchmarkFragment()      // Upgraded to v2
-            12 -> ConnectivityFragment()
-            13 -> PowerFragment()
-            14 -> GpuFragment()            // NEW
-            15 -> MemoryFragment()         // NEW
-            16 -> BuildFragment()          // NEW
-            17 -> InputFragment()          // NEW
-            18 -> AboutFragment()
+            0  -> FavoritesFragment()    // ← NEW
+            1  -> SocFragment()
+            2  -> DeviceFragment()
+            3  -> SystemFragment()
+            4  -> BatteryFragment()
+            5  -> ThermalFragment()
+            6  -> SensorsFragment()
+            7  -> NetworkFragment()
+            8  -> CameraFragment()
+            9  -> AudioFragment()
+            10 -> DisplayFragment()
+            11 -> CodecFragment()
+            12 -> BenchmarkFragment()
+            13 -> ConnectivityFragment()
+            14 -> PowerFragment()
+            15 -> GpuFragment()
+            16 -> MemoryFragment()
+            17 -> BuildFragment()
+            18 -> InputFragment()
+            19 -> AboutFragment()
             else -> SocFragment()
         }
     }

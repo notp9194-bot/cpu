@@ -124,7 +124,7 @@ class BuildFragment : Fragment(), ShareableFragment {
         items.add(InfoItem("Support Status",    apiNote))
 
         latestItems = items
-        adapter = InfoAdapter(items)
+        adapter = InfoAdapter(items, "BUILD")
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         b.recyclerView.adapter = adapter
     }

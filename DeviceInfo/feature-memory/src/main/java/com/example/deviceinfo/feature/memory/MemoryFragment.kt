@@ -167,11 +167,11 @@ class MemoryFragment : Fragment(), ShareableFragment {
 
         latestItems = items
         if (adapter == null) {
-            adapter = InfoAdapter(items)
+            adapter = InfoAdapter(items, "MEMORY")
             b.recyclerView.layoutManager = LinearLayoutManager(ctx)
             b.recyclerView.adapter = adapter
         } else {
-            adapter = InfoAdapter(items)
+            adapter = InfoAdapter(items, "MEMORY")
             b.recyclerView.adapter = adapter
         }
         val q = b.searchBar.etSearch.text?.toString() ?: ""

@@ -201,7 +201,7 @@ class BenchmarkFragment : Fragment(), ShareableFragment {
         items.add(InfoItem("Note",        "Results vary with throttling and system load"))
 
         latestItems = items
-        adapter = InfoAdapter(items)
+        adapter = InfoAdapter(items, "BENCHMARK")
         if (_b != null) {
             b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
             b.recyclerView.adapter = adapter

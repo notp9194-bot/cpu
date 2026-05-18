@@ -163,7 +163,7 @@ class InputFragment : Fragment(), ShareableFragment {
         items.add(InfoItem("Camera",         if (hasCamera) "Present ✅" else "Not Available", true))
 
         latestItems = items
-        adapter = InfoAdapter(items)
+        adapter = InfoAdapter(items, "INPUT")
         b.recyclerView.layoutManager = LinearLayoutManager(ctx)
         b.recyclerView.adapter = adapter
     }

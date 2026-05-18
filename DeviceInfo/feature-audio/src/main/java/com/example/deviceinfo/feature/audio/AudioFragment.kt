@@ -29,7 +29,7 @@ class AudioFragment : Fragment(), ShareableFragment {
         super.onViewCreated(view, s)
         val items = buildAudioInfo()
         latestItems = items
-        adapter = InfoAdapter(items)
+        adapter = InfoAdapter(items, "AUDIO")
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         b.recyclerView.adapter = adapter
 

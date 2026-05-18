@@ -177,7 +177,7 @@ class GpuFragment : Fragment(), ShareableFragment {
         items.add(InfoItem("Total Extensions", extCount.toString(), true))
 
         latestItems = items
-        adapter = InfoAdapter(items)
+        adapter = InfoAdapter(items, "GPU")
         b.recyclerView.layoutManager = LinearLayoutManager(ctx)
         b.recyclerView.adapter = adapter
     }

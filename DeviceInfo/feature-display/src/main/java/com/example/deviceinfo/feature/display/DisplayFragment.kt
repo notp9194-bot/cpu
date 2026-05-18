@@ -133,7 +133,7 @@ class DisplayFragment : Fragment(), ShareableFragment {
         items.add(InfoItem("Font Scale", "${"%.2f".format(ctx.resources.configuration.fontScale)}\u00d7"))
 
         latestItems = items
-        adapter = InfoAdapter(items)
+        adapter = InfoAdapter(items, "DISPLAY")
         b.recyclerView.layoutManager = LinearLayoutManager(ctx)
         b.recyclerView.adapter = adapter
 

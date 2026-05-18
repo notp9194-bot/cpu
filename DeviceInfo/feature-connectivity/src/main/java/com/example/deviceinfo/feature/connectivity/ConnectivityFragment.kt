@@ -173,7 +173,7 @@ class ConnectivityFragment : Fragment(), ShareableFragment {
         )
         b.radarChart.update(radarAxes)
 
-        adapter = InfoAdapter(items)
+        adapter = InfoAdapter(items, "CONNECTIVITY")
         b.recyclerView.layoutManager = LinearLayoutManager(ctx)
         b.recyclerView.adapter = adapter
     }

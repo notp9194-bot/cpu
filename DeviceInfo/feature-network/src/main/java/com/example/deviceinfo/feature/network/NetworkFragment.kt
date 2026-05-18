@@ -108,7 +108,7 @@ class NetworkFragment : Fragment(), ShareableFragment {
             InfoItem(k, v, highlight)
         }
         val query = b.searchBar.etSearch.text?.toString() ?: ""
-        adapter = InfoAdapter(items)
+        adapter = InfoAdapter(items, "NETWORK")
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         b.recyclerView.adapter = adapter
         if (query.isNotBlank()) adapter?.filter(query)

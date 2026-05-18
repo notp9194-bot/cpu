@@ -187,7 +187,7 @@ class PowerFragment : Fragment(), ShareableFragment {
         items.add(InfoItem("Ultra Fast", "45W+ (120W / 240W)"))
 
         latestItems = items
-        adapter = InfoAdapter(items)
+        adapter = InfoAdapter(items, "POWER")
         b.recyclerView.layoutManager = LinearLayoutManager(ctx)
         b.recyclerView.adapter = adapter
 

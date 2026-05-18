@@ -131,7 +131,7 @@ package com.example.deviceinfo.feature.codec
           items.add(InfoItem("Software Codecs", "${allCodecs.size - hwCount}"))
 
           latestItems = items
-          adapter = InfoAdapter(items)
+          adapter = InfoAdapter(items, "CODEC")
           b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
           b.recyclerView.adapter = adapter
       }

@@ -88,7 +88,7 @@ class CameraFragment : Fragment(), ShareableFragment {
         }
 
         latestItems = items
-        adapter = InfoAdapter(items)
+        adapter = InfoAdapter(items, "CAMERA")
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         b.recyclerView.adapter = adapter
 

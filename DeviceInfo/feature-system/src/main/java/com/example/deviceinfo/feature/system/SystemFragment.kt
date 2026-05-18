@@ -88,7 +88,7 @@ class SystemFragment : Fragment(), ShareableFragment {
         )
 
         val items = latestData.entries.mapIndexed { i, (k, v) -> InfoItem(k, v, i % 2 == 0) }
-        adapter = InfoAdapter(items)
+        adapter = InfoAdapter(items, "SYSTEM")
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         b.recyclerView.adapter = adapter
 

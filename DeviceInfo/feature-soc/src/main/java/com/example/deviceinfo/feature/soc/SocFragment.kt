@@ -87,7 +87,7 @@ class SocFragment : Fragment(), ShareableFragment {
         )
         latestItems = items
         val query = b.searchBar.etSearch.text?.toString() ?: ""
-        adapter = InfoAdapter(items)
+        adapter = InfoAdapter(items, "SOC")
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         b.recyclerView.adapter = adapter
         if (query.isNotBlank()) adapter?.filter(query)

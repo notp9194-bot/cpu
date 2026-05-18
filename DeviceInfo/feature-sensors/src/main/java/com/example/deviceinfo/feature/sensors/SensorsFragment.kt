@@ -29,7 +29,7 @@ class SensorsFragment : Fragment(), SensorEventListener, ShareableFragment {
         sensorList = sm.getSensorList(Sensor.TYPE_ALL)
 
         val items = sensorList.map { InfoItem(it.name, typeLabel(it.type), it.isWakeUpSensor) }
-        adapter = InfoAdapter(items)
+        adapter = InfoAdapter(items, "SENSORS")
         b.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         b.recyclerView.adapter = adapter
 
