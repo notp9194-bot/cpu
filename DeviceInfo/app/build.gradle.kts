@@ -87,7 +87,7 @@ dependencies {
     implementation(project(":feature-power"))
     implementation(project(":feature-gpu"))
     implementation(project(":feature-memory"))
-    implementation(project(":feature-build"))
+    implementation(project(":feature-security"))
     implementation(project(":feature-input"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

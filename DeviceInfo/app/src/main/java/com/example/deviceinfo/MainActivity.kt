@@ -30,7 +30,7 @@ import com.example.deviceinfo.feature.about.AboutFragment
 import com.example.deviceinfo.feature.audio.AudioFragment
 import com.example.deviceinfo.feature.battery.BatteryFragment
 import com.example.deviceinfo.feature.benchmark.BenchmarkFragment
-import com.example.deviceinfo.feature.build.BuildFragment
+import com.example.deviceinfo.feature.security.BuildFragment
 import com.example.deviceinfo.feature.camera.CameraFragment
 import com.example.deviceinfo.feature.codec.CodecFragment
 import com.example.deviceinfo.feature.connectivity.ConnectivityFragment

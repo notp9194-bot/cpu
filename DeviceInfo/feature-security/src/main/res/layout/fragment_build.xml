@@ -7,7 +7,7 @@
     android:paddingTop="4dp">
 
     <!-- Security Patch Timeline bar -->
-    <com.example.deviceinfo.feature.build.SecurityTimelineView
+    <com.example.deviceinfo.feature.security.SecurityTimelineView
         android:id="@+id/securityTimeline"
         android:layout_width="match_parent"
         android:layout_height="100dp"
