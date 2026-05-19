@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 android {
-    namespace = "com.cpua.deviceinfo.feature.favorites"
+    namespace = "com.example.deviceinfo.feature.favorites"
     compileSdk = 35
     defaultConfig { minSdk = 24 }
     compileOptions {

@@ -53,7 +53,7 @@
         android:visibility="gone"/>
 
     <!-- Comparison Chart -->
-    <com.cpua.deviceinfo.feature.soc.SocCompareChartView
+    <com.example.deviceinfo.feature.soc.SocCompareChartView
         android:id="@+id/compareChart"
         android:layout_width="match_parent"
         android:layout_height="220dp"

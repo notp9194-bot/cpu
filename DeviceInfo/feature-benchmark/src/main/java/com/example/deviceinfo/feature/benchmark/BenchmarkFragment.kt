@@ -1,4 +1,4 @@
-package com.cpua.deviceinfo.feature.benchmark
+package com.example.deviceinfo.feature.benchmark
 
 // ──────────────────────────────────────────────────────────────────────────────
 // REPLACE the existing BenchmarkFragment.kt with this file.
@@ -12,10 +12,10 @@ import android.os.Looper
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.cpua.deviceinfo.core.model.InfoItem
-import com.cpua.deviceinfo.core.ui.InfoAdapter
-import com.cpua.deviceinfo.core.ui.ShareableFragment
-import com.cpua.deviceinfo.feature.benchmark.databinding.FragmentBenchmarkBinding
+import com.example.deviceinfo.core.model.InfoItem
+import com.example.deviceinfo.core.ui.InfoAdapter
+import com.example.deviceinfo.core.ui.ShareableFragment
+import com.example.deviceinfo.feature.benchmark.databinding.FragmentBenchmarkBinding
 import java.util.concurrent.Executors
 
 class BenchmarkFragment : Fragment(), ShareableFragment {
@@ -130,7 +130,8 @@ class BenchmarkFragment : Fragment(), ShareableFragment {
             items.add(InfoItem("CPU BENCHMARK", "", true))
             items.add(InfoItem("Single-Thread Score", "%,d".format(result.singleThreadScore), true))
             items.add(InfoItem("Multi-Thread Score",  "%,d".format(result.multiThreadScore),  true))
-            items.add(InfoItem("MT/ST Speedup", "${"%.2f".format(result.multiThreadScore.toFloat() / result.singleThreadScore.toFloat())}×"))
+            items.add(InfoItem("MT/ST Speedup", "${"%.2f".format(
+                result.multiThreadScore.toFloat() / result.singleThreadScore.toFloat())}×"))
             items.add(InfoItem("Duration",   "${result.durationMs} ms"))
             items.add(InfoItem("Cores Used", result.coreCount.toString()))
             val cpuClass = when {

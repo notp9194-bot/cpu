@@ -1,10 +1,10 @@
-package com.cpua.deviceinfo.feature.thermal
+package com.example.deviceinfo.feature.thermal
 
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.cpua.deviceinfo.feature.thermal.databinding.ItemThermalBinding
+import com.example.deviceinfo.feature.thermal.databinding.ItemThermalBinding
 
 data class ThermalItem(val zone: String, val tempC: Float)
 

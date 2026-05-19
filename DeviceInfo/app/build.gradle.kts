@@ -13,15 +13,15 @@ fun localProps(): Properties {
 }
 
 android {
-    namespace = "com.cpua.deviceinfo"
+    namespace = "com.example.deviceinfo"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.cpua.deviceinfo"
+        applicationId = "com.example.deviceinfo"
         minSdk = 24
         targetSdk = 35
-        versionCode = 21
-        versionName = "21.0"
+        versionCode = 12
+        versionName = "12.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -69,9 +69,7 @@ android {
 }
 
 dependencies {
-    // Core
     implementation(project(":core"))
-    // Original Features
     implementation(project(":feature-soc"))
     implementation(project(":feature-device"))
     implementation(project(":feature-system"))
@@ -93,23 +91,6 @@ dependencies {
     implementation(project(":feature-input"))
     implementation(project(":feature-favorites"))
     implementation(project(":feature-health"))
-    // Advanced Modules (Policy Compliant)
-    implementation(project(":feature-cpucore"))
-    implementation(project(":feature-chargesession"))
-    implementation(project(":feature-pingmonitor"))
-    implementation(project(":feature-screentime"))
-    implementation(project(":feature-dischargerate"))
-    implementation(project(":feature-cpuheatmap"))
-    implementation(project(":feature-throttle"))
-    implementation(project(":feature-loadavg"))
-    implementation(project(":feature-chargecurve"))
-    implementation(project(":feature-sensorlive"))
-    implementation(project(":feature-devcompare"))
-    implementation(project(":feature-powerestimate"))
-    implementation(project(":feature-brightness"))
-    implementation(project(":feature-bootspeed"))
-    implementation(project(":feature-featurematrix"))
-    // AndroidX & Material
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

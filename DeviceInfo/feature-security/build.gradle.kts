@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.cpua.deviceinfo.feature.security"
+    namespace = "com.example.deviceinfo.feature.security"
     compileSdk = 35
     defaultConfig { minSdk = 24 }
     compileOptions {

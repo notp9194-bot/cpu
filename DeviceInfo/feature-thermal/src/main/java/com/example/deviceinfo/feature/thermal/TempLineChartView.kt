@@ -1,4 +1,4 @@
-package com.cpua.deviceinfo.feature.thermal
+package com.example.deviceinfo.feature.thermal
 
 import android.content.Context
 import android.graphics.*

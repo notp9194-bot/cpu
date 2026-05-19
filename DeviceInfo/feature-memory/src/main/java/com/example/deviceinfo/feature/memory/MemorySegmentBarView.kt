@@ -1,4 +1,4 @@
-package com.cpua.deviceinfo.feature.memory
+package com.example.deviceinfo.feature.memory
 
 import android.content.Context
 import android.graphics.*

@@ -7,7 +7,7 @@
     android:paddingTop="4dp">
 
     <!-- Camera megapixel bar chart -->
-    <com.cpua.deviceinfo.feature.camera.CameraMpBarChartView
+    <com.example.deviceinfo.feature.camera.CameraMpBarChartView
         android:id="@+id/cameraMpChart"
         android:layout_width="match_parent"
         android:layout_height="150dp"

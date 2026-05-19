@@ -7,7 +7,7 @@
     android:paddingTop="4dp">
 
     <!-- Radar chart -->
-    <com.cpua.deviceinfo.feature.connectivity.RadarChartView
+    <com.example.deviceinfo.feature.connectivity.RadarChartView
         android:id="@+id/radarChart"
         android:layout_width="match_parent"
         android:layout_height="200dp"

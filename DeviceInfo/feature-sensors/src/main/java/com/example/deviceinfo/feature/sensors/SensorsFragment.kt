@@ -1,4 +1,4 @@
-package com.cpua.deviceinfo.feature.sensors
+package com.example.deviceinfo.feature.sensors
 
 import android.content.Context
 import android.hardware.*
@@ -8,10 +8,10 @@ import android.text.TextWatcher
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.cpua.deviceinfo.core.model.InfoItem
-import com.cpua.deviceinfo.core.ui.InfoAdapter
-import com.cpua.deviceinfo.core.ui.ShareableFragment
-import com.cpua.deviceinfo.feature.sensors.databinding.FragmentSensorsBinding
+import com.example.deviceinfo.core.model.InfoItem
+import com.example.deviceinfo.core.ui.InfoAdapter
+import com.example.deviceinfo.core.ui.ShareableFragment
+import com.example.deviceinfo.feature.sensors.databinding.FragmentSensorsBinding
 
 class SensorsFragment : Fragment(), SensorEventListener, ShareableFragment {
     private var _b: FragmentSensorsBinding? = null

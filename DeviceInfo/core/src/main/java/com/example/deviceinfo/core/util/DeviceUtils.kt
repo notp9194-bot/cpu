@@ -1,4 +1,4 @@
-package com.cpua.deviceinfo.core.util
+package com.example.deviceinfo.core.util
 
 import android.content.Context
 import android.content.Intent
@@ -186,15 +186,14 @@ object DeviceUtils {
 
         val dlMbps = caps.linkDownstreamBandwidthKbps / 1000
         val ulMbps = caps.linkUpstreamBandwidthKbps / 1000
-        info["Download Speed"] = "$dlMbps Mbps (est.)"
-        info["Upload Speed"]   = "$ulMbps Mbps (est.)"
+        info["Link Down Capacity"] = "$dlMbps Mbps"
+        info["Link Up Capacity"] = "$ulMbps Mbps"
 
         if (caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 val wifiInfo = caps.transportInfo as? WifiInfo
                 if (wifiInfo != null) {
                     val ssid = wifiInfo.ssid
-                    info["WiFi SSID"]       = if (ssid.isNullOrBlank() || ssid == "<unknown ssid>") "Hidden/Unknown" else ssid.removeSurrounding("\"")
                     info["WiFi Frequency"]  = "${wifiInfo.frequency} MHz (${if (wifiInfo.frequency > 4000) "5 GHz" else "2.4 GHz"})"
                     info["WiFi Link Speed"] = "${wifiInfo.linkSpeed} Mbps"
                     val bars = WifiManager.calculateSignalLevel(wifiInfo.rssi, 5)
@@ -207,7 +206,6 @@ object DeviceUtils {
                 @Suppress("DEPRECATION")
                 val wifiInfo = wm.connectionInfo
                 val ssid = wifiInfo.ssid
-                info["WiFi SSID"]       = if (ssid.isNullOrBlank() || ssid == "<unknown ssid>") "Hidden/Unknown" else ssid.removeSurrounding("\"")
                 info["WiFi Frequency"]  = "${wifiInfo.frequency} MHz (${if (wifiInfo.frequency > 4000) "5 GHz" else "2.4 GHz"})"
                 info["WiFi Link Speed"] = "${wifiInfo.linkSpeed} Mbps"
                 @Suppress("DEPRECATION")

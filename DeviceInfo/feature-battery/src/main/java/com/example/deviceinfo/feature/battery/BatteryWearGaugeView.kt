@@ -1,4 +1,4 @@
-package com.cpua.deviceinfo.feature.battery
+package com.example.deviceinfo.feature.battery
 
 import android.content.Context
 import android.graphics.*
@@ -38,7 +38,7 @@ class BatteryWearGaugeView @JvmOverloads constructor(
         interpolator = android.view.animation.DecelerateInterpolator()
         addUpdateListener {
             val d = data ?: return@addUpdateListener
-            animWear = d.wearPct * (it.animatedValue as Float)
+            animWear = (if (d.wearPct >= 0) d.wearPct else 0) * (it.animatedValue as Float)
             invalidate()
         }
     }
@@ -146,7 +146,7 @@ class BatteryWearGaugeView @JvmOverloads constructor(
         if (wearSweep > 0f) canvas.drawArc(oval, startAngle, wearSweep, false, wearArcPaint)
 
         // Health arc (remaining = 100 - wear)
-        val healthPct = (100 - d.wearPct).coerceIn(0, 100)
+        val healthPct = if (d.wearPct >= 0) (100 - d.wearPct).coerceIn(0, 100) else 100
         val healthSweep = (healthPct / 100f) * sweepTotal
         if (healthSweep > 0f) {
             healthArcPaint.strokeWidth = sw * 0.7f
@@ -165,7 +165,7 @@ class BatteryWearGaugeView @JvmOverloads constructor(
         // ── Grade label ───────────────────────────────────────────────
         gradePaint.textSize = arcR * 0.22f
         gradePaint.color    = wearColor
-        canvas.drawText("Wear: ${d.wearPct}%  •  ${gradeLabel(d.wearPct)}", cx, cy - arcR * 0.32f, gradePaint)
+        canvas.drawText(if (d.wearPct >= 0) "Wear: ${d.wearPct}%  •  ${gradeLabel(d.wearPct)}" else "Wear: Not Available", cx, cy - arcR * 0.32f, gradePaint)
 
         // ── Bottom info bars ──────────────────────────────────────────
         val barTop    = cy + arcR * 0.58f

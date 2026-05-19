@@ -1,4 +1,4 @@
-package com.cpua.deviceinfo.feature.battery
+package com.example.deviceinfo.feature.battery
 
 import android.app.ActivityManager
 import android.app.NotificationChannel
@@ -20,12 +20,12 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.cpua.deviceinfo.core.model.InfoItem
-import com.cpua.deviceinfo.core.ui.InfoAdapter
-import com.cpua.deviceinfo.core.ui.ShareableFragment
-import com.cpua.deviceinfo.core.util.DeviceUtils
-import com.cpua.deviceinfo.core.util.ExportUtils
-import com.cpua.deviceinfo.feature.battery.databinding.FragmentBatteryBinding
+import com.example.deviceinfo.core.model.InfoItem
+import com.example.deviceinfo.core.ui.InfoAdapter
+import com.example.deviceinfo.core.ui.ShareableFragment
+import com.example.deviceinfo.core.util.DeviceUtils
+import com.example.deviceinfo.core.util.ExportUtils
+import com.example.deviceinfo.feature.battery.databinding.FragmentBatteryBinding
 
 class BatteryFragment : Fragment(), ShareableFragment {
     private var _b: FragmentBatteryBinding? = null
@@ -157,10 +157,10 @@ class BatteryFragment : Fragment(), ShareableFragment {
 
         // Also inject wear info into the info list
         wearInfoCache = linkedMapOf(
-            "Design Capacity" to "~${result.designMah} mAh  (${result.sourceLabel})",
-            "Charge Remaining" to "${result.chargeMah} mAh",
+            "Design Capacity" to if (result.designMah > 0) "${result.designMah} mAh (${result.sourceLabel})" else "Not available on this device",
+            "Charge Remaining" to if (result.chargeMah > 0) "${result.chargeMah} mAh" else "Unavailable",
             "Learned Capacity" to if (result.learnedMah > 0) "${result.learnedMah} mAh" else "Unknown",
-            "Wear Level" to "${result.wearPct}%  •  ${gradeLabel(result.wearPct)}",
+            "Wear Level" to if (result.wearPct >= 0) "${result.wearPct}%  •  ${gradeLabel(result.wearPct)}" else "Not available on this device",
             "Current Flow" to if (result.currentMa > 0) "${result.currentMa} mA  ${if (result.isCharging) "(⚡ In)" else "(🔋 Out)"}" else "Unknown",
             "Power" to if (result.currentMa > 0 && result.voltageMv > 0) "%.2f W".format(result.currentMa * result.voltageMv / 1_000_000f) else "Unknown"
         )
@@ -190,6 +190,7 @@ class BatteryFragment : Fragment(), ShareableFragment {
         val status = intent?.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
 
         // Battery Full alert (user-configurable toggle)
+        if (com.example.deviceinfo.AlertPrefs.isBattFullEnabled(ctx)) {
             if (pct >= 100 &&
                 (status == BatteryManager.BATTERY_STATUS_FULL || status == BatteryManager.BATTERY_STATUS_CHARGING) &&
                 lastBatteryFullNotifPct != 100
@@ -205,6 +206,8 @@ class BatteryFragment : Fragment(), ShareableFragment {
         if (pct < 95) lastBatteryFullNotifPct = -1
 
         // Battery Low alert (user-configurable threshold)
+        if (com.example.deviceinfo.AlertPrefs.isBattLowEnabled(ctx)) {
+            val lowThreshold = com.example.deviceinfo.AlertPrefs.getBattLowPct(ctx)
             val isDischarging = status == BatteryManager.BATTERY_STATUS_DISCHARGING
             if (pct <= lowThreshold && isDischarging && lastRamAlertPct != lowThreshold) {
                 lastRamAlertPct = lowThreshold
@@ -219,6 +222,8 @@ class BatteryFragment : Fragment(), ShareableFragment {
     }
     private fun checkRamAlert(usedPct: Int) {
         val ctx = context ?: return
+        if (!com.example.deviceinfo.AlertPrefs.isRamEnabled(ctx)) return
+        val threshold = com.example.deviceinfo.AlertPrefs.getRamPct(ctx)
         val hysteresis = (threshold - 10).coerceAtLeast(0)
         if (usedPct >= threshold && lastRamAlertPct < threshold) {
             lastRamAlertPct = usedPct

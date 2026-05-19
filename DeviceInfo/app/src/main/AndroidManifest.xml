@@ -1,54 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+  <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Network & Connectivity -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
+      <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+      <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+      <uses-permission android:name="android.permission.INTERNET" />
+      <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+          android:maxSdkVersion="28" />
+      <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+      <uses-permission android:name="android.permission.VIBRATE" />
+      <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-    <!-- Location - required for WiFi info on API 29+ -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+      <application
+          android:allowBackup="true"
+          android:icon="@mipmap/ic_launcher"
+          android:label="@string/app_name"
+          android:roundIcon="@mipmap/ic_launcher_round"
+          android:supportsRtl="true"
+          android:theme="@style/Theme.DeviceInfo">
 
-    <!-- Nearby WiFi Devices - API 33+ -->
-    <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES"
-        android:usesPermissionFlags="neverForLocation"
-        tools:targetApi="tiramisu" />
+          <activity
+              android:name=".MainActivity"
+              android:exported="true"
+              android:windowSoftInputMode="adjustResize">
+              <intent-filter>
+                  <action android:name="android.intent.action.MAIN" />
+                  <category android:name="android.intent.category.LAUNCHER" />
+              </intent-filter>
+          </activity>
 
-    <!-- Notifications -->
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.VIBRATE" />
+          <!-- Alert Thresholds Settings -->
+          <activity
+              android:name=".AlertSettingsActivity"
+              android:exported="false"
+              android:label="Alert Thresholds"
+              android:parentActivityName=".MainActivity" />
 
-    <application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/Theme.DeviceInfo">
+          <!-- Battery LOW alert -->
+          <receiver android:name=".BatteryAlertReceiver"
+              android:exported="false">
+              <intent-filter>
+                  <action android:name="android.intent.action.BATTERY_LOW" />
+              </intent-filter>
+          </receiver>
 
-        <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:windowSoftInputMode="adjustResize">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+          <!-- Battery FULL alert -->
+          <receiver android:name=".BatteryFullReceiver"
+              android:exported="false">
+              <intent-filter>
+                  <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+              </intent-filter>
+          </receiver>
 
-        <!-- Home Screen Widget -->
-        <receiver android:name=".DeviceInfoWidget"
-            android:exported="true"
-            android:label="Device Info Widget">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/device_info_widget_provider" />
-        </receiver>
+          <!-- Home Screen Widget -->
+          <receiver android:name=".DeviceInfoWidget"
+              android:exported="true"
+              android:label="Device Info Widget">
+              <intent-filter>
+                  <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+              </intent-filter>
+              <meta-data
+                  android:name="android.appwidget.provider"
+                  android:resource="@xml/device_info_widget_provider" />
+          </receiver>
 
-    </application>
-</manifest>
+      </application>
+  </manifest>

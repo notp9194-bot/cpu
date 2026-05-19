@@ -1,4 +1,4 @@
-package com.cpua.deviceinfo.feature.gpu
+package com.example.deviceinfo.feature.gpu
 
 import android.content.Context
 import android.opengl.EGL14
@@ -12,10 +12,10 @@ import android.text.TextWatcher
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.cpua.deviceinfo.core.model.InfoItem
-import com.cpua.deviceinfo.core.ui.InfoAdapter
-import com.cpua.deviceinfo.core.ui.ShareableFragment
-import com.cpua.deviceinfo.feature.gpu.databinding.FragmentGpuBinding
+import com.example.deviceinfo.core.model.InfoItem
+import com.example.deviceinfo.core.ui.InfoAdapter
+import com.example.deviceinfo.core.ui.ShareableFragment
+import com.example.deviceinfo.feature.gpu.databinding.FragmentGpuBinding
 
 class GpuFragment : Fragment(), ShareableFragment {
 
@@ -112,8 +112,7 @@ class GpuFragment : Fragment(), ShareableFragment {
             pm.hasSystemFeature("android.hardware.vulkan.version") else false
         val hasVulkan11 = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1)
             pm.hasSystemFeature("android.hardware.vulkan.level", 1) else false
-        val hasVulkan12 = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-            pm.hasSystemFeature("android.software.vulkan.deqp.level") else false
+        // Vulkan 1.2 cannot be accurately detected without private APIs — removed
 
         // ── Update charts ─────────────────────────────────────────────
         b.gpuDoughnut.update(glVersionFloat, maxTexSize, extCount, renderer)
@@ -154,7 +153,6 @@ class GpuFragment : Fragment(), ShareableFragment {
         items.add(InfoItem("Vulkan", if (hasVulkan) "Supported ✅" else "Not Available", true))
         if (hasVulkan) {
             items.add(InfoItem("Vulkan 1.1", if (hasVulkan11) "Supported" else "Not Detected"))
-            items.add(InfoItem("Vulkan 1.2", if (hasVulkan12) "Likely" else "Check device specs"))
         }
 
         items.add(InfoItem("EXTENSIONS ($extCount)", "", true))

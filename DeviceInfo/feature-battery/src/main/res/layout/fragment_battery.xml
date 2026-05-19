@@ -21,13 +21,13 @@
             android:layout_marginHorizontal="12dp"
             android:layout_marginTop="8dp">
 
-            <com.cpua.deviceinfo.feature.battery.BatteryDoughnutView
+            <com.example.deviceinfo.feature.battery.BatteryDoughnutView
                 android:id="@+id/batteryDoughnut"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"/>
 
-            <com.cpua.deviceinfo.feature.battery.BatteryChartView
+            <com.example.deviceinfo.feature.battery.BatteryChartView
                 android:id="@+id/batteryChart"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -35,7 +35,7 @@
         </LinearLayout>
 
         <!-- RAM line chart -->
-        <com.cpua.deviceinfo.feature.battery.RamChartView
+        <com.example.deviceinfo.feature.battery.RamChartView
             android:id="@+id/ramChart"
             android:layout_width="match_parent"
             android:layout_height="90dp"
@@ -55,7 +55,7 @@
             android:layout_marginTop="6dp"
             android:layout_marginBottom="2dp"/>
 
-        <com.cpua.deviceinfo.feature.battery.BatteryWearGaugeView
+        <com.example.deviceinfo.feature.battery.BatteryWearGaugeView
             android:id="@+id/wearGauge"
             android:layout_width="match_parent"
             android:layout_height="230dp"
@@ -95,7 +95,7 @@
                 android:paddingEnd="10dp"/>
         </LinearLayout>
 
-        <com.cpua.deviceinfo.feature.battery.BatteryHistoryChartView
+        <com.example.deviceinfo.feature.battery.BatteryHistoryChartView
             android:id="@+id/batteryHistoryChart"
             android:layout_width="match_parent"
             android:layout_height="140dp"

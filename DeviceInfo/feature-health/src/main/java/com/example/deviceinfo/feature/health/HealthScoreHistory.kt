@@ -1,4 +1,4 @@
-package com.cpua.deviceinfo.feature.health
+package com.example.deviceinfo.feature.health
 
 import android.content.Context
 import org.json.JSONArray

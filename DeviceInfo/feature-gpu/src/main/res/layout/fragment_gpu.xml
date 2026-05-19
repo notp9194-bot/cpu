@@ -15,14 +15,14 @@
         android:layout_marginTop="8dp">
 
         <!-- GPU Doughnut (left) -->
-        <com.cpua.deviceinfo.feature.gpu.GpuDoughnutView
+        <com.example.deviceinfo.feature.gpu.GpuDoughnutView
             android:id="@+id/gpuDoughnut"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"/>
 
         <!-- GPU Bar Chart (right) -->
-        <com.cpua.deviceinfo.feature.gpu.GpuBarChartView
+        <com.example.deviceinfo.feature.gpu.GpuBarChartView
             android:id="@+id/gpuBarChart"
             android:layout_width="0dp"
             android:layout_height="match_parent"

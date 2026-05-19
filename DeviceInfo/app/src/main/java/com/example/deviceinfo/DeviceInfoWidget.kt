@@ -1,4 +1,4 @@
-package com.cpua.deviceinfo
+package com.example.deviceinfo
 
   import android.app.ActivityManager
   import android.app.PendingIntent

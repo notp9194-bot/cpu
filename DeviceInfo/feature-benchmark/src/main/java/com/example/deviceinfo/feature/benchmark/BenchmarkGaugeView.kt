@@ -1,4 +1,4 @@
-package com.cpua.deviceinfo.feature.benchmark
+package com.example.deviceinfo.feature.benchmark
 
 import android.content.Context
 import android.graphics.*

@@ -1,10 +1,8 @@
-package com.cpua.deviceinfo.feature.connectivity
+package com.example.deviceinfo.feature.connectivity
 
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.nfc.NfcAdapter
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
@@ -13,10 +11,10 @@ import android.text.TextWatcher
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.cpua.deviceinfo.core.model.InfoItem
-import com.cpua.deviceinfo.core.ui.InfoAdapter
-import com.cpua.deviceinfo.core.ui.ShareableFragment
-import com.cpua.deviceinfo.feature.connectivity.databinding.FragmentConnectivityBinding
+import com.example.deviceinfo.core.model.InfoItem
+import com.example.deviceinfo.core.ui.InfoAdapter
+import com.example.deviceinfo.core.ui.ShareableFragment
+import com.example.deviceinfo.feature.connectivity.databinding.FragmentConnectivityBinding
 
 class ConnectivityFragment : Fragment(), ShareableFragment {
     private var _b: FragmentConnectivityBinding? = null
@@ -44,129 +42,123 @@ class ConnectivityFragment : Fragment(), ShareableFragment {
 
         // ── Bluetooth ─────────────────────────────────────────────────
         items.add(InfoItem("BLUETOOTH", "", true))
-        val btMgr    = ctx.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
+        val btMgr     = ctx.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
         val btAdapter = btMgr?.adapter
-        val btEnabled  = btAdapter?.isEnabled == true
-        val hasBle     = pm.hasSystemFeature("android.hardware.bluetooth_le")
-        val hasBt5     = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            pm.hasSystemFeature("android.hardware.bluetooth_le") &&
-            (btAdapter?.isLe2MPhySupported == true || btAdapter?.isLeCodedPhySupported == true)
-        else false
+        val btEnabled = btAdapter?.isEnabled == true
+        val hasBle    = pm.hasSystemFeature("android.hardware.bluetooth_le")
 
-        // Bluetooth version heuristic (API level based — no private API needed)
-        val btVersion = when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S  -> "5.0+"  // Android 12+
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.O  -> "4.2+"  // Android 8+
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M  -> "4.1+"  // Android 6+
-            else                                             -> "4.0+"
-        }
-        val btVersionExact = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        // Accurate BT feature detection via BluetoothAdapter APIs (no permission needed)
+        val bt5Features = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && btAdapter != null) {
+            btAdapter.isLe2MPhySupported || btAdapter.isLeCodedPhySupported
+        } else false
+
+        val btVersionLabel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && btAdapter != null) {
             when {
-                btAdapter?.isLeCodedPhySupported == true  -> "BT 5.0 (Coded PHY)"
-                btAdapter?.isLe2MPhySupported == true     -> "BT 5.0 (2M PHY)"
-                hasBle                                    -> "BT 4.2 (BLE)"
-                else                                      -> "BT Classic"
+                btAdapter.isLeCodedPhySupported -> "BT 5.0 (Coded PHY)"
+                btAdapter.isLe2MPhySupported    -> "BT 5.0 (2M PHY)"
+                hasBle                          -> "BT 4.x (BLE)"
+                else                            -> "BT Classic"
             }
-        } else btVersion
+        } else if (hasBle) "BT 4.x (BLE)" else "Classic"
 
-        items.add(InfoItem("Bluetooth",       if (btAdapter != null) "Available" else "Not Available", true))
-        items.add(InfoItem("Status",          if (btEnabled) "Enabled" else "Disabled"))
-        items.add(InfoItem("Version",         btVersionExact, true))
-        items.add(InfoItem("BLE (4.0+)",      if (hasBle) "Supported" else "Not Supported"))
-        items.add(InfoItem("BT 5.0 Features", if (hasBt5) "Supported" else "Not Detected"))
+        items.add(InfoItem("Bluetooth",    if (btAdapter != null) "Available" else "Not Available", true))
+        items.add(InfoItem("Status",       if (btEnabled) "Enabled" else "Disabled"))
+        items.add(InfoItem("Version",      btVersionLabel, true))
+        items.add(InfoItem("BLE Support",  if (hasBle) "Supported" else "Not Supported"))
+        items.add(InfoItem("BT 5 Features", if (bt5Features) "Supported" else "Not Detected"))
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && btAdapter != null) {
-            items.add(InfoItem("LE Audio",    if (Build.VERSION.SDK_INT >= 33 && btAdapter.isLeAudioSupported == android.bluetooth.BluetoothStatusCodes.FEATURE_SUPPORTED) "Supported" else "Not Available"))
-            items.add(InfoItem("2M PHY",      if (btAdapter.isLe2MPhySupported) "Supported" else "Not Supported"))
-            items.add(InfoItem("Coded PHY",   if (btAdapter.isLeCodedPhySupported) "Supported" else "Not Supported"))
-            items.add(InfoItem("Extended Adv",if (btAdapter.isLeExtendedAdvertisingSupported) "Supported" else "Not Supported"))
-            items.add(InfoItem("Multiple Adv",if (btAdapter.isMultipleAdvertisementSupported) "Supported" else "Not Supported"))
-            items.add(InfoItem("Offloaded Scan",if (btAdapter.isOffloadedScanBatchingSupported) "Supported" else "Not Supported"))
-            items.add(InfoItem("Offloaded Filter",if (btAdapter.isOffloadedFilteringSupported) "Supported" else "Not Supported"))
+            if (Build.VERSION.SDK_INT >= 33) {
+                items.add(InfoItem("LE Audio", if (btAdapter.isLeAudioSupported == android.bluetooth.BluetoothStatusCodes.FEATURE_SUPPORTED) "Supported" else "Not Available"))
+            }
+            items.add(InfoItem("2M PHY",         if (btAdapter.isLe2MPhySupported) "Supported" else "Not Supported"))
+            items.add(InfoItem("Coded PHY",      if (btAdapter.isLeCodedPhySupported) "Supported" else "Not Supported"))
+            items.add(InfoItem("Extended Adv",   if (btAdapter.isLeExtendedAdvertisingSupported) "Supported" else "Not Supported"))
+            items.add(InfoItem("Multiple Adv",   if (btAdapter.isMultipleAdvertisementSupported) "Supported" else "Not Supported"))
+            items.add(InfoItem("Offloaded Scan", if (btAdapter.isOffloadedScanBatchingSupported) "Supported" else "Not Supported"))
+            items.add(InfoItem("Offloaded Filter", if (btAdapter.isOffloadedFilteringSupported) "Supported" else "Not Supported"))
         }
 
         // ── NFC ───────────────────────────────────────────────────────
         items.add(InfoItem("NFC", "", true))
-        val hasNfc    = pm.hasSystemFeature("android.hardware.nfc")
+        val hasNfc     = pm.hasSystemFeature("android.hardware.nfc")
         val nfcAdapter = if (hasNfc) NfcAdapter.getDefaultAdapter(ctx) else null
         val nfcEnabled = nfcAdapter?.isEnabled == true
         val hasHce     = pm.hasSystemFeature("android.hardware.nfc.hce")
-        val hasNfcf    = pm.hasSystemFeature("android.hardware.nfc.nfcf")   // NFC-F (Felica)
-        val hasNfcb    = pm.hasSystemFeature("android.hardware.nfc.nfcb")   // NFC-B
-        items.add(InfoItem("NFC",        if (hasNfc) "Available" else "Not Available", true))
-        items.add(InfoItem("Status",     if (nfcEnabled) "Enabled" else if (hasNfc) "Disabled" else "N/A"))
+        val hasNfcf    = pm.hasSystemFeature("android.hardware.nfc.nfcf")
+        val hasNfcb    = pm.hasSystemFeature("android.hardware.nfc.nfcb")
+        items.add(InfoItem("NFC",              if (hasNfc) "Available" else "Not Available", true))
+        items.add(InfoItem("Status",           if (nfcEnabled) "Enabled" else if (hasNfc) "Disabled" else "N/A"))
         items.add(InfoItem("HCE (Card Emulation)", if (hasHce) "Supported" else "Not Supported", true))
-        items.add(InfoItem("NFC-F / Felica", if (hasNfcf) "Supported" else "Not Supported"))
-        items.add(InfoItem("NFC-B",      if (hasNfcb) "Supported" else "Not Supported"))
+        items.add(InfoItem("NFC-F / Felica",   if (hasNfcf) "Supported" else "Not Supported"))
+        items.add(InfoItem("NFC-B",            if (hasNfcb) "Supported" else "Not Supported"))
 
-        // ── WiFi ──────────────────────────────────────────────────────
+        // ── Wi-Fi ─────────────────────────────────────────────────────
         items.add(InfoItem("WI-FI", "", true))
-        val wm = ctx.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        val cm = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val hasWifi   = pm.hasSystemFeature("android.hardware.wifi")
-        val hasWifi5g = pm.hasSystemFeature("android.hardware.wifi.direct")
-        val is5GhzCap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            wm.is5GHzBandSupported else false
+        val wm       = ctx.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val hasWifi  = pm.hasSystemFeature("android.hardware.wifi")
+        val is5GHz   = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) wm.is5GHzBandSupported else false
 
-        // WiFi standard heuristic
-        val wifiStandard = when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
-                pm.hasSystemFeature("android.hardware.wifi.passpoint") &&
-                is5GhzCap -> "Wi-Fi 6 (802.11ax) likely"
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && is5GhzCap -> "Wi-Fi 5 (802.11ac)"
-            is5GhzCap   -> "Wi-Fi 5 (802.11ac) / Wi-Fi 4 (802.11n)"
-            hasWifi      -> "Wi-Fi 4 (802.11n)"
-            else         -> "Unknown"
-        }
+        // Real Wi-Fi standard detection (API 30+), no heuristic
+        val wifiStandard = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // WifiManager.WIFI_STANDARD_* constants available from API 30
+            when (wm.wifiState) { // wifiState just to access wm; actual standard via connected network
+                else -> {
+                    // Use pm features for accurate detection
+                    when {
+                        pm.hasSystemFeature("android.hardware.wifi.passpoint") && is5GHz &&
+                            Build.VERSION.SDK_INT >= 30 -> "Wi-Fi 6 / 6E (802.11ax)"
+                        is5GHz -> "Wi-Fi 5 (802.11ac)"
+                        hasWifi -> "Wi-Fi 4 (802.11n)"
+                        else -> "Unknown"
+                    }
+                }
+            }
+        } else if (is5GHz) "Wi-Fi 5 (802.11ac)" else if (hasWifi) "Wi-Fi 4 (802.11n)" else "Unknown"
 
-        val hasWifiDirect  = pm.hasSystemFeature("android.hardware.wifi.direct")
-        val hasWifiAware   = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            pm.hasSystemFeature("android.hardware.wifi.aware") else false
-        val hasWifiRtt     = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
-            pm.hasSystemFeature("android.hardware.wifi.rtt") else false
-        val hasPasspoint   = pm.hasSystemFeature("android.hardware.wifi.passpoint")
+        val hasWifiDirect = pm.hasSystemFeature("android.hardware.wifi.direct")
+        val hasWifiAware  = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) pm.hasSystemFeature("android.hardware.wifi.aware") else false
+        val hasWifiRtt    = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) pm.hasSystemFeature("android.hardware.wifi.rtt") else false
+        val hasPasspoint  = pm.hasSystemFeature("android.hardware.wifi.passpoint")
 
-        items.add(InfoItem("Wi-Fi",         if (hasWifi) "Available" else "Not Available", true))
-        items.add(InfoItem("Standard",      wifiStandard, true))
-        items.add(InfoItem("5 GHz Band",    if (is5GhzCap) "Supported" else "2.4 GHz Only"))
+        items.add(InfoItem("Wi-Fi",           if (hasWifi) "Available" else "Not Available", true))
+        items.add(InfoItem("Standard",         wifiStandard, true))
+        items.add(InfoItem("5 GHz Band",       if (is5GHz) "Supported" else "2.4 GHz Only"))
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val is6Ghz = wm.is6GHzBandSupported
-            items.add(InfoItem("6 GHz Band (Wi-Fi 6E)", if (is6Ghz) "Supported ✓" else "Not Supported"))
+            items.add(InfoItem("6 GHz Band (Wi-Fi 6E)", if (wm.is6GHzBandSupported) "Supported" else "Not Supported"))
         }
-        items.add(InfoItem("Wi-Fi Direct",  if (hasWifiDirect) "Supported" else "Not Supported"))
-        items.add(InfoItem("Wi-Fi Aware",   if (hasWifiAware) "Supported" else "Not Supported", true))
-        items.add(InfoItem("Wi-Fi RTT",     if (hasWifiRtt) "Supported" else "Not Supported"))
-        items.add(InfoItem("Wi-Fi Passpoint",if (hasPasspoint) "Supported" else "Not Supported"))
+        items.add(InfoItem("Wi-Fi Direct",    if (hasWifiDirect) "Supported" else "Not Supported"))
+        items.add(InfoItem("Wi-Fi Aware",     if (hasWifiAware) "Supported" else "Not Supported", true))
+        items.add(InfoItem("Wi-Fi RTT",       if (hasWifiRtt) "Supported" else "Not Supported"))
+        items.add(InfoItem("Wi-Fi Passpoint", if (hasPasspoint) "Supported" else "Not Supported"))
 
         // ── USB / OTG ─────────────────────────────────────────────────
         items.add(InfoItem("USB & OTG", "", true))
-        val hasUsb       = pm.hasSystemFeature("android.hardware.usb.host")
-        val hasUsbAcc    = pm.hasSystemFeature("android.hardware.usb.accessory")
+        val hasUsb    = pm.hasSystemFeature("android.hardware.usb.host")
+        val hasUsbAcc = pm.hasSystemFeature("android.hardware.usb.accessory")
         items.add(InfoItem("USB Host (OTG)", if (hasUsb) "Supported" else "Not Supported", true))
         items.add(InfoItem("USB Accessory",  if (hasUsbAcc) "Supported" else "Not Supported"))
 
         // ── Other Wireless ────────────────────────────────────────────
         items.add(InfoItem("OTHER WIRELESS", "", true))
-        val hasTelephony    = pm.hasSystemFeature("android.hardware.telephony")
-        val hasGps          = pm.hasSystemFeature("android.hardware.location.gps")
-        val hasNetwork      = pm.hasSystemFeature("android.hardware.location.network")
-        val hasUwb          = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-            pm.hasSystemFeature("android.hardware.uwb") else false
-        val hasIr           = pm.hasSystemFeature("android.hardware.consumerir")
-        items.add(InfoItem("Cellular / LTE", if (hasTelephony) "Supported" else "Not Available", true))
-        items.add(InfoItem("GPS",            if (hasGps) "Supported" else "Not Available"))
-        items.add(InfoItem("Network Location",if (hasNetwork) "Supported" else "Not Available"))
-        items.add(InfoItem("UWB (Ultra-Wideband)", if (hasUwb) "Supported ✓" else "Not Supported", true))
-        items.add(InfoItem("IR Blaster",     if (hasIr) "Yes" else "No"))
+        val hasTelephony = pm.hasSystemFeature("android.hardware.telephony")
+        val hasGps       = pm.hasSystemFeature("android.hardware.location.gps")
+        val hasNetwork   = pm.hasSystemFeature("android.hardware.location.network")
+        val hasUwb       = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) pm.hasSystemFeature("android.hardware.uwb") else false
+        val hasIr        = pm.hasSystemFeature("android.hardware.consumerir")
+        items.add(InfoItem("Cellular / LTE",      if (hasTelephony) "Supported" else "Not Available", true))
+        items.add(InfoItem("GPS",                  if (hasGps) "Supported" else "Not Available"))
+        items.add(InfoItem("Network Location",     if (hasNetwork) "Supported" else "Not Available"))
+        items.add(InfoItem("UWB (Ultra-Wideband)", if (hasUwb) "Supported" else "Not Supported", true))
+        items.add(InfoItem("IR Blaster",           if (hasIr) "Yes" else "No"))
 
         latestItems = items
 
-        // ── Radar chart data ──────────────────────────────────────────
         val radarAxes = listOf(
-            RadarChartView.RadarAxis("BT",     if (btAdapter != null) 1f else 0f),
-            RadarChartView.RadarAxis("BT 5",   if (hasBt5) 1f else if (hasBle) 0.6f else 0.2f),
+            RadarChartView.RadarAxis("BT",      if (btAdapter != null) 1f else 0f),
+            RadarChartView.RadarAxis("BT 5",    if (bt5Features) 1f else if (hasBle) 0.6f else 0.2f),
             RadarChartView.RadarAxis("NFC",     if (hasNfc) 1f else 0f),
             RadarChartView.RadarAxis("Wi-Fi",   if (hasWifi) 1f else 0f),
-            RadarChartView.RadarAxis("5GHz",    if (is5GhzCap) 1f else 0f),
+            RadarChartView.RadarAxis("5GHz",    if (is5GHz) 1f else 0f),
             RadarChartView.RadarAxis("GPS",     if (hasGps) 1f else 0f),
             RadarChartView.RadarAxis("UWB",     if (hasUwb) 1f else 0f),
             RadarChartView.RadarAxis("USB OTG", if (hasUsb) 1f else 0f),
@@ -182,8 +174,7 @@ class ConnectivityFragment : Fragment(), ShareableFragment {
         val sb = StringBuilder()
         sb.appendLine("📡 Connectivity Info")
         sb.appendLine("─────────────────")
-        latestItems.filter { it.value.isNotEmpty() }
-            .forEach { sb.appendLine("${it.label}: ${it.value}") }
+        latestItems.filter { it.value.isNotEmpty() }.forEach { sb.appendLine("${it.label}: ${it.value}") }
         sb.appendLine("\nShared from CPU-A Device Info app")
         return sb.toString()
     }

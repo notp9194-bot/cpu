@@ -1,4 +1,4 @@
-package com.cpua.deviceinfo.feature.health
+package com.example.deviceinfo.feature.health
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,8 +6,8 @@ import android.os.Handler
 import android.os.Looper
 import android.view.*
 import androidx.fragment.app.Fragment
-import com.cpua.deviceinfo.core.ui.ShareableFragment
-import com.cpua.deviceinfo.feature.health.databinding.FragmentHealthBinding
+import com.example.deviceinfo.core.ui.ShareableFragment
+import com.example.deviceinfo.feature.health.databinding.FragmentHealthBinding
 import java.util.concurrent.Executors
 
 class HealthFragment : Fragment(), ShareableFragment {

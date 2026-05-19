@@ -1,4 +1,4 @@
-package com.cpua.deviceinfo.feature.network
+package com.example.deviceinfo.feature.network
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -14,11 +14,11 @@ import android.text.TextWatcher
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.cpua.deviceinfo.core.model.InfoItem
-import com.cpua.deviceinfo.core.ui.InfoAdapter
-import com.cpua.deviceinfo.core.ui.ShareableFragment
-import com.cpua.deviceinfo.core.util.DeviceUtils
-import com.cpua.deviceinfo.feature.network.databinding.FragmentNetworkBinding
+import com.example.deviceinfo.core.model.InfoItem
+import com.example.deviceinfo.core.ui.InfoAdapter
+import com.example.deviceinfo.core.ui.ShareableFragment
+import com.example.deviceinfo.core.util.DeviceUtils
+import com.example.deviceinfo.feature.network.databinding.FragmentNetworkBinding
 import java.net.URL
 import java.util.concurrent.Executors
 
@@ -104,7 +104,7 @@ class NetworkFragment : Fragment(), ShareableFragment {
         latestData = LinkedHashMap(networkData)
         latestData["Public IP"] = publicIp
         val items = latestData.map { (k, v) ->
-            val highlight = k.startsWith("DNS") || k == "WiFi SSID" || k == "Connection Type" || k == "Public IP"
+            val highlight = k.startsWith("DNS") || k == "Connection Type" || k == "Public IP"
             InfoItem(k, v, highlight)
         }
         val query = b.searchBar.etSearch.text?.toString() ?: ""

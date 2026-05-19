@@ -1,4 +1,4 @@
-package com.cpua.deviceinfo.feature.network
+package com.example.deviceinfo.feature.network
 
 import android.content.Context
 import android.graphics.*

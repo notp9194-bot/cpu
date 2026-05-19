@@ -14,13 +14,13 @@
         android:layout_marginHorizontal="12dp"
         android:layout_marginTop="8dp">
 
-        <com.cpua.deviceinfo.feature.power.PowerGaugeView
+        <com.example.deviceinfo.feature.power.PowerGaugeView
             android:id="@+id/powerGauge"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"/>
 
-        <com.cpua.deviceinfo.feature.power.PowerLineChartView
+        <com.example.deviceinfo.feature.power.PowerLineChartView
             android:id="@+id/powerChart"
             android:layout_width="0dp"
             android:layout_height="match_parent"

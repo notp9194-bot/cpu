@@ -1,4 +1,4 @@
-package com.cpua.deviceinfo.feature.soc
+package com.example.deviceinfo.feature.soc
 
 /**
  * In-memory circular ring buffer storing CPU clock snapshots.

@@ -197,21 +197,6 @@
             android:gravity="center"
             android:layout_marginBottom="8dp"/>
 
-        <!-- Privacy Policy Button - Required for Play Store -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnPrivacyPolicy"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="4dp"
-            android:text="Privacy Policy"
-            android:textColor="#00E5FF"
-            android:textSize="13sp"
-            app:backgroundTint="#1A2A3A"
-            app:cornerRadius="14dp"
-            app:strokeColor="#00E5FF"
-            app:strokeWidth="1dp"/>
-
         <!-- Footer -->
         <TextView
             android:layout_width="match_parent"

@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 android {
-    namespace = "com.cpua.deviceinfo.feature.soc"
+    namespace = "com.example.deviceinfo.feature.soc"
     compileSdk = 35
     defaultConfig { minSdk = 24 }
     compileOptions {

@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.cpua.deviceinfo.feature.memory"
+    namespace = "com.example.deviceinfo.feature.memory"
     compileSdk = 35
     defaultConfig { minSdk = 24 }
     compileOptions {

@@ -1,4 +1,4 @@
-package com.cpua.deviceinfo.feature.audio
+package com.example.deviceinfo.feature.audio
 
 import android.content.Context
 import android.graphics.*

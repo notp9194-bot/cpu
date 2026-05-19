@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.cpua.deviceinfo.feature.gpu"
+    namespace = "com.example.deviceinfo.feature.gpu"
     compileSdk = 35
     defaultConfig { minSdk = 24 }
     compileOptions {

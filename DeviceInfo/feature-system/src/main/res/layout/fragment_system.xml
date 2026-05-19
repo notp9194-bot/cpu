@@ -11,7 +11,7 @@
         layout="@layout/layout_search_bar"/>
 
     <!-- Existing Storage + RAM Doughnut -->
-    <com.cpua.deviceinfo.feature.system.StorageDoughnutView
+    <com.example.deviceinfo.feature.system.StorageDoughnutView
         android:id="@+id/storageDoughnut"
         android:layout_width="match_parent"
         android:layout_height="200dp"
@@ -31,7 +31,7 @@
         android:textColor="?attr/colorOnSurface"
         android:alpha="0.7"/>
 
-    <com.cpua.deviceinfo.feature.system.StorageCategoryBarView
+    <com.example.deviceinfo.feature.system.StorageCategoryBarView
         android:id="@+id/storageCategoryBar"
         android:layout_width="match_parent"
         android:layout_height="180dp"

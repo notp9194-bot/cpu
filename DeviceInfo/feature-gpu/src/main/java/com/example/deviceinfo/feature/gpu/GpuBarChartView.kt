@@ -1,4 +1,4 @@
-package com.cpua.deviceinfo.feature.gpu
+package com.example.deviceinfo.feature.gpu
 
 import android.content.Context
 import android.graphics.*

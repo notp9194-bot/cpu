@@ -1,6 +1,7 @@
-package com.cpua.deviceinfo
+package com.example.deviceinfo
 
 import android.Manifest
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
@@ -16,45 +17,29 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.cpua.deviceinfo.core.ui.ShareableFragment
-import com.cpua.deviceinfo.core.util.ExportUtils
-import com.cpua.deviceinfo.databinding.ActivityMainBinding
-import com.cpua.deviceinfo.feature.about.AboutFragment
-import com.cpua.deviceinfo.feature.audio.AudioFragment
-import com.cpua.deviceinfo.feature.battery.BatteryFragment
-import com.cpua.deviceinfo.feature.benchmark.BenchmarkFragment
-import com.cpua.deviceinfo.feature.security.BuildFragment
-import com.cpua.deviceinfo.feature.camera.CameraFragment
-import com.cpua.deviceinfo.feature.codec.CodecFragment
-import com.cpua.deviceinfo.feature.connectivity.ConnectivityFragment
-import com.cpua.deviceinfo.feature.device.DeviceFragment
-import com.cpua.deviceinfo.feature.display.DisplayFragment
-import com.cpua.deviceinfo.feature.favorites.FavoritesFragment
-import com.cpua.deviceinfo.feature.health.HealthFragment
-import com.cpua.deviceinfo.feature.gpu.GpuFragment
-import com.cpua.deviceinfo.feature.input.InputFragment
-import com.cpua.deviceinfo.feature.memory.MemoryFragment
-import com.cpua.deviceinfo.feature.network.NetworkFragment
-import com.cpua.deviceinfo.feature.power.PowerFragment
-import com.cpua.deviceinfo.feature.sensors.SensorsFragment
-import com.cpua.deviceinfo.feature.soc.SocFragment
-import com.cpua.deviceinfo.feature.system.SystemFragment
-import com.cpua.deviceinfo.feature.thermal.ThermalFragment
-import com.cpua.deviceinfo.feature.cpucore.CpuCoreFragment
-import com.cpua.deviceinfo.feature.chargesession.ChargeSessionFragment
-import com.cpua.deviceinfo.feature.pingmonitor.PingMonitorFragment
-import com.cpua.deviceinfo.feature.screentime.ScreenTimeFragment
-import com.cpua.deviceinfo.feature.dischargerate.DischargeRateFragment
-import com.cpua.deviceinfo.feature.cpuheatmap.CpuHeatmapFragment
-import com.cpua.deviceinfo.feature.throttle.ThrottleFragment
-import com.cpua.deviceinfo.feature.loadavg.LoadAvgFragment
-import com.cpua.deviceinfo.feature.chargecurve.ChargeCurveFragment
-import com.cpua.deviceinfo.feature.sensorlive.SensorLiveFragment
-import com.cpua.deviceinfo.feature.devcompare.DeviceCompareFragment
-import com.cpua.deviceinfo.feature.powerestimate.PowerEstimateFragment
-import com.cpua.deviceinfo.feature.brightness.BrightnessFragment
-import com.cpua.deviceinfo.feature.bootspeed.BootSpeedFragment
-import com.cpua.deviceinfo.feature.featurematrix.FeatureMatrixFragment
+import com.example.deviceinfo.core.ui.ShareableFragment
+import com.example.deviceinfo.core.util.ExportUtils
+import com.example.deviceinfo.databinding.ActivityMainBinding
+import com.example.deviceinfo.feature.about.AboutFragment
+import com.example.deviceinfo.feature.audio.AudioFragment
+import com.example.deviceinfo.feature.battery.BatteryFragment
+import com.example.deviceinfo.feature.benchmark.BenchmarkFragment
+import com.example.deviceinfo.feature.security.BuildFragment
+import com.example.deviceinfo.feature.camera.CameraFragment
+import com.example.deviceinfo.feature.codec.CodecFragment
+import com.example.deviceinfo.feature.connectivity.ConnectivityFragment
+import com.example.deviceinfo.feature.device.DeviceFragment
+import com.example.deviceinfo.feature.display.DisplayFragment
+import com.example.deviceinfo.feature.favorites.FavoritesFragment
+import com.example.deviceinfo.feature.gpu.GpuFragment
+import com.example.deviceinfo.feature.input.InputFragment
+import com.example.deviceinfo.feature.memory.MemoryFragment
+import com.example.deviceinfo.feature.network.NetworkFragment
+import com.example.deviceinfo.feature.power.PowerFragment
+import com.example.deviceinfo.feature.sensors.SensorsFragment
+import com.example.deviceinfo.feature.soc.SocFragment
+import com.example.deviceinfo.feature.system.SystemFragment
+import com.example.deviceinfo.feature.thermal.ThermalFragment
 import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
@@ -62,14 +47,28 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var prefs: SharedPreferences
 
+    // ── Tab order (20 tabs — HEALTH removed) ─────────────────────────
     private val tabs = listOf(
-        "★ FAV", "SOC", "DEVICE", "SYSTEM", "BATTERY", "THERMAL",
-        "SENSORS", "NETWORK", "CAMERA", "AUDIO", "DISPLAY", "CODEC",
-        "BENCHMARK", "CONNECTIVITY", "POWER", "GPU", "MEMORY", "BUILD",
-        "INPUT", "HEALTH", "ABOUT",
-        "CPU CORES", "CHG SESSION", "PING", "SCREEN TIME", "DISCHARGE",
-        "CPU HEATMAP", "THROTTLE", "LOAD AVG", "CHG CURVE", "SENSOR LIVE",
-        "DEV COMPARE", "PWR ESTIMATE", "BRIGHTNESS", "BOOT SPEED", "FEAT MATRIX"
+        "★ FAV",        // 0
+        "SOC",          // 1
+        "DEVICE",       // 2
+        "SYSTEM",       // 3
+        "BATTERY",      // 4
+        "THERMAL",      // 5
+        "SENSORS",      // 6
+        "NETWORK",      // 7
+        "CAMERA",       // 8
+        "AUDIO",        // 9
+        "DISPLAY",      // 10
+        "CODEC",        // 11
+        "BENCHMARK",    // 12
+        "CONNECTIVITY", // 13
+        "POWER",        // 14
+        "GPU",          // 15
+        "MEMORY",       // 16
+        "BUILD",        // 17
+        "INPUT",        // 18
+        "ABOUT"         // 19
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,6 +78,7 @@ class MainActivity : AppCompatActivity() {
             if (isDark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
         )
         WindowCompat.setDecorFitsSystemWindows(window, false)
+
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -94,11 +94,13 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        binding.viewPager.adapter = MainPagerAdapter(this)
+        val adapter = MainPagerAdapter(this)
+        binding.viewPager.adapter = adapter
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, pos ->
             tab.text = tabs[pos]
         }.attach()
 
+        // Request POST_NOTIFICATIONS (Android 13+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -127,31 +129,32 @@ class MainActivity : AppCompatActivity() {
             )
             recreate(); true
         }
-        R.id.action_share      -> { shareCurrentTab(); true }
-        R.id.action_export_pdf -> { exportCurrentTabPdf(); true }
+        R.id.action_share         -> { shareCurrentTab(); true }
+        R.id.action_export_pdf    -> { exportCurrentTabPdf(); true }
+        R.id.action_alert_settings -> {
+            startActivity(Intent(this, AlertSettingsActivity::class.java)); true
+        }
         else -> super.onOptionsItemSelected(item)
     }
 
     private fun shareCurrentTab() {
-        val pos  = binding.viewPager.currentItem
-        val frag = supportFragmentManager.findFragmentByTag("f$pos")
-        val text = (frag as? ShareableFragment)?.getShareText()
+        val pos = binding.viewPager.currentItem
+        val fragment = supportFragmentManager.findFragmentByTag("f$pos")
+        val text = (fragment as? ShareableFragment)?.getShareText()
             ?: "\uD83D\uDCF1 Device Info — ${tabs[pos]}\nChecked with CPU-A Device Info app."
         startActivity(
-            android.content.Intent.createChooser(
-                android.content.Intent(android.content.Intent.ACTION_SEND).apply {
-                    type = "text/plain"
-                    putExtra(android.content.Intent.EXTRA_TEXT, text)
-                    putExtra(android.content.Intent.EXTRA_SUBJECT, "Device Info — ${tabs[pos]}")
-                }, "Share via"
-            )
+            Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, text)
+                putExtra(Intent.EXTRA_SUBJECT, "Device Info — ${tabs[pos]}")
+            }, "Share via")
         )
     }
 
     private fun exportCurrentTabPdf() {
-        val pos  = binding.viewPager.currentItem
-        val frag = supportFragmentManager.findFragmentByTag("f$pos")
-        val data = (frag as? ShareableFragment)?.getExportData() ?: emptyMap()
+        val pos = binding.viewPager.currentItem
+        val fragment = supportFragmentManager.findFragmentByTag("f$pos")
+        val data = (fragment as? ShareableFragment)?.getExportData() ?: emptyMap()
         ExportUtils.exportToPdf(this, tabs[pos], data)
     }
 
@@ -177,23 +180,7 @@ class MainActivity : AppCompatActivity() {
             16 -> MemoryFragment()
             17 -> BuildFragment()
             18 -> InputFragment()
-            19 -> HealthFragment()
-            20 -> AboutFragment()
-            21 -> CpuCoreFragment()
-            22 -> ChargeSessionFragment()
-            23 -> PingMonitorFragment()
-            24 -> ScreenTimeFragment()
-            25 -> DischargeRateFragment()
-            26 -> CpuHeatmapFragment()
-            27 -> ThrottleFragment()
-            28 -> LoadAvgFragment()
-            29 -> ChargeCurveFragment()
-            30 -> SensorLiveFragment()
-            31 -> DeviceCompareFragment()
-            32 -> PowerEstimateFragment()
-            33 -> BrightnessFragment()
-            34 -> BootSpeedFragment()
-            35 -> FeatureMatrixFragment()
+            19 -> AboutFragment()
             else -> SocFragment()
         }
     }

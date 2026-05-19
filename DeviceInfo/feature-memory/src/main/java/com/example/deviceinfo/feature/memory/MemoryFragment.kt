@@ -1,4 +1,4 @@
-package com.cpua.deviceinfo.feature.memory
+package com.example.deviceinfo.feature.memory
 
 import android.app.ActivityManager
 import android.app.NotificationChannel
@@ -15,10 +15,10 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.cpua.deviceinfo.core.model.InfoItem
-import com.cpua.deviceinfo.core.ui.InfoAdapter
-import com.cpua.deviceinfo.core.ui.ShareableFragment
-import com.cpua.deviceinfo.feature.memory.databinding.FragmentMemoryBinding
+import com.example.deviceinfo.core.model.InfoItem
+import com.example.deviceinfo.core.ui.InfoAdapter
+import com.example.deviceinfo.core.ui.ShareableFragment
+import com.example.deviceinfo.feature.memory.databinding.FragmentMemoryBinding
 
 class MemoryFragment : Fragment(), ShareableFragment {
 
@@ -69,6 +69,8 @@ class MemoryFragment : Fragment(), ShareableFragment {
         b.memorySegmentBar.update(usedMb, availMb, totalMb)
 
         // Alert if RAM exceeds user-configured threshold
+        val ramThreshold = com.example.deviceinfo.AlertPrefs.getRamPct(ctx)
+        val ramEnabled   = com.example.deviceinfo.AlertPrefs.isRamEnabled(ctx)
         val hysteresis   = (ramThreshold - 10).coerceAtLeast(0)
         if (ramEnabled && usedPct >= ramThreshold && lastHighRamNotifPct < ramThreshold) {
             lastHighRamNotifPct = usedPct

@@ -7,7 +7,7 @@
     android:paddingTop="4dp">
 
     <!-- Input Radar Chart -->
-    <com.cpua.deviceinfo.feature.input.InputRadarChartView
+    <com.example.deviceinfo.feature.input.InputRadarChartView
         android:id="@+id/inputRadarChart"
         android:layout_width="match_parent"
         android:layout_height="210dp"

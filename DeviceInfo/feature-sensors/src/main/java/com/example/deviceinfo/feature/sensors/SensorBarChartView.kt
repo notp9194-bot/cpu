@@ -1,4 +1,4 @@
-package com.cpua.deviceinfo.feature.sensors
+package com.example.deviceinfo.feature.sensors
 
 import android.content.Context
 import android.graphics.*

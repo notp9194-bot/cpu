@@ -1,4 +1,4 @@
-package com.cpua.deviceinfo.feature.device
+package com.example.deviceinfo.feature.device
 
 import android.app.ActivityManager
 import android.content.Context
@@ -9,11 +9,11 @@ import android.util.DisplayMetrics
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.cpua.deviceinfo.core.model.InfoItem
-import com.cpua.deviceinfo.core.ui.InfoAdapter
-import com.cpua.deviceinfo.core.ui.ShareableFragment
-import com.cpua.deviceinfo.core.util.DeviceUtils
-import com.cpua.deviceinfo.feature.device.databinding.FragmentDeviceBinding
+import com.example.deviceinfo.core.model.InfoItem
+import com.example.deviceinfo.core.ui.InfoAdapter
+import com.example.deviceinfo.core.ui.ShareableFragment
+import com.example.deviceinfo.core.util.DeviceUtils
+import com.example.deviceinfo.feature.device.databinding.FragmentDeviceBinding
 import kotlin.math.sqrt
 
 class DeviceFragment : Fragment(), ShareableFragment {

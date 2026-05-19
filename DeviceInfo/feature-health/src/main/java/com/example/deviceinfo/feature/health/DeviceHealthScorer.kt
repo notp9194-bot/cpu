@@ -1,4 +1,4 @@
-package com.cpua.deviceinfo.feature.health
+package com.example.deviceinfo.feature.health
 
 import android.app.ActivityManager
 import android.content.Context
@@ -7,7 +7,7 @@ import android.content.IntentFilter
 import android.os.BatteryManager
 import android.os.Environment
 import android.os.StatFs
-import com.cpua.deviceinfo.core.util.DeviceUtils
+import com.example.deviceinfo.core.util.DeviceUtils
 
 /**
  * Computes a weighted Device Health Score (0–100).
